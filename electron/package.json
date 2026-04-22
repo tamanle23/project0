@@ -1,0 +1,36 @@
+{
+  "name": "project0",
+  "version": "1.0.0",
+  "private": true,
+  "main": "electron.main.js",
+  "scripts": {
+    "compile": "tsc --project tsconfig.json",
+    "start": "npm run compile -s && electron .",
+    "start:dev": "npm run compile -s && electron . --serve",
+    "build": "npm run compile -s && npm run env -s && ng build --configuration production-desktop --base-href ./dist/dist.electron --output-path dist/dist.electron",
+    "package:common": "electron-packager . --overwrite --out=../dist/packages/desktop --prune --ignore=\"/(platforms|plugins|docs|www|reports|e2e|src|dist)\"",
+    "package:windows": "npm run package:common -s -- --platform=win32 --arch=x64 --icon=./resources/win/icon.ico",
+    "package:winstore": "npm run package:windows && electron-windows-store --input-directory ../dist/packages/desktop/project0-win32-x64 --output-directory ../dist/packages/desktop/project0-winstore --package-version 1.0.0 --package-name project0",
+    "package:mac": "npm run package:common -s -- --platform=darwin --icon=./resources/mac/icon.icns",
+    "package:linux": "npm run package:common -s --platform=linux",
+    "package": "npm run package:windows -s && npm run package:mac -s && npm run package:linux -s",
+    "installer:win64": "electron-installer-windows --src ../dist/packages/desktop/prjz-win32-x64/ --dest dist.installer/win64",
+    "installer:win32": "electron-installer-windows --src ../dist/packages/desktop/prjz-win32-ia32/ --dest dist.installer/win32",
+    "installer:mac": "electron-installer-dmg ../dist/packages/desktop/prjz-darwin-x64/prjz-ui.app prjz-ui --out=./dist.installer/mac"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^15.1.0",
+    "electron-builder": "^22.11.7",
+    "electron-installer-dmg": "^3.0.0",
+    "electron-installer-windows": "^3.0.0",
+    "electron-packager": "^15.4.0",
+    "electron-reload": "^2.0.0-alpha.1",
+    "electron-windows-store": "^2.1.0",
+    "ts-node": "^10.2.1",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^4.4.3",
+    "v8-compile-cache": "^2.3.0"
+  }
+}
