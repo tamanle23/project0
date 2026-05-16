@@ -1,0 +1,15 @@
+{
+  "extends": "@project0/typescript-config/base.json",
+  "compilerOptions": {
+    "sourceMap": true,
+    "declaration": false,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "target": "ESNext",
+    "outDir": "../../dist/electron",
+  }
+}

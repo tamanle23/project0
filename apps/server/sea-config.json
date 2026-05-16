@@ -1,0 +1,5 @@
+{
+  "main": "../../dist/server/bundle.js",
+  "output": "../../dist/server/sea-prep.exe",
+  "disableExperimentalSEAWarning": true
+}

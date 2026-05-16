@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1777991117017,
+      "tag": "20260505142517_gifted_thunderbird",
+      "breakpoints": true
+    }
+  ]
+}

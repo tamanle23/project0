@@ -1,0 +1,16 @@
+{
+  "extends": "@project0/typescript-config/base.json",
+  "compilerOptions": {
+    "outDir": "../../dist/api",
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "types": [
+      "node"
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+  }
+}

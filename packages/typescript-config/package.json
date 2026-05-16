@@ -1,0 +1,10 @@
+{
+  "name": "@project0/typescript-config",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "base.json",
+    "electron-main.json",
+    "react-renderer.json"
+  ]
+}
