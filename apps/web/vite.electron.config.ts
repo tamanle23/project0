@@ -8,7 +8,7 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite'
 export default defineConfig({
   base: './',
   build: {
-    outDir: '../../dist/web',
+    outDir: '../../dist/electron-web',
   },
   plugins: [
     tanstackRouter({
@@ -23,10 +23,4 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  ssr: {
-    // Force Vite to bundle all npm packages into your server chunk
-    noExternal: true,
-    // Specify target environment constraints
-    target: 'webworker'
-  }
 })

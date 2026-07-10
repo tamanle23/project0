@@ -12,7 +12,7 @@ const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     extraResource: [
-      path.resolve(__dirname, '../../dist/web')
+      path.resolve(__dirname, '../../dist/electron-web')
     ]
   },
   outDir: '../../dist/electron',
@@ -46,10 +46,10 @@ const config: ForgeConfig = {
         },
       ],
       renderer: [
-        {
-          name: 'main_window',
-          config: 'vite.renderer.config.ts',
-        },
+        // {
+        //   name: 'main_window',
+        //   config: 'vite.renderer.config.ts',
+        // },
       ],
     }),
     // Fuses are used to enable/disable various Electron functionality

@@ -6,7 +6,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { RouterProvider, createMemoryHistory, createRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { handleServerError } from '@/lib/handle-server-error'
@@ -80,12 +80,17 @@ const queryClient = new QueryClient({
   }),
 })
 
+ const memoryHistory = createMemoryHistory({
+    initialEntries: ['/'], // Define your initial fallback entry path
+  })
+
 // Create a new router instance
 const router = createRouter({
   routeTree,
   context: { queryClient },
   defaultPreload: 'intent',
   defaultPreloadStaleTime: 0,
+  history: memoryHistory,
 })
 
 // Register the router instance for type safety
