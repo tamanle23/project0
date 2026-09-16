@@ -3,13 +3,12 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc --noEmit && esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=../../dist/server/bundle.js && node --build-sea sea-config.json",
-    "make": "tsc --noEmit && esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=../../dist/server/bundle.js",
+    "build": "tsc --noEmit && esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=dist/bundle.js && node --build-sea sea-config.json",
+    "make": "tsc --noEmit && esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=dist/bundle.js",
     "package": "node --build-sea sea-config.json"
   },
   "dependencies": {
     "@hono/node-server": "^2.0.2",
-    "@project0/api": "workspace:*",
     "hono": "^4.12.15"
   },
   "devDependencies": {

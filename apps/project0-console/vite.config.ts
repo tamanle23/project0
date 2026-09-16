@@ -8,7 +8,7 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite'
 export default defineConfig({
   base: './',
   build: {
-    outDir: '../../dist/web',
+    outDir: 'dist/web',
   },
   plugins: [
     tanstackRouter({

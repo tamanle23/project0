@@ -12,10 +12,10 @@ const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     extraResource: [
-      path.resolve(__dirname, '../../dist/electron-web')
+      path.resolve(__dirname, '../project0-console/dist/electron-web')
     ]
   },
-  outDir: '../../dist/electron',
+  outDir: 'dist/electron',
   rebuildConfig: {},
   makers: [
     {

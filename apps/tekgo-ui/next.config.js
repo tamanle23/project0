@@ -66,6 +66,7 @@ module.exports = () => {
   return plugins.reduce((acc, next) => next(acc), {
     output,
     basePath,
+    distDir: 'dist',
     reactStrictMode: true,
     trailingSlash: true,
     turbopack: {
