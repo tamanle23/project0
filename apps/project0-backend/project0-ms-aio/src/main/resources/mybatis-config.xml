@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <properties>
+    <property name="table_prefix" value="project0_"/>
+    <property name="table_prefix_cms" value="project0_cms_"/>
+    <property name="table_prefix_identity" value="project0_identity_"/>
+    <property name="table_prefix_worker" value="project0_worker_"/>
+  </properties>
+  <settings>
+    <setting name="mapUnderscoreToCamelCase" value="true" />
+    <setting name="defaultFetchSize" value="100" />
+    <setting name="defaultStatementTimeout" value="30" />
+    <setting name="defaultEnumTypeHandler" value="org.apache.ibatis.type.EnumOrdinalTypeHandler"/>
+  </settings>
+  <typeHandlers>
+    <typeHandler handler="org.apache.ibatis.type.EnumTypeHandler" javaType="com.project0.user.model.enums.UserType" />
+    <typeHandler handler="org.apache.ibatis.type.EnumTypeHandler" javaType="com.project0.workflow.RecordState" />
+    <typeHandler handler="org.apache.ibatis.type.EnumTypeHandler" javaType="com.project0.domain.enums.RecordMode" />
+    <typeHandler handler="org.apache.ibatis.type.EnumTypeHandler" javaType="com.project0.worker.model.enums.TaskFrequency" />
+    <typeHandler handler="org.apache.ibatis.type.EnumTypeHandler" javaType="com.project0.worker.model.enums.TaskType" />
+    <typeHandler handler="org.apache.ibatis.type.EnumTypeHandler" javaType="com.project0.worker.model.enums.TriggerType" />
+    <typeHandler handler="org.apache.ibatis.type.EnumTypeHandler" javaType="com.project0.worker.model.enums.TaskStatus" />
+
+  </typeHandlers>
+</configuration>

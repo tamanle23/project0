@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+  <changeSet author="tamanle23" id="changelog-${schema}-000.000.00000">
+    <createTable tableName="${table_prefix}OBJECT">
+      <column autoIncrement="true" name="ID" type="INT">
+        <constraints primaryKey="true" primaryKeyName="PK_OBJECT"/>
+      </column>
+      <column name="CODE" type="VARCHAR(50)"/>
+      <column name="NAME" type="VARCHAR(255)"/>
+      <column name="CREATEDDATE" type="TIMESTAMP"/>
+      <column name="LASTUPDATEDDATE" type="TIMESTAMP"/>
+      <column name="VERSION" type="INT"/>
+      <column name="DELETEDDATE" type="TIMESTAMP"/>
+      <column name="MODE" type="VARCHAR(50)"/>
+      <column name="STATE" type="VARCHAR(20)"/>
+      <column name="EXTENSION" type="VARCHAR(50)"/>
+      <column name="ISPERSISTED" type="BOOLEAN"/>
+      <column name="ISDIRECTORY" type="BOOLEAN"/>
+      <column name="CONTENTTYPE" type="VARCHAR(50)"/>
+      <column name="ROOTLOCATION" type="VARCHAR(300)"/>
+      <column name="SIZE" type="INT"/>
+      <column name="LEVEL" type="INT"/>
+      <column name="CHECKSUM" type="VARCHAR(64)"/>
+      <column name="UID" type="VARCHAR(50)"/>
+      <column name="DESCRIPTION" type="VARCHAR(200)"/>
+      <column name="ATTRIBUTESJSON" type="CLOB"/>
+      <column name="CONNECTOR" type="VARCHAR(200)"/>
+      <column name="CREATEDBY_UID" type="VARCHAR(50)"/>
+      <column name="LASTUPDATEDBY_UID" type="VARCHAR(50)"/>
+      <column name="OWNER_UID" type="VARCHAR(50)"/>
+    </createTable>
+    <createTable tableName="${table_prefix}OBJECTRELATION">
+      <column autoIncrement="true" name="ID" type="INT">
+        <constraints primaryKey="true" primaryKeyName="PK_OBJECTRELATION"/>
+      </column>
+      <column name="UID" type="VARCHAR(50)"/>
+      <column name="CREATEDDATE" type="TIMESTAMP"/>
+      <column name="LASTUPDATEDDATE" type="TIMESTAMP"/>
+      <column name="VERSION" type="INT"/>
+      <column name="DELETEDDATE" type="TIMESTAMP"/>
+      <column name="MODE" type="VARCHAR(50)"/>
+      <column name="STATE" type="VARCHAR(20)"/>
+      <column name="OWNER_UID" type="VARCHAR(50)"/>
+      <column name="PARENT_ID" type="INT"/>
+      <column name="CHILD_ID" type="INT"/>
+      <column name="CREATEDBY_UID" type="VARCHAR(50)"/>
+      <column name="LASTUPDATEDBY_UID" type="VARCHAR(50)"/>
+    </createTable>
+
+    <createIndex tableName="${table_prefix}OBJECT" indexName="IDX_${table_prefix}OBJECT_CODE">
+      <column name="code" />
+    </createIndex>
+    <addUniqueConstraint columnNames="UID" constraintName="UN_10225" tableName="${table_prefix}OBJECT"/>
+    <addUniqueConstraint columnNames="UID" constraintName="UN_10234" tableName="${table_prefix}OBJECTRELATION"/>
+    <createIndex indexName="IDX_FK_OBJECTRELATION_CHILDID_PROJECT_10241" tableName="${table_prefix}OBJECTRELATION">
+      <column name="CHILD_ID"/>
+    </createIndex>
+    <createIndex indexName="IDX_FK_OBJECTRELATION_PARENTID_PROJECT_10239" tableName="${table_prefix}OBJECTRELATION">
+      <column name="PARENT_ID"/>
+    </createIndex>
+    <addForeignKeyConstraint baseColumnNames="CHILD_ID" baseTableName="${table_prefix}OBJECTRELATION"
+                             constraintName="FK_OBJECTRELATION_CHILDID_PROJECT" deferrable="false"
+                             initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                             referencedColumnNames="ID" referencedTableName="${table_prefix}OBJECT" validate="true"/>
+    <addForeignKeyConstraint baseColumnNames="PARENT_ID" baseTableName="${table_prefix}OBJECTRELATION"
+                             constraintName="FK_OBJECTRELATION_PARENTID_PROJECT" deferrable="false"
+                             initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                             referencedColumnNames="ID" referencedTableName="${table_prefix}OBJECT" validate="true"/>
+  </changeSet>
+</databaseChangeLog>

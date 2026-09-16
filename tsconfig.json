@@ -2,16 +2,16 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/electron"
+      "path": "./apps/desktop-console"
     },
     {
-      "path": "./apps/server"
+      "path": "./apps/backend"
     },
     {
       "path": "./apps/web"
     },
     {
-      "path": "./packages/api"
+      "path": "./packages/typescript-config"
     }
   ]
 }

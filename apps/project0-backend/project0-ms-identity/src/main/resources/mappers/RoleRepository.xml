@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project0.user.repository.mybatis.RoleRepository">
+  <select id="count" resultType="Long">
+      SELECT count(0)
+      FROM ${table_prefix_identity}user
+      <include refid="searchCondition"></include>
+  </select>
+  <select id="findWithUserCount" resultType="RoleWithUserCount">
+      SELECT r.uid, max(r.code) as code, max(r.id) as id, max(r.description) as description, count(1) as numberOfUsers
+      FROM (
+        SELECT *
+        FROM ${table_prefix_identity}role
+        <include refid="searchCondition"></include>
+        <if test="searchRequest != null and searchRequest.pageRequest != null">
+          LIMIT #{searchRequest.pageRequest.size} OFFSET #{searchRequest.pageRequest.offset}
+        </if>
+      ) r
+      LEFT JOIN ${table_prefix_identity}userRole ur
+            ON r.uid = ur.role_uid
+      WHERE ur.deletedDate IS NULL
+      GROUP BY r.uid
+  </select>
+  <sql id="searchCondition">
+    <if test="searchRequest != null">
+    </if>
+  </sql>
+</mapper>

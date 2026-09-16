@@ -1,0 +1,59 @@
+---
+title: 'Google Mantis: an Agentic Vulnerability Scanning Harness for Reducing False Positives'
+date: '2026-09-06'
+tags: ['ai', 'security', 'agents', 'google', 'devops']
+draft: false
+summary: 'Google has open-sourced Mantis, an AI-agent framework designed to automate the software vulnerability lifecycle using critic agents, sandbox validation, and hierarchical context reduction.'
+authors: ['default']
+---
+
+Google has open-sourced **Mantis**, an AI-agent framework designed to automate the software vulnerability lifecycle—from identifying and validating vulnerabilities to reproducing and fixing them. Google developed Mantis to tackle the persistent problem of high false positive rates and hallucinated vulnerabilities typical of traditional AI code scanning.
+
+<blockquote className="border-l-4 border-primary-500 pl-4 italic text-gray-700 dark:text-gray-300 my-4">
+  "While sloppiness in AI code scanning frequently leads to hallucinated bugs and weak true-positive rates under 7%, we designed Mantis to be effective by combining industry-standard agentic techniques like critic and review agents with sandboxed reproduction of vulnerabilities for grounding."
+  <span className="block text-sm not-italic text-gray-500 mt-1">— Google Security Team</span>
+</blockquote>
+
+Google explains that Mantis analyzes repository history, previous security fixes, architecture, and threat models rather than blindly scanning files using brute force. It summarizes the analyzed files into a hierarchical tree containing directory- and repository-level context, **reducing token usage by 85%** while retaining critical structural information.
+
+Mantis combines critic and reviewer agents to eliminate false positives and prioritize high-value findings. Instead of relying solely on an LLM's judgment, it reproduces findings inside a sandboxed environment to gather concrete runtime evidence before flagging an issue.
+
+---
+
+## Multi-Agent Architecture and Skill Suite
+
+Mantis is part of Google's internal approach to finding and resolving security vulnerabilities at machine speed. Its architecture delegates responsibilities across specialized roles:
+
+- **Strategist Agent:** Evaluates high-level system architecture, threat models, and dependency graphs.
+- **Research Agents:** Query internal code indexes and trace data flows, control flows, and sanitization logic across raw source files.
+- **Critic and Reviewer Agents:** Filter noise and validate that proposed vulnerabilities are structurally sound.
+
+Mantis is organized as a modular skill suite containing over 15 discrete tools that execute sequentially or in parallel (such as `mantis-summarize`, `mantis-review`, and `mantis-critic`). Pipeline stages synchronize state by reading and writing to a shared, disk-backed state store.
+
+---
+
+## Model Tiering and Execution Strategy
+
+Mantis supports combining heterogeneous model tiers across different phases of the lifecycle:
+
+<blockquote className="border-l-4 border-primary-500 pl-4 italic text-gray-700 dark:text-gray-300 my-4">
+  "To maximize the speed and efficiency of your automated pipeline, you should strategically pair the right AI model class with the specific task. You do not need to use the heaviest, most advanced frontier models for every stage."
+  <span className="block text-sm not-italic text-gray-500 mt-1">— Google</span>
+</blockquote>
+
+| Model Tier | Target Tasks | Mantis Tools |
+| :--- | :--- | :--- |
+| **Flash / Lite Variants** | Rapid classification, pattern clustering, deduplication | `mantis-researcher`, `mantis-dedupe` |
+| **Frontier Models** | Context-heavy reasoning, crash reproducer scripts, automated patches | `mantis-reproduce`, `mantis-patch` |
+
+---
+
+## Handling False Positives
+
+Vulnerability scanners frequently overwhelm security teams with high false-positive volumes. Mantis introduces the `mantis-review` stage, which applies a rule-based negative filter to eliminate noise before triage. 
+
+However, Google notes that engineering teams must calibrate these negative filters with caution: flagging low-severity or low-risk findings as immediate false positives can overly broaden the filter and cause genuine vulnerabilities to slip through undetected.
+
+---
+
+*Mantis is openly available on GitHub alongside official agent reference guides detailing inter-stage communication contracts and deployment recipes.*

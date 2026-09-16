@@ -1,0 +1,35 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <link href="//vjs.zencdn.net/7.6.6/video-js.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/mediaelement@4.2.16/build/mediaelementplayer.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.16/build/mediaelement.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+</head>
+<script type="text/javascript">
+  $(function() {
+	  $(".src-link").click(function(e) {
+		  var myPlayer = videojs('player');
+	    myPlayer.src(e.target.href);
+	    return false;
+	  });
+  });
+</script>
+<body>
+  <div>
+    <video id="player" class="video-js vjs-default-skin"  controls preload="auto" width="640" height="264" data-setup='{}'>
+      <p class="vjs-no-js">
+        To view this video please enable JavaScript, and consider
+        upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+      </p>
+    </video>
+  </div>
+  <div>
+    <ul>
+      <li th:each="fsObject : ${fsObjects}">
+        <a class="src-link" th:href="${fsObject}" th:text="${fsObject}"></a>
+      </li>
+    </ul>
+  </div>
+  <script src="https://vjs.zencdn.net/7.6.6/video.js"></script>
+</body>
+</html>
