@@ -12,7 +12,7 @@ dist
 build
 dist-ssr
 *.local
-
+.yarn
 .env
 .env.local
 
