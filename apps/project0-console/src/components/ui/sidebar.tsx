@@ -241,7 +241,7 @@ function Sidebar({
         <div
           data-sidebar='sidebar'
           data-slot='sidebar-inner'
-          className='flex h-full w-full flex-col bg-sidebar/70 backdrop-blur-2xl group-data-[variant=floating]:rounded-2xl group-data-[variant=floating]:border group-data-[variant=floating]:border-white/20 dark:group-data-[variant=floating]:border-white/10 group-data-[variant=floating]:shadow-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]'
+          className='flex h-full w-full flex-col bg-sidebar/70 backdrop-blur-[var(--glass-blur,20px)] group-data-[variant=floating]:rounded-2xl group-data-[variant=floating]:border group-data-[variant=floating]:border-white/20 dark:group-data-[variant=floating]:border-white/10 group-data-[variant=floating]:shadow-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]'
         >
           {children}
         </div>

@@ -35,9 +35,10 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
       className={cn(
         'z-50 h-16 transition-colors duration-200',
         fixed && 'header-fixed peer/header sticky top-0 w-[inherit]',
+        'backdrop-blur-[var(--glass-blur,16px)]',
         isScrolled && fixed
-          ? 'bg-white/65 dark:bg-slate-950/65 backdrop-blur-2xl border-b border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/20'
-          : 'bg-white/30 dark:bg-slate-950/30 backdrop-blur-md border-b border-white/20 dark:border-white/5',
+          ? 'bg-[rgba(255,255,255,calc(0.35+var(--glass-intensity,0.2)*0.35))] dark:bg-[rgba(15,23,42,calc(0.4+var(--glass-intensity,0.2)*0.35))] border-b border-[rgba(255,255,255,calc(0.2+var(--glass-intensity,0.2)*0.3))] dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/20'
+          : 'bg-[rgba(255,255,255,calc(0.15+var(--glass-intensity,0.2)*0.25))] dark:bg-[rgba(15,23,42,calc(0.2+var(--glass-intensity,0.2)*0.25))] border-b border-[rgba(255,255,255,calc(0.1+var(--glass-intensity,0.2)*0.2))] dark:border-white/5',
         className
       )}
       {...props}

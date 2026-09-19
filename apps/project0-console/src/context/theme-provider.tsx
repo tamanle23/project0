@@ -106,18 +106,23 @@ export function ThemeProvider({
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [theme, resolvedTheme])
 
-  useEffect(() => {
-    const root = window.document.documentElement
-    // Dynamic blur: 0px to 32px based on intensity
-    const blurPx = Math.round((glassIntensity / 100) * 30)
-    // Dynamic opacity multiplier (0.0 to 1.0)
-    const intensityRatio = Number((glassIntensity / 100).toFixed(2))
+  const applyGlassVariables = (intensity: number) => {
+    const clamped = Math.max(0, Math.min(100, intensity))
+    // Dynamic blur: 0px (crystal clear) up to 36px (dense frosted glass)
+    const blurPx = Math.round((clamped / 100) * 36)
+    // Dynamic opacity multiplier (0.00 to 1.00)
+    const intensityRatio = Number((clamped / 100).toFixed(2))
     // Dynamic specular reflection alpha (0.15 to 0.95)
-    const specularAlpha = Math.max(0.15, Number((0.2 + (glassIntensity / 100) * 0.75).toFixed(2)))
+    const specularAlpha = Math.max(0.15, Number((0.15 + (clamped / 100) * 0.8).toFixed(2)))
 
+    const root = window.document.documentElement
     root.style.setProperty('--glass-blur', `${blurPx}px`)
     root.style.setProperty('--glass-intensity', `${intensityRatio}`)
     root.style.setProperty('--glass-specular-alpha', `${specularAlpha}`)
+  }
+
+  useEffect(() => {
+    applyGlassVariables(glassIntensity)
   }, [glassIntensity])
 
   useEffect(() => {
@@ -131,15 +136,7 @@ export function ThemeProvider({
   }
 
   const previewGlassIntensity = (intensity: number) => {
-    const clamped = Math.max(0, Math.min(100, intensity))
-    const blurPx = Math.round((clamped / 100) * 30)
-    const intensityRatio = Number((clamped / 100).toFixed(2))
-    const specularAlpha = Math.max(0.15, Number((0.2 + (clamped / 100) * 0.75).toFixed(2)))
-
-    const root = window.document.documentElement
-    root.style.setProperty('--glass-blur', `${blurPx}px`)
-    root.style.setProperty('--glass-intensity', `${intensityRatio}`)
-    root.style.setProperty('--glass-specular-alpha', `${specularAlpha}`)
+    applyGlassVariables(intensity)
   }
 
   const setGlassIntensity = (intensity: number) => {
