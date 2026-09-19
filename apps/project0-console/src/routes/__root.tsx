@@ -9,8 +9,7 @@ import { NotFoundError } from '@/features/errors/not-found-error'
 
 const isDevtoolsDisabled =
   import.meta.env.MODE === 'production' ||
-  import.meta.env.VITE_DISABLE_DEVTOOLS === 'true' ||
-  import.meta.env.VITE_DEVTOOLS === 'false'
+  import.meta.env.VITE_DISABLE_DEVTOOLS === 'true'
 
 const ReactQueryDevtools = isDevtoolsDisabled
   ? () => null

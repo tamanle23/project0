@@ -10,7 +10,6 @@ export default defineConfig(({ mode }) => {
     process.argv.includes('--no-devtools') ||
     process.argv.includes('--disable-devtools') ||
     process.env.VITE_DISABLE_DEVTOOLS === 'true' ||
-    process.env.VITE_DEVTOOLS === 'false' ||
     mode === 'no-devtools'
 
   return {
