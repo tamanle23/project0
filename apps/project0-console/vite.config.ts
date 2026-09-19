@@ -5,11 +5,24 @@ import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 
 // https://vite.dev/config/
-export default defineConfig({
-  base: './',
-  build: {
-    outDir: 'dist/web',
-  },
+export default defineConfig(({ mode }) => {
+  const disableDevtools =
+    process.argv.includes('--no-devtools') ||
+    process.argv.includes('--disable-devtools') ||
+    process.env.VITE_DISABLE_DEVTOOLS === 'true' ||
+    process.env.VITE_DEVTOOLS === 'false' ||
+    mode === 'no-devtools'
+
+  return {
+    base: './',
+    build: {
+      outDir: 'dist/web',
+    },
+    define: {
+      'import.meta.env.VITE_DISABLE_DEVTOOLS': JSON.stringify(
+        disableDevtools ? 'true' : 'false'
+      ),
+    },
   plugins: [
     tanstackRouter({
       target: 'react',
@@ -23,10 +36,11 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  ssr: {
-    // Force Vite to bundle all npm packages into your server chunk
-    noExternal: true,
-    // Specify target environment constraints
-    target: 'webworker'
+    ssr: {
+      // Force Vite to bundle all npm packages into your server chunk
+      noExternal: true,
+      // Specify target environment constraints
+      target: 'webworker'
+    }
   }
 })
