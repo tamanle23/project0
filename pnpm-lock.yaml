@@ -23,12 +23,12 @@ importers:
 
   apps/desktop-console:
     devDependencies:
+      '@project0/console':
+        specifier: workspace:*
+        version: link:../project0-console
       '@project0/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
-      '@project0/web':
-        specifier: workspace:*
-        version: link:../project0-console
       '@types/bun':
         specifier: latest
         version: 1.4.2

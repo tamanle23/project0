@@ -2,6 +2,7 @@ import { type ChangeEvent, useState } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { SlidersHorizontal, ArrowUpAZ, ArrowDownAZ } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -148,28 +149,31 @@ export function Apps() {
         <Separator className='shadow-sm' />
         <ul className='faded-bottom no-scrollbar grid gap-4 overflow-auto pt-4 pb-16 md:grid-cols-2 lg:grid-cols-3'>
           {filteredApps.map((app) => (
-            <li
-              key={app.name}
-              className='rounded-lg border p-4 hover:shadow-md'
-            >
-              <div className='mb-8 flex items-center justify-between'>
-                <div
-                  className={`flex size-10 items-center justify-center rounded-lg bg-muted p-2`}
-                >
-                  {app.logo}
+            <li key={app.name} className='flex'>
+              <Card className='flex w-full flex-col justify-between gap-4 p-5'>
+                <div className='flex items-center justify-between'>
+                  <div
+                    className='flex size-11 items-center justify-center rounded-xl bg-white/40 dark:bg-white/10 border border-white/30 dark:border-white/10 backdrop-blur-md p-2 shadow-xs'
+                  >
+                    {app.logo}
+                  </div>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className={
+                      app.connected
+                        ? 'border border-blue-400/50 bg-blue-500/15 text-blue-700 dark:text-blue-300 hover:bg-blue-500/25 shadow-xs'
+                        : 'liquid-glass-interactive'
+                    }
+                  >
+                    {app.connected ? 'Connected' : 'Connect'}
+                  </Button>
                 </div>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  className={`${app.connected ? 'border border-blue-300 bg-blue-50 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900' : ''}`}
-                >
-                  {app.connected ? 'Connected' : 'Connect'}
-                </Button>
-              </div>
-              <div>
-                <h2 className='mb-1 font-semibold'>{app.name}</h2>
-                <p className='line-clamp-2 text-gray-500'>{app.desc}</p>
-              </div>
+                <div>
+                  <h2 className='mb-1 font-semibold tracking-tight text-card-foreground'>{app.name}</h2>
+                  <p className='line-clamp-2 text-sm text-muted-foreground'>{app.desc}</p>
+                </div>
+              </Card>
             </li>
           ))}
         </ul>
