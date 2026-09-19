@@ -11,37 +11,39 @@ type HeaderProps = React.HTMLAttributes<HTMLElement> & {
 }
 
 export function Header({ className, fixed, children, ...props }: HeaderProps) {
-  const [offset, setOffset] = useState(0)
+  const [isScrolled, setIsScrolled] = useState(false)
 
   useEffect(() => {
+    let ticking = false
     const onScroll = () => {
-      setOffset(document.body.scrollTop || document.documentElement.scrollTop)
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const top = document.body.scrollTop || document.documentElement.scrollTop
+          setIsScrolled(top > 10)
+          ticking = false
+        })
+        ticking = true
+      }
     }
 
-    // Add scroll listener to the body
-    document.addEventListener('scroll', onScroll, { passive: true })
-
-    // Clean up the event listener on unmount
-    return () => document.removeEventListener('scroll', onScroll)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   return (
     <header
       className={cn(
-        'z-50 h-16',
+        'z-50 h-16 transition-colors duration-200',
         fixed && 'header-fixed peer/header sticky top-0 w-[inherit]',
-        offset > 10 && fixed ? 'shadow' : 'shadow-none',
+        isScrolled && fixed
+          ? 'bg-white/65 dark:bg-slate-950/65 backdrop-blur-2xl border-b border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/20'
+          : 'bg-white/30 dark:bg-slate-950/30 backdrop-blur-md border-b border-white/20 dark:border-white/5',
         className
       )}
       {...props}
     >
       <div
-        className={cn(
-          'relative flex h-full items-center gap-3 p-4 sm:gap-4',
-          offset > 10 &&
-            fixed &&
-            'after:absolute after:inset-0 after:-z-10 after:bg-background/20 after:backdrop-blur-lg'
-        )}
+        className='relative flex h-full items-center gap-3 p-4 sm:gap-4'
       >
         <SidebarTrigger variant='outline' className='max-md:scale-125' />
         <Separator orientation='vertical' className='h-6' />

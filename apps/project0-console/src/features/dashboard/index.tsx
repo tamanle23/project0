@@ -12,11 +12,17 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { TopNav } from '@/components/layout/top-nav'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import React, { Suspense } from 'react'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { Analytics } from './components/analytics'
-import { Overview } from './components/overview'
 import { RecentSales } from './components/recent-sales'
+
+const Overview = React.lazy(() =>
+  import('./components/overview').then((mod) => ({ default: mod.Overview }))
+)
+const Analytics = React.lazy(() =>
+  import('./components/analytics').then((mod) => ({ default: mod.Analytics }))
+)
 
 export function Dashboard() {
   return (
@@ -167,7 +173,15 @@ export function Dashboard() {
                   <CardTitle>Overview</CardTitle>
                 </CardHeader>
                 <CardContent className='ps-2'>
-                  <Overview />
+                  <Suspense
+                    fallback={
+                      <div className='flex h-[350px] w-full items-center justify-center text-xs text-muted-foreground animate-pulse'>
+                        Loading charts...
+                      </div>
+                    }
+                  >
+                    <Overview />
+                  </Suspense>
                 </CardContent>
               </Card>
               <Card className='col-span-1 lg:col-span-3'>
@@ -184,7 +198,15 @@ export function Dashboard() {
             </div>
           </TabsContent>
           <TabsContent value='analytics' className='space-y-4'>
-            <Analytics />
+            <Suspense
+              fallback={
+                <div className='flex h-[400px] w-full items-center justify-center text-xs text-muted-foreground animate-pulse'>
+                  Loading analytics...
+                </div>
+              }
+            >
+              <Analytics />
+            </Suspense>
           </TabsContent>
         </Tabs>
       </Main>

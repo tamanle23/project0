@@ -6,7 +6,14 @@ function Card({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot='card'
       className={cn(
-        'flex flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm',
+        'relative flex flex-col gap-6 rounded-2xl py-6 text-card-foreground overflow-hidden',
+        'bg-[rgba(255,255,255,calc(0.25+var(--glass-intensity,0.2)*0.3))] dark:bg-[rgba(15,23,42,calc(0.3+var(--glass-intensity,0.2)*0.35))]',
+        'backdrop-blur-[var(--glass-blur,20px)]',
+        'border border-[rgba(255,255,255,calc(0.2+var(--glass-intensity,0.2)*0.35))] dark:border-[rgba(255,255,255,calc(0.08+var(--glass-intensity,0.2)*0.12))]',
+        'shadow-[0_8px_32px_0_rgba(0,0,0,0.08),inset_0_1px_1px_0_rgba(255,255,255,var(--glass-specular-alpha,0.85))]',
+        'dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.37),inset_0_1px_0_0_rgba(255,255,255,calc(var(--glass-specular-alpha,0.2)*0.65))]',
+        'before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-b before:from-[rgba(255,255,255,calc(var(--glass-specular-alpha,0.3)*0.45))] before:via-white/5 before:to-transparent dark:before:from-[rgba(255,255,255,calc(var(--glass-specular-alpha,0.2)*0.3))] dark:before:to-transparent',
+        'transition-[box-shadow,border-color] duration-200 hover:shadow-xl',
         className
       )}
       {...props}

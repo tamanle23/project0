@@ -233,7 +233,7 @@ function Sidebar({
           // Adjust the padding for floating and inset variants.
           variant === 'floating' || variant === 'inset'
             ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]'
-            : 'group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-e group-data-[side=right]:border-s',
+            : 'group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-e group-data-[side=left]:border-white/20 dark:group-data-[side=left]:border-white/10 group-data-[side=right]:border-s group-data-[side=right]:border-white/20 dark:group-data-[side=right]:border-white/10',
           className
         )}
         {...props}
@@ -241,7 +241,7 @@ function Sidebar({
         <div
           data-sidebar='sidebar'
           data-slot='sidebar-inner'
-          className='flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm'
+          className='flex h-full w-full flex-col bg-sidebar/70 backdrop-blur-2xl group-data-[variant=floating]:rounded-2xl group-data-[variant=floating]:border group-data-[variant=floating]:border-white/20 dark:group-data-[variant=floating]:border-white/10 group-data-[variant=floating]:shadow-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]'
         >
           {children}
         </div>
@@ -311,8 +311,8 @@ function SidebarInset({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot='sidebar-inset'
       className={cn(
-        'relative flex w-full flex-1 flex-col bg-background',
-        'md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ms-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ms-2',
+        'relative flex w-full flex-1 flex-col bg-transparent',
+        'md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ms-0 md:peer-data-[variant=inset]:rounded-2xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:border-white/25 dark:md:peer-data-[variant=inset]:border-white/10 md:peer-data-[variant=inset]:bg-white/15 dark:md:peer-data-[variant=inset]:bg-slate-950/20 md:peer-data-[variant=inset]:backdrop-blur-xs md:peer-data-[variant=inset]:shadow-xl md:peer-data-[variant=inset]:shadow-black/5 dark:md:peer-data-[variant=inset]:shadow-black/20 md:peer-data-[variant=inset]:shadow-[inset_0_1px_1px_rgba(255,255,255,0.7)] dark:md:peer-data-[variant=inset]:shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ms-2',
         className
       )}
       {...props}

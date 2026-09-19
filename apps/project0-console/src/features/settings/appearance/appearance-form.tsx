@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
-import { ChevronDownIcon } from '@radix-ui/react-icons'
+import { ChevronDown } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { fonts } from '@/config/fonts'
 import { showSubmittedData } from '@/lib/show-submitted-data'
@@ -18,22 +18,27 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Slider } from '@/components/ui/slider'
 
 const appearanceFormSchema = z.object({
   theme: z.enum(['light', 'dark']),
   font: z.enum(fonts),
+  glassIntensity: z.number().min(0).max(100),
+  wallpaper: z.enum(['liquid', 'mesh', 'none']),
 })
 
 type AppearanceFormValues = z.infer<typeof appearanceFormSchema>
 
 export function AppearanceForm() {
   const { font, setFont } = useFont()
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, glassIntensity, setGlassIntensity, previewGlassIntensity, wallpaper, setWallpaper } = useTheme()
 
   // This can come from your database or API.
   const defaultValues: Partial<AppearanceFormValues> = {
     theme: theme as 'light' | 'dark',
     font,
+    glassIntensity: glassIntensity ?? 20,
+    wallpaper: wallpaper ?? 'liquid',
   }
 
   const form = useForm<AppearanceFormValues>({
@@ -44,6 +49,12 @@ export function AppearanceForm() {
   function onSubmit(data: AppearanceFormValues) {
     if (data.font != font) setFont(data.font)
     if (data.theme != theme) setTheme(data.theme)
+    if (data.glassIntensity !== undefined && data.glassIntensity !== glassIntensity) {
+      setGlassIntensity(data.glassIntensity)
+    }
+    if (data.wallpaper && data.wallpaper !== wallpaper) {
+      setWallpaper(data.wallpaper)
+    }
 
     showSubmittedData(data)
   }
@@ -74,7 +85,7 @@ export function AppearanceForm() {
                     ))}
                   </select>
                 </FormControl>
-                <ChevronDownIcon className='absolute end-3 top-2.5 h-4 w-4 opacity-50' />
+                <ChevronDown className='absolute end-3 top-2.5 h-4 w-4 opacity-50' />
               </div>
               <FormDescription className='font-manrope'>
                 Set the font you want to use in the dashboard.
@@ -147,6 +158,124 @@ export function AppearanceForm() {
                     </div>
                     <span className='block w-full p-2 text-center font-normal'>
                       Dark
+                    </span>
+                  </FormLabel>
+                </FormItem>
+              </RadioGroup>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name='glassIntensity'
+          render={({ field }) => (
+            <FormItem className='max-w-md space-y-3'>
+              <div className='flex items-center justify-between'>
+                <FormLabel>Liquid Glass Intensity</FormLabel>
+                <span className='rounded-md border border-white/30 dark:border-white/15 bg-white/40 dark:bg-white/10 px-2 py-0.5 text-xs font-semibold backdrop-blur-md'>
+                  {field.value ?? 20}%
+                </span>
+              </div>
+              <FormControl>
+                <Slider
+                  min={0}
+                  max={100}
+                  step={5}
+                  value={[field.value ?? 20]}
+                  onValueChange={(vals) => {
+                    const val = vals[0] ?? 20
+                    field.onChange(val)
+                    previewGlassIntensity(val)
+                  }}
+                  onValueCommit={(vals) => {
+                    const val = vals[0] ?? 20
+                    setGlassIntensity(val)
+                  }}
+                  className='py-2'
+                />
+              </FormControl>
+              <FormDescription>
+                Dynamically adjust the frosted blur, translucency, and specular refraction of glass surfaces across the console.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name='wallpaper'
+          render={({ field }) => (
+            <FormItem className='space-y-3'>
+              <FormLabel>Ambient Glass Background</FormLabel>
+              <FormDescription>
+                Choose an ambient wallpaper underneath the glass layer to test blur and refraction.
+              </FormDescription>
+              <FormMessage />
+              <RadioGroup
+                onValueChange={(val) => {
+                  field.onChange(val)
+                  setWallpaper(val as 'liquid' | 'mesh' | 'none')
+                }}
+                defaultValue={field.value}
+                className='grid max-w-xl grid-cols-3 gap-4 pt-1'
+              >
+                <FormItem>
+                  <FormLabel className='[&:has([data-state=checked])>div]:border-primary cursor-pointer'>
+                    <FormControl>
+                      <RadioGroupItem value='liquid' className='sr-only' />
+                    </FormControl>
+                    <div className='items-center rounded-xl border-2 border-white/20 dark:border-white/10 p-1 hover:border-accent transition-all'>
+                      <div className='h-20 rounded-lg overflow-hidden relative border border-white/20'>
+                        <img
+                          src={theme === 'dark' ? '/images/liquid-glass-bg.jpg' : '/images/liquid-glass-bg-light.jpg'}
+                          alt='Liquid Caustic'
+                          className='h-full w-full object-cover'
+                        />
+                        <div className='absolute inset-0 bg-black/20 flex items-center justify-center'>
+                          <span className='rounded bg-black/50 px-1.5 py-0.5 text-[10px] text-white font-medium backdrop-blur-xs'>
+                            Liquid Caustic
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <span className='block w-full p-2 text-center text-xs font-medium'>
+                      Liquid Caustic (Dynamic)
+                    </span>
+                  </FormLabel>
+                </FormItem>
+                <FormItem>
+                  <FormLabel className='[&:has([data-state=checked])>div]:border-primary cursor-pointer'>
+                    <FormControl>
+                      <RadioGroupItem value='mesh' className='sr-only' />
+                    </FormControl>
+                    <div className='items-center rounded-xl border-2 border-white/20 dark:border-white/10 p-1 hover:border-accent transition-all'>
+                      <div className='h-20 rounded-lg bg-gradient-to-tr from-indigo-500/30 via-pink-500/25 to-sky-400/30 flex items-center justify-center border border-white/20'>
+                        <span className='rounded bg-white/40 dark:bg-black/40 px-1.5 py-0.5 text-[10px] font-medium backdrop-blur-xs'>
+                          Mesh Glow
+                        </span>
+                      </div>
+                    </div>
+                    <span className='block w-full p-2 text-center text-xs font-medium'>
+                      Ambient Mesh
+                    </span>
+                  </FormLabel>
+                </FormItem>
+                <FormItem>
+                  <FormLabel className='[&:has([data-state=checked])>div]:border-primary cursor-pointer'>
+                    <FormControl>
+                      <RadioGroupItem value='none' className='sr-only' />
+                    </FormControl>
+                    <div className='items-center rounded-xl border-2 border-white/20 dark:border-white/10 p-1 hover:border-accent transition-all'>
+                      <div className='h-20 rounded-lg bg-muted/40 flex items-center justify-center border border-white/10'>
+                        <span className='rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground font-medium'>
+                          Clean
+                        </span>
+                      </div>
+                    </div>
+                    <span className='block w-full p-2 text-center text-xs font-medium'>
+                      Minimalist
                     </span>
                   </FormLabel>
                 </FormItem>

@@ -17,7 +17,9 @@
 
     /* Alias */
     "paths": {
-      "@/*": ["./src/*"]
+      "react": ["./node_modules/@types/react"],
+      "@/*": ["./src/*"],
+      "@hookform/resolvers/zod": ["./src/lib/zod-resolver.ts"]
     },
 
     /* Linting */

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
-import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { showSubmittedData } from '@/lib/show-submitted-data'
 import { cn } from '@/lib/utils'
@@ -125,7 +125,7 @@ export function AccountForm() {
                             (language) => language.value === field.value
                           )?.label
                         : 'Select language'}
-                      <CaretSortIcon className='ms-2 h-4 w-4 shrink-0 opacity-50' />
+                      <ChevronsUpDown className='ms-2 h-4 w-4 shrink-0 opacity-50' />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
@@ -143,7 +143,7 @@ export function AccountForm() {
                               form.setValue('language', language.value)
                             }}
                           >
-                            <CheckIcon
+                            <Check
                               className={cn(
                                 'size-4',
                                 language.value === field.value
