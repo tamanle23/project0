@@ -11,6 +11,7 @@ import {
   Loader2,
   RefreshCw,
   ShieldCheck,
+  Sparkles,
   Unplug,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -33,7 +34,7 @@ import {
   simulateDemoLongLivedExchange,
   type FacebookPage,
 } from '../services/facebook-service'
-import { useFacebookStore } from '../stores/facebook-store'
+import { FACEBOOK_ENV_CONFIG, useFacebookStore } from '../stores/facebook-store'
 
 type FacebookConnectModalProps = {
   open: boolean
@@ -68,6 +69,14 @@ export function FacebookConnectModal({
   const [showSecret, setShowSecret] = useState(false)
   const [showToken, setShowToken] = useState(false)
   const [copied, setCopied] = useState(false)
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (newOpen) {
+      setInputAppId(appId)
+      setInputAppSecret(appSecret)
+    }
+    onOpenChange(newOpen)
+  }
 
   // Step 1: Facebook Login & Fetch Pages
   const handleConnectFacebook = async (useSandbox: boolean) => {
@@ -187,7 +196,7 @@ export function FacebookConnectModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className='max-w-xl rounded-2xl border border-white/20 bg-white/90 p-6 shadow-2xl backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/90'>
         <DialogHeader className='text-start'>
           <div className='flex items-center gap-3'>
@@ -226,9 +235,17 @@ export function FacebookConnectModal({
 
               <div className='space-y-3'>
                 <div>
-                  <label className='mb-1 block text-xs font-medium text-foreground'>
-                    Facebook App ID
-                  </label>
+                  <div className='mb-1 flex items-center justify-between'>
+                    <label className='text-xs font-medium text-foreground'>
+                      Facebook App ID
+                    </label>
+                    {FACEBOOK_ENV_CONFIG.hasEnvAppId &&
+                      inputAppId === FACEBOOK_ENV_CONFIG.envAppId && (
+                        <span className='inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400'>
+                          <Sparkles className='size-2.5' /> .env loaded
+                        </span>
+                      )}
+                  </div>
                   <Input
                     placeholder='e.g. 102938475610293'
                     value={inputAppId}
@@ -238,12 +255,20 @@ export function FacebookConnectModal({
                 </div>
 
                 <div>
-                  <label className='mb-1 block text-xs font-medium text-foreground'>
-                    Facebook App Secret{' '}
-                    <span className='text-muted-foreground font-normal'>
-                      (required for long-lived exchange)
-                    </span>
-                  </label>
+                  <div className='mb-1 flex items-center justify-between'>
+                    <label className='text-xs font-medium text-foreground'>
+                      Facebook App Secret{' '}
+                      <span className='text-muted-foreground font-normal'>
+                        (required for long-lived exchange)
+                      </span>
+                    </label>
+                    {FACEBOOK_ENV_CONFIG.hasEnvAppSecret &&
+                      inputAppSecret === FACEBOOK_ENV_CONFIG.envAppSecret && (
+                        <span className='inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400'>
+                          <Sparkles className='size-2.5' /> .env loaded
+                        </span>
+                      )}
+                  </div>
                   <div className='relative'>
                     <Input
                       type={showSecret ? 'text' : 'password'}

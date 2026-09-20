@@ -55,18 +55,22 @@ function persistState(state: Partial<FacebookState>) {
   }
 }
 
+const envAppId = (import.meta.env.VITE_FACEBOOK_APP_ID as string | undefined)?.trim() || ''
+const envAppSecret = (import.meta.env.VITE_FACEBOOK_APP_SECRET as string | undefined)?.trim() || ''
+
+export const FACEBOOK_ENV_CONFIG = {
+  envAppId,
+  envAppSecret,
+  hasEnvAppId: Boolean(envAppId),
+  hasEnvAppSecret: Boolean(envAppSecret),
+}
+
 const initialSaved = loadPersistedState()
 
 export const useFacebookStore = create<FacebookState>()((set, get) => ({
   isConnected: initialSaved.isConnected ?? false,
-  appId:
-    initialSaved.appId ??
-    (import.meta.env.VITE_FACEBOOK_APP_ID as string | undefined) ??
-    '',
-  appSecret:
-    initialSaved.appSecret ??
-    (import.meta.env.VITE_FACEBOOK_APP_SECRET as string | undefined) ??
-    '',
+  appId: (initialSaved.appId && initialSaved.appId.trim()) || envAppId,
+  appSecret: (initialSaved.appSecret && initialSaved.appSecret.trim()) || envAppSecret,
   userToken: initialSaved.userToken ?? '',
   connectedPage: initialSaved.connectedPage ?? null,
   availablePages: initialSaved.availablePages ?? [],
