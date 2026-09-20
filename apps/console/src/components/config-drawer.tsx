@@ -27,11 +27,28 @@ import {
 } from '@/components/ui/sheet'
 import { useSidebar } from './ui/sidebar'
 
-export function ConfigDrawer() {
+type ConfigDrawerProps = {
+  forceShow?: boolean
+}
+
+export function ConfigDrawer({ forceShow = false }: ConfigDrawerProps = {}) {
+  const isEnabled =
+    forceShow ||
+    import.meta.env.VITE_ENABLE_THEME_SETTINGS === 'true' ||
+    import.meta.env.VITE_SHOW_THEME_SETTINGS === 'true' ||
+    (typeof window !== 'undefined' &&
+      (new URLSearchParams(window.location.search).get('themeSettings') ===
+        'true' ||
+        localStorage.getItem('theme_settings_enabled') === 'true'))
+
   const { setOpen } = useSidebar()
   const { resetDir } = useDirection()
   const { resetTheme } = useTheme()
   const { resetLayout } = useLayout()
+
+  if (!isEnabled) {
+    return null
+  }
 
   const handleReset = () => {
     setOpen(true)

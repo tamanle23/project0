@@ -12,6 +12,12 @@ export default defineConfig(({ mode }) => {
     process.env.VITE_DISABLE_DEVTOOLS === 'true' ||
     mode === 'no-devtools'
 
+  const enableThemeSettings =
+    process.argv.includes('--theme-settings') ||
+    process.argv.includes('--enable-theme-settings') ||
+    process.env.VITE_ENABLE_THEME_SETTINGS === 'true' ||
+    mode === 'theme-settings'
+
   return {
     base: './',
     build: {
@@ -20,6 +26,9 @@ export default defineConfig(({ mode }) => {
     define: {
       'import.meta.env.VITE_DISABLE_DEVTOOLS': JSON.stringify(
         disableDevtools ? 'true' : 'false'
+      ),
+      'import.meta.env.VITE_ENABLE_THEME_SETTINGS': JSON.stringify(
+        enableThemeSettings ? 'true' : 'false'
       ),
     },
   plugins: [
