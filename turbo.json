@@ -1,6 +1,7 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "globalDependencies": ["**/.env.*local"],
+  "globalPassThroughEnv": ["JAVA_HOME"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
