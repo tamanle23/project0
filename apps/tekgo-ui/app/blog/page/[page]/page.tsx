@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable prettier/prettier */
+/* eslint-disable jsx-a11y/media-has-caption */
 import ListLayout from '@/layouts/ListLayoutWithTags'
-import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer'
-import { allBlogs } from 'contentlayer/generated'
+import { allCoreContent, sortPosts } from '@/lib/content'
+import { allBlogs } from '@/lib/content'
 import { notFound } from 'next/navigation'
 
 const POSTS_PER_PAGE = 5
@@ -14,7 +17,7 @@ export const generateStaticParams = async () => {
 
 export default async function Page(props: { params: Promise<{ page: string }> }) {
   const params = await props.params
-  const posts = allCoreContent(sortPosts(allBlogs))
+  const posts = allCoreContent(sortPosts(allBlogs as any) as any)
   const pageNumber = parseInt(params.page as string)
   const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE)
 
@@ -33,8 +36,8 @@ export default async function Page(props: { params: Promise<{ page: string }> })
 
   return (
     <ListLayout
-      posts={posts}
-      initialDisplayPosts={initialDisplayPosts}
+      posts={posts as any}
+      initialDisplayPosts={initialDisplayPosts as any}
       pagination={pagination}
       title="All Posts"
     />

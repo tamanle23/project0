@@ -1,0 +1,444 @@
+{
+  "title": "O Canada",
+  "date": "2017-07-15",
+  "tags": [
+    "holiday",
+    "canada",
+    "images"
+  ],
+  "draft": false,
+  "layout": "PostBanner",
+  "images": [
+    "/static/images/canada/mountains.jpg"
+  ],
+  "summary": "The scenic lands of Canada featuring maple leaves, snow-capped mountains, turquoise lakes and Toronto. Take in the sights in this photo gallery exhibition and see how easy it is to replicate with some MDX magic and tailwind classes.",
+  "portableTextBody": [
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The scenic lands of Canada featuring maple leaves, snow-capped mountains, turquoise lakes and Toronto. Take in the sights in this photo gallery exhibition and see how easy it is to replicate with some MDX magic and tailwind classes.",
+          "_key": "egr21k"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Features images served using ",
+          "_key": "q6d5lx"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "next/image",
+          "_key": "xnzmfu"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " component. The locally stored images are located in a folder with the following path: ",
+          "_key": "fgd43i"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "/static/images/canada/[filename].jpg",
+          "_key": "8z1o5j"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Since we are using mdx, we can create a simple responsive flexbox grid to display our images with a few tailwind css classes.",
+          "_key": "sii4se"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h1",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Gallery",
+          "_key": "pbg8jl"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "mdxComponent",
+      "name": "div",
+      "attributes": {
+        "className": "-mx-2 flex flex-wrap overflow-hidden xl:-mx-2"
+      },
+      "children": [
+        {
+          "_type": "mdxComponent",
+          "name": "div",
+          "attributes": {
+            "className": "my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2"
+          },
+          "children": [
+            {
+              "_type": "block",
+              "style": "normal",
+              "children": [
+                {
+                  "_type": "span",
+                  "marks": [],
+                  "text": "[Image: Maple]",
+                  "_key": "8of2bn"
+                }
+              ],
+              "markDefs": []
+            }
+          ]
+        },
+        {
+          "_type": "mdxComponent",
+          "name": "div",
+          "attributes": {
+            "className": "my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2"
+          },
+          "children": [
+            {
+              "_type": "block",
+              "style": "normal",
+              "children": [
+                {
+                  "_type": "span",
+                  "marks": [],
+                  "text": "[Image: Lake]",
+                  "_key": "utwemx"
+                }
+              ],
+              "markDefs": []
+            }
+          ]
+        },
+        {
+          "_type": "mdxComponent",
+          "name": "div",
+          "attributes": {
+            "className": "my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2"
+          },
+          "children": [
+            {
+              "_type": "block",
+              "style": "normal",
+              "children": [
+                {
+                  "_type": "span",
+                  "marks": [],
+                  "text": "[Image: Mountains]",
+                  "_key": "g8o4qv"
+                }
+              ],
+              "markDefs": []
+            }
+          ]
+        },
+        {
+          "_type": "mdxComponent",
+          "name": "div",
+          "attributes": {
+            "className": "my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2"
+          },
+          "children": [
+            {
+              "_type": "block",
+              "style": "normal",
+              "children": [
+                {
+                  "_type": "span",
+                  "marks": [],
+                  "text": "[Image: Toronto]",
+                  "_key": "wp2keq"
+                }
+              ],
+              "markDefs": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h1",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Implementation",
+          "_key": "kyq4ey"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "js",
+      "code": "<div className=\"-mx-2 flex flex-wrap overflow-hidden xl:-mx-2\">\n  <div className=\"my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2\">\n    ![Maple](/static/images/canada/maple.jpg)\n  </div>\n  <div className=\"my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2\">\n    ![Lake](/static/images/canada/lake.jpg)\n  </div>\n  <div className=\"my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2\">\n    ![Mountains](/static/images/canada/mountains.jpg)\n  </div>\n  <div className=\"my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2\">\n    ![Toronto](/static/images/canada/toronto.jpg)\n  </div>\n</div>"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "With MDX v2, one can interleave markdown in jsx as shown in the example code.",
+          "_key": "x0bewx"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h3",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Photo Credits",
+          "_key": "guy2sp"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "mdxComponent",
+      "name": "div",
+      "attributes": {},
+      "children": [
+        {
+          "_type": "block",
+          "style": "normal",
+          "children": [
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "Maple photo by ",
+              "_key": "co5yy2"
+            },
+            {
+              "_type": "span",
+              "marks": [
+                "k50bw6"
+              ],
+              "text": "Guillaume\nJaillet",
+              "_key": "6apdz5"
+            },
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "\non\n",
+              "_key": "jarp74"
+            },
+            {
+              "_type": "span",
+              "marks": [
+                "101om8"
+              ],
+              "text": "Unsplash",
+              "_key": "wgg98o"
+            }
+          ],
+          "markDefs": [
+            {
+              "_type": "link",
+              "_key": "k50bw6",
+              "href": "https://unsplash.com/@i_am_g?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+            },
+            {
+              "_type": "link",
+              "_key": "101om8",
+              "href": "https://unsplash.com/s/photos/canada?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_type": "mdxComponent",
+      "name": "div",
+      "attributes": {},
+      "children": [
+        {
+          "_type": "block",
+          "style": "normal",
+          "children": [
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "Mountains photo by ",
+              "_key": "rpgl1m"
+            },
+            {
+              "_type": "span",
+              "marks": [
+                "8mytkn"
+              ],
+              "text": "John\nLee",
+              "_key": "agrauv"
+            },
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "\non\n",
+              "_key": "4m5pjp"
+            },
+            {
+              "_type": "span",
+              "marks": [
+                "rfo78o"
+              ],
+              "text": "Unsplash",
+              "_key": "85059g"
+            }
+          ],
+          "markDefs": [
+            {
+              "_type": "link",
+              "_key": "8mytkn",
+              "href": "https://unsplash.com/@john_artifexfilms?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+            },
+            {
+              "_type": "link",
+              "_key": "rfo78o",
+              "href": "https://unsplash.com/s/photos/canada?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_type": "mdxComponent",
+      "name": "div",
+      "attributes": {},
+      "children": [
+        {
+          "_type": "block",
+          "style": "normal",
+          "children": [
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "Lake photo by ",
+              "_key": "5nohhm"
+            },
+            {
+              "_type": "span",
+              "marks": [
+                "ohws9h"
+              ],
+              "text": "Tj\nHolowaychuk",
+              "_key": "lc8kda"
+            },
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "\non\n",
+              "_key": "9ozh0p"
+            },
+            {
+              "_type": "span",
+              "marks": [
+                "imlxil"
+              ],
+              "text": "Unsplash",
+              "_key": "e3sf6g"
+            }
+          ],
+          "markDefs": [
+            {
+              "_type": "link",
+              "_key": "ohws9h",
+              "href": "https://unsplash.com/@tjholowaychuk?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+            },
+            {
+              "_type": "link",
+              "_key": "imlxil",
+              "href": "https://unsplash.com/s/photos/canada?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_type": "mdxComponent",
+      "name": "div",
+      "attributes": {},
+      "children": [
+        {
+          "_type": "block",
+          "style": "normal",
+          "children": [
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "Toronto photo by ",
+              "_key": "nz6xt8"
+            },
+            {
+              "_type": "span",
+              "marks": [
+                "0rs2rk"
+              ],
+              "text": "Matthew\nHenry",
+              "_key": "1v4dn2"
+            },
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "\non\n",
+              "_key": "rc69jw"
+            },
+            {
+              "_type": "span",
+              "marks": [
+                "npf55e"
+              ],
+              "text": "Unsplash",
+              "_key": "fh59st"
+            }
+          ],
+          "markDefs": [
+            {
+              "_type": "link",
+              "_key": "0rs2rk",
+              "href": "https://unsplash.com/@matthewhenry?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+            },
+            {
+              "_type": "link",
+              "_key": "npf55e",
+              "href": "https://unsplash.com/s/photos/canada?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

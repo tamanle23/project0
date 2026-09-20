@@ -1,0 +1,2905 @@
+{
+  "title": "New features in v1",
+  "date": "2021-08-07T15:32:14.000Z",
+  "lastmod": "2021-02-01",
+  "tags": [
+    "next-js",
+    "tailwind",
+    "guide"
+  ],
+  "draft": false,
+  "summary": "An overview of the new features released in v1 - code block copy, multiple authors, frontmatter layout and more",
+  "layout": "PostSimple",
+  "bibliography": "references-data.bib",
+  "portableTextBody": [
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Overview",
+          "_key": "7ir35n"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "A post on the new features introduced in v1.0. New features:",
+          "_key": "bg1dan"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "mdxComponent",
+      "name": "TOCInline",
+      "attributes": {
+        "toc": {
+          "type": "mdxJsxAttributeValueExpression",
+          "value": "props.toc",
+          "data": {
+            "estree": {
+              "type": "Program",
+              "start": 92,
+              "end": 101,
+              "body": [
+                {
+                  "type": "ExpressionStatement",
+                  "expression": {
+                    "type": "MemberExpression",
+                    "start": 92,
+                    "end": 101,
+                    "loc": {
+                      "start": {
+                        "line": 6,
+                        "column": 16,
+                        "offset": 92
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 25,
+                        "offset": 101
+                      }
+                    },
+                    "object": {
+                      "type": "Identifier",
+                      "start": 92,
+                      "end": 97,
+                      "loc": {
+                        "start": {
+                          "line": 6,
+                          "column": 16,
+                          "offset": 92
+                        },
+                        "end": {
+                          "line": 6,
+                          "column": 21,
+                          "offset": 97
+                        }
+                      },
+                      "name": "props",
+                      "range": [
+                        92,
+                        97
+                      ]
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "start": 98,
+                      "end": 101,
+                      "loc": {
+                        "start": {
+                          "line": 6,
+                          "column": 22,
+                          "offset": 98
+                        },
+                        "end": {
+                          "line": 6,
+                          "column": 25,
+                          "offset": 101
+                        }
+                      },
+                      "name": "toc",
+                      "range": [
+                        98,
+                        101
+                      ]
+                    },
+                    "computed": false,
+                    "optional": false,
+                    "range": [
+                      92,
+                      101
+                    ]
+                  },
+                  "start": 92,
+                  "end": 101,
+                  "loc": {
+                    "start": {
+                      "line": 6,
+                      "column": 16,
+                      "offset": 92
+                    },
+                    "end": {
+                      "line": 6,
+                      "column": 25,
+                      "offset": 101
+                    }
+                  },
+                  "range": [
+                    92,
+                    101
+                  ]
+                }
+              ],
+              "sourceType": "module",
+              "comments": [],
+              "loc": {
+                "start": {
+                  "line": 6,
+                  "column": 16,
+                  "offset": 92
+                },
+                "end": {
+                  "line": 6,
+                  "column": 25,
+                  "offset": 101
+                }
+              },
+              "range": [
+                92,
+                101
+              ]
+            }
+          }
+        },
+        "exclude": "Overview",
+        "toHeading": {
+          "type": "mdxJsxAttributeValueExpression",
+          "value": "2",
+          "data": {
+            "estree": {
+              "type": "Program",
+              "start": 133,
+              "end": 134,
+              "body": [
+                {
+                  "type": "ExpressionStatement",
+                  "expression": {
+                    "type": "Literal",
+                    "start": 133,
+                    "end": 134,
+                    "loc": {
+                      "start": {
+                        "line": 6,
+                        "column": 57,
+                        "offset": 133
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 58,
+                        "offset": 134
+                      }
+                    },
+                    "value": 2,
+                    "raw": "2",
+                    "range": [
+                      133,
+                      134
+                    ]
+                  },
+                  "start": 133,
+                  "end": 134,
+                  "loc": {
+                    "start": {
+                      "line": 6,
+                      "column": 57,
+                      "offset": 133
+                    },
+                    "end": {
+                      "line": 6,
+                      "column": 58,
+                      "offset": 134
+                    }
+                  },
+                  "range": [
+                    133,
+                    134
+                  ]
+                }
+              ],
+              "sourceType": "module",
+              "comments": [],
+              "loc": {
+                "start": {
+                  "line": 6,
+                  "column": 57,
+                  "offset": 133
+                },
+                "end": {
+                  "line": 6,
+                  "column": 58,
+                  "offset": 134
+                }
+              },
+              "range": [
+                133,
+                134
+              ]
+            }
+          }
+        }
+      },
+      "children": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "First load JS decreased from 43kB to 39kB despite all the new features added! ",
+          "_key": "k94xe2"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "1u5nap"
+          ],
+          "text": "[1]",
+          "_key": "44p6y5"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "1u5nap",
+          "href": "#fn-1"
+        }
+      ]
+    },
+    {
+      "_type": "footnoteDefinition",
+      "identifier": "1",
+      "children": [
+        {
+          "_type": "block",
+          "style": "normal",
+          "children": [
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "With the new changes in Nextjs 12, first load JS increase to 45kB.",
+              "_key": "h1ksrl"
+            }
+          ],
+          "markDefs": []
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "See ",
+          "_key": "apoqln"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "a2h6by"
+          ],
+          "text": "upgrade guide",
+          "_key": "r6pdrc"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " below if you are migrating from v0 version of the template.",
+          "_key": "uemgpt"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "a2h6by",
+          "href": "#upgrade-guide"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Theme colors",
+          "_key": "wj2cs0"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "You can easily modify the theme color by changing the primary attribute in the tailwind config file:",
+          "_key": "i038hb"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "js:tailwind.config.js",
+      "code": "theme: {\n    colors: {\n      primary: colors.teal,\n      gray: colors.neutral,\n      ...\n    }\n  ...\n}"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The primary color attribute should be assigned an object with keys from 50, 100, 200 ... 900 and the corresponding color code values.",
+          "_key": "m3tbuz"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Tailwind includes great default color palettes that can be used for theming your own website. Check out ",
+          "_key": "pu86vf"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "4wbh4x"
+          ],
+          "text": "customizing colors documentation page",
+          "_key": "1de6q1"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " for the full range of options.",
+          "_key": "sl5cwt"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "4wbh4x",
+          "href": "https://tailwindcss.com/docs/customizing-colors"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Migrating from v1? You can revert to the previous theme by setting ",
+          "_key": "ezvga2"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "primary",
+          "_key": "n240zz"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " to ",
+          "_key": "ftcql2"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "colors.sky",
+          "_key": "7fbt53"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " (Tailwind 2.2.2 and above, otherwise ",
+          "_key": "0eq8zg"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "colors.lightBlue",
+          "_key": "jnxxrn"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ") and changing gray to ",
+          "_key": "2pxua5"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "colors.gray",
+          "_key": "9zmen7"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".",
+          "_key": "6ljsxg"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "From v1.1.2+, you can also customize the style of your code blocks easily by modifying the ",
+          "_key": "oa1ws5"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "css/prism.css",
+          "_key": "u06req"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " stylesheet. Token classnames are compatible with prismjs\nso you can copy and adapt token styles from a prismjs stylesheet e.g. ",
+          "_key": "39l6yw"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "hquprz"
+          ],
+          "text": "prism themes",
+          "_key": "w45bon"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".",
+          "_key": "8zrwef"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "hquprz",
+          "href": "https://github.com/PrismJS/prism-themes"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Xdm MDX compiler",
+          "_key": "l9m1rz"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "We switched the MDX bundler from ",
+          "_key": "bndsti"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "3a2b54"
+          ],
+          "text": "next-mdx-remote",
+          "_key": "yb0s0b"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " to ",
+          "_key": "moa115"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "e7jidn"
+          ],
+          "text": "mdx-bundler",
+          "_key": "p7bpyf"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".\nThis uses ",
+          "_key": "5uc5nm"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "zl7sgy"
+          ],
+          "text": "xdm",
+          "_key": "oy5349"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " under the hood, the latest micromark 3 and remark, rehype libraries.",
+          "_key": "vwb391"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "3a2b54",
+          "href": "https://github.com/hashicorp/next-mdx-remote"
+        },
+        {
+          "_type": "link",
+          "_key": "e7jidn",
+          "href": "https://github.com/kentcdodds/mdx-bundler"
+        },
+        {
+          "_type": "link",
+          "_key": "zl7sgy",
+          "href": "https://github.com/wooorm/xdm"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Warning:",
+          "_key": "2v8jym"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " If you were using custom remark or rehype libraries, please upgrade to micromark 3 compatible ones. If you are upgrading, please delete ",
+          "_key": "slsiiv"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "node_modules",
+          "_key": "k1cu39"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and ",
+          "_key": "36jw3y"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "package-lock.json",
+          "_key": "0coanb"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " to avoid having past dependencies related issues.",
+          "_key": "f25q6s"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "1o1789"
+          ],
+          "text": "xdm",
+          "_key": "xs6ln5"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " contains multiple improvements over ",
+          "_key": "w5s8l9"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "wptsv0"
+          ],
+          "text": "@mdx-js/mdx",
+          "_key": "zflnkr"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ", the compiler used internally by next-mdx-remote, but there might be some breaking behaviour changes.\nPlease check your markdown output to verify.",
+          "_key": "dzpi67"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "1o1789",
+          "href": "https://github.com/wooorm/xdm"
+        },
+        {
+          "_type": "link",
+          "_key": "wptsv0",
+          "href": "https://github.com/mdx-js/mdx"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Some new possibilities include loading components directly in the mdx file using the import syntax and including js code which could be compiled and bundled at the build step.",
+          "_key": "qx1qps"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "For example, the following jsx snippet can be used directly in an MDX file to render the page title component:",
+          "_key": "2j2goe"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "jsx",
+      "code": "// Or import PageTitle from './components/PageTitle.js' if you are using js\nimport PageTitle from './components/PageTitle.tsx'\n;<PageTitle> Using JSX components in MDX </PageTitle>"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The default configuration resolves all components relative to the ",
+          "_key": "ofvvct"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "components",
+          "_key": "5hv6ci"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " directory.",
+          "_key": "pss7vl"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Note",
+          "_key": "5tectu"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ":\nComponents which require external image loaders also require additional esbuild configuration.\nComponents which are dependent on global application state on lifecycle like the Nextjs ",
+          "_key": "wrry07"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "Link",
+          "_key": "6dlmlk"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " component would also not work with this setup as each mdx file is built independently.\nFor such cases, it is better to use component substitution.",
+          "_key": "5mkz3s"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Table of contents component",
+          "_key": "7ic472"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Inspired by ",
+          "_key": "o08z8p"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "du15l3"
+          ],
+          "text": "Docusaurus",
+          "_key": "4436yt"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and Gatsby's ",
+          "_key": "0ygkxn"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "fq6aon"
+          ],
+          "text": "gatsby-remark-table-of-contents",
+          "_key": "p7zw7r"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ",\nthe ",
+          "_key": "ewstzz"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "toc",
+          "_key": "y9f9d4"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " variable containing all the top level headings of the document is passed to the MDX file and can be styled accordingly.\nTo make generating a table of contents (TOC) simple, you can use the existing ",
+          "_key": "yndpf3"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "TOCInline",
+          "_key": "wxt042"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " component.",
+          "_key": "cmvyry"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "du15l3",
+          "href": "https://docusaurus.io/docs/next/markdown-features/inline-toc"
+        },
+        {
+          "_type": "link",
+          "_key": "fq6aon",
+          "href": "https://www.gatsbyjs.com/plugins/gatsby-remark-table-of-contents/"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "For example, the TOC in this post was generated with the following code:",
+          "_key": "1uj0zu"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "jsx",
+      "code": "<TOCInline toc={props.toc} exclude=\"Overview\" toHeading={2} />"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "You can customise the headings that are displayed by configuring the ",
+          "_key": "qoqyqi"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "fromHeading",
+          "_key": "umvkzm"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and ",
+          "_key": "u6tpze"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "toHeading",
+          "_key": "wtc9dn"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " props, or exclude particular headings\nby passing a string or a string array to the ",
+          "_key": "u3fzom"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "exclude",
+          "_key": "a8huqf"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " prop. By default, all headings that are of depth 3 or smaller are indented. This can be configured by changing the ",
+          "_key": "2i1lqd"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "indentDepth",
+          "_key": "ovlube"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " property.\nA ",
+          "_key": "hwve79"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "asDisclosure",
+          "_key": "4b0ajj"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " prop can be used to render the TOC within an expandable disclosure element.",
+          "_key": "v0ksoi"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Here's the full TOC rendered in a disclosure element.",
+          "_key": "tht6w7"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "jsx",
+      "code": "<TOCInline toc={props.toc} asDisclosure />"
+    },
+    {
+      "_type": "mdxComponent",
+      "name": "TOCInline",
+      "attributes": {
+        "toc": {
+          "type": "mdxJsxAttributeValueExpression",
+          "value": "props.toc",
+          "data": {
+            "estree": {
+              "type": "Program",
+              "start": 4374,
+              "end": 4383,
+              "body": [
+                {
+                  "type": "ExpressionStatement",
+                  "expression": {
+                    "type": "MemberExpression",
+                    "start": 4374,
+                    "end": 4383,
+                    "loc": {
+                      "start": {
+                        "line": 87,
+                        "column": 16,
+                        "offset": 4374
+                      },
+                      "end": {
+                        "line": 87,
+                        "column": 25,
+                        "offset": 4383
+                      }
+                    },
+                    "object": {
+                      "type": "Identifier",
+                      "start": 4374,
+                      "end": 4379,
+                      "loc": {
+                        "start": {
+                          "line": 87,
+                          "column": 16,
+                          "offset": 4374
+                        },
+                        "end": {
+                          "line": 87,
+                          "column": 21,
+                          "offset": 4379
+                        }
+                      },
+                      "name": "props",
+                      "range": [
+                        4374,
+                        4379
+                      ]
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "start": 4380,
+                      "end": 4383,
+                      "loc": {
+                        "start": {
+                          "line": 87,
+                          "column": 22,
+                          "offset": 4380
+                        },
+                        "end": {
+                          "line": 87,
+                          "column": 25,
+                          "offset": 4383
+                        }
+                      },
+                      "name": "toc",
+                      "range": [
+                        4380,
+                        4383
+                      ]
+                    },
+                    "computed": false,
+                    "optional": false,
+                    "range": [
+                      4374,
+                      4383
+                    ]
+                  },
+                  "start": 4374,
+                  "end": 4383,
+                  "loc": {
+                    "start": {
+                      "line": 87,
+                      "column": 16,
+                      "offset": 4374
+                    },
+                    "end": {
+                      "line": 87,
+                      "column": 25,
+                      "offset": 4383
+                    }
+                  },
+                  "range": [
+                    4374,
+                    4383
+                  ]
+                }
+              ],
+              "sourceType": "module",
+              "comments": [],
+              "loc": {
+                "start": {
+                  "line": 87,
+                  "column": 16,
+                  "offset": 4374
+                },
+                "end": {
+                  "line": 87,
+                  "column": 25,
+                  "offset": 4383
+                }
+              },
+              "range": [
+                4374,
+                4383
+              ]
+            }
+          }
+        },
+        "asDisclosure": null
+      },
+      "children": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Layouts",
+          "_key": "2w470d"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "You can map mdx blog content to layout components by configuring the frontmatter field. For example, this post is written with the new ",
+          "_key": "74ah7y"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "PostSimple",
+          "_key": "ldpinj"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " layout!",
+          "_key": "rezcdp"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h3",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Adding new templates",
+          "_key": "lkriyz"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "layout templates are stored in the ",
+          "_key": "098byp"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "./layouts",
+          "_key": "7uyhqt"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " folder. You can add your React components that you want to map to markdown content in this folder.\nThe component file name must match that specified in the markdown frontmatter ",
+          "_key": "d8rfz7"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "layout",
+          "_key": "kq18p1"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " field.",
+          "_key": "7vpbae"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The only required field is ",
+          "_key": "1c8z1y"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "children",
+          "_key": "yzo31u"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " which contains the rendered MDX content, though you would probably want to pass in the frontMatter contents and render it in the template.",
+          "_key": "7zutiw"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "You can configure the template to take in other fields - see ",
+          "_key": "pjszli"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "PostLayout",
+          "_key": "dtzqbe"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " component for an example.",
+          "_key": "fshwpw"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Here's an example layout which you can further customise:",
+          "_key": "f1vrkv"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "jsx",
+      "code": "export default function ExampleLayout({ frontMatter, children }) {\n  const { date, title } = frontMatter\n\n  return (\n    <SectionContainer>\n      <div>{date}</div>\n      <h1>{title}</h1>\n      <div>{children}</div>\n    </SectionContainer>\n  )\n}"
+    },
+    {
+      "_type": "block",
+      "style": "h3",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Configuring a blog post frontmatter",
+          "_key": "3da4ou"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Use the ",
+          "_key": "n2mhx1"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "layout",
+          "_key": "45pzzm"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " frontmatter field to specify the template you want to map the markdown post to. Here's how the frontmatter of this post looks like:",
+          "_key": "sqmm8j"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "---\ntitle: 'New features in v1'\ndate: '2021-05-26   '\ntags: ['next-js', 'tailwind', 'guide']\ndraft: false\nsummary: 'Introducing the new layout features - you can map mdx blog content to layout components by configuring the frontmatter field'\nlayout: PostSimple\n---"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "You can configure the default layout in the respective page section by modifying the ",
+          "_key": "f1hfuk"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "DEFAULT_LAYOUT",
+          "_key": "au4emx"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " variable.\nThe ",
+          "_key": "cskjiy"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "DEFAULT_LAYOUT",
+          "_key": "e89ja5"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " for blog posts page is set to ",
+          "_key": "y38dub"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "PostLayout",
+          "_key": "bk54ua"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".",
+          "_key": "cpae86"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h3",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Extend",
+          "_key": "3fow0k"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "layout",
+          "_key": "3x8fil"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " is mapped to wrapper which wraps the entire MDX content.",
+          "_key": "3pv23a"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "jsx",
+      "code": "export const MDXComponents = {\n  Image,\n  a: CustomLink,\n  pre: Pre,\n  wrapper: ({ components, layout, ...rest }) => {\n    const Layout = require(`../layouts/${layout}`).default\n    return <Layout {...rest} />\n  },\n}\n\nexport const MDXLayoutRenderer = ({ layout, mdxSource, ...rest }) => {\n  const MDXLayout = useMemo(() => getMDXComponent(mdxSource), [mdxSource])\n\n  return <MDXLayout layout={layout} components={MDXComponents} {...rest} />\n}"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Use the ",
+          "_key": "qph5yq"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "MDXLayoutRenderer",
+          "_key": "6358n3"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " component on a page where you want to accept a layout name to map to the desired layout.\nYou need to pass the layout name from the layout folder (it has to be an exact match).",
+          "_key": "o4i9da"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Analytics",
+          "_key": "deomq7"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The template now supports ",
+          "_key": "rngrql"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "naskjc"
+          ],
+          "text": "plausible",
+          "_key": "x54cxd"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ", ",
+          "_key": "5y2ke4"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "a0ybbj"
+          ],
+          "text": "simple analytics",
+          "_key": "35ed96"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and google analytics.\nConfigure ",
+          "_key": "vzh9w1"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "siteMetadata.js",
+          "_key": "uy3tg1"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " with the settings that correspond with the desired analytics provider.",
+          "_key": "gqpzia"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "naskjc",
+          "href": "https://plausible.io/"
+        },
+        {
+          "_type": "link",
+          "_key": "a0ybbj",
+          "href": "https://simpleanalytics.com/"
+        }
+      ]
+    },
+    {
+      "_type": "code",
+      "language": "js",
+      "code": "analytics: {\n    // supports plausible, simpleAnalytics or googleAnalytics\n    plausibleDataDomain: '', // e.g. tailwind-nextjs-starter-blog.vercel.app\n    simpleAnalytics: false, // true or false\n    googleAnalyticsId: '', // e.g. UA-000000-2 or G-XXXXXXX\n  },"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Custom events are also supported. You can import the ",
+          "_key": "ii9wce"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "logEvent",
+          "_key": "5141az"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " function from ",
+          "_key": "u44nsm"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "@components/analytics/[ANALYTICS-PROVIDER]",
+          "_key": "izh356"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " file and call it when\ntriggering certain events of interest. ",
+          "_key": "aam7yk"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "em"
+          ],
+          "text": "Note",
+          "_key": "24vwxr"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ": Additional configuration might be required depending on the analytics provider, please check their official\ndocumentation for more information.",
+          "_key": "839n1y"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Blog comments system",
+          "_key": "zegyho"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "We have also added support for ",
+          "_key": "5kygbn"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "i9ex8g"
+          ],
+          "text": "giscus",
+          "_key": "s9sr8d"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ", ",
+          "_key": "sowt51"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "bk5m6b"
+          ],
+          "text": "utterances",
+          "_key": "753xyj"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " or disqus.\nTo enable, simply configure ",
+          "_key": "udvswk"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "siteMetadata.js",
+          "_key": "io32ai"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " comments property with the desired provider and settings as specified in the config file.",
+          "_key": "ddxan9"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "i9ex8g",
+          "href": "https://github.com/laymonage/giscus"
+        },
+        {
+          "_type": "link",
+          "_key": "bk5m6b",
+          "href": "https://github.com/utterance/utterances"
+        }
+      ]
+    },
+    {
+      "_type": "code",
+      "language": "js",
+      "code": "comment: {\n    // Select a provider and use the environment variables associated to it\n    // https://vercel.com/docs/environment-variables\n    provider: 'giscus', // supported providers: giscus, utterances, disqus\n    giscusConfig: {\n      // Visit the link below, and follow the steps in the 'configuration' section\n      // https://giscus.app/\n      repo: process.env.NEXT_PUBLIC_GISCUS_REPO,\n      repositoryId: process.env.NEXT_PUBLIC_GISCUS_REPOSITORY_ID,\n      category: process.env.NEXT_PUBLIC_GISCUS_CATEGORY,\n      categoryId: process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID,\n      mapping: 'pathname', // supported options: pathname, url, title\n      reactions: '1', // Emoji reactions: 1 = enable / 0 = disable\n      // Send discussion metadata periodically to the parent window: 1 = enable / 0 = disable\n      metadata: '0',\n      // theme example: light, dark, dark_dimmed, dark_high_contrast\n      // transparent_dark, preferred_color_scheme, custom\n      theme: 'light',\n      // theme when dark mode\n      darkTheme: 'transparent_dark',\n      // If the theme option above is set to 'custom`\n      // please provide a link below to your custom theme css file.\n      // example: https://giscus.app/themes/custom_example.css\n      themeURL: '',\n    },\n    utterancesConfig: {\n      // Visit the link below, and follow the steps in the 'configuration' section\n      // https://utteranc.es/\n      repo: process.env.NEXT_PUBLIC_UTTERANCES_REPO,\n      issueTerm: '', // supported options: pathname, url, title\n      label: '', // label (optional): Comment 💬\n      // theme example: github-light, github-dark, preferred-color-scheme\n      // github-dark-orange, icy-dark, dark-blue, photon-dark, boxy-light\n      theme: '',\n      // theme when dark mode\n      darkTheme: '',\n    },\n    disqus: {\n      // https://help.disqus.com/en/articles/1717111-what-s-a-shortname\n      shortname: process.env.NEXT_PUBLIC_DISQUS_SHORTNAME,\n    },\n  },"
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Multiple authors",
+          "_key": "0w59yn"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Information on authors is now split from ",
+          "_key": "32gsxk"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "siteMetadata.js",
+          "_key": "l4qnas"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and stored in its own ",
+          "_key": "jlavke"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "data/authors",
+          "_key": "7kv6ad"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " folder as a markdown file. Minimally, you will need to have a ",
+          "_key": "20rlpb"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "default.md",
+          "_key": "zb121t"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " file with authorship information. You can create additional files as required and the file name will be used as the reference to the author.",
+          "_key": "zhe37f"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Here's how an author markdown file might look like:",
+          "_key": "5s72d1"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "md:default.md",
+      "code": "---\nname: Tails Azimuth\navatar: /static/images/avatar.png\noccupation: Professor of Atmospheric Science\ncompany: Stanford University\nemail: address@yoursite.com\ntwitter: https://twitter.com/Twitter\nlinkedin: https://www.linkedin.com\ngithub: https://github.com\n---\n\nA long description of yourself..."
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "You can use this information in multiple places across the template. For example in the about section of the page, we grab the default author information with this line of code:",
+          "_key": "tt0ag9"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "js",
+      "code": "const authorDetails = await getFileBySlug('authors', ['default'])"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "This is rendered in the ",
+          "_key": "xuz17r"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "AuthorLayout",
+          "_key": "q163lv"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " template.",
+          "_key": "rdk0q2"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h3",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Multiple authors in blog post",
+          "_key": "rdhiuw"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The frontmatter of a blog post accepts an optional ",
+          "_key": "7a9nel"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "authors",
+          "_key": "p05k15"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " array field. If no field is specified, it is assumed that the default author is used. Simply pass in an array of authors to render multiple authors associated with a post.",
+          "_key": "3xbqi0"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "For example, the following frontmatter will display the authors given by ",
+          "_key": "6qaqa1"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "data/authors/default.md",
+          "_key": "i8o07k"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and ",
+          "_key": "xpyqc6"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "data/authors/sparrowhawk.md",
+          "_key": "i75p1s"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "yaml",
+      "code": "title: 'My first post'\ndate: '2021-01-12'\ndraft: false\nsummary: 'My first post'\nauthors: ['default', 'sparrowhawk']"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "A demo of a multiple authors post is shown in ",
+          "_key": "10lrl6"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "k3jqfr"
+          ],
+          "text": "Introducing Tailwind Nextjs Starter Blog post",
+          "_key": "nkj25l"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".",
+          "_key": "bsbdqb"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "k3jqfr",
+          "href": "/blog/introducing-tailwind-nextjs-starter-blog"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Copy button for code blocks",
+          "_key": "ihec4h"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Hover over a code block and you will notice a GitHub-inspired copy button! You can modify ",
+          "_key": "xojbnc"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "./components/Pre.js",
+          "_key": "i6y0c4"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " to further customise it.\nThe component is passed to ",
+          "_key": "5hym81"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "MDXComponents",
+          "_key": "cxi9ud"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and modifies all ",
+          "_key": "istcij"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "<pre>",
+          "_key": "6m13iv"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " blocks.",
+          "_key": "45no3n"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Line highlighting and line numbers",
+          "_key": "n9trld"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Line highlighting and line numbers are now supported out of the box thanks to the new ",
+          "_key": "l9no7y"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "wcaquu"
+          ],
+          "text": "rehype-prism-plus plugin",
+          "_key": "vf7yvg"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "wcaquu",
+          "href": "https://github.com/timlrx/rehype-prism-plus"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The following javascript code block:",
+          "_key": "phlusy"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "```js {1, 3-4} showLineNumbers\nvar num1, num2, sum\nnum1 = prompt('Enter first number')\nnum2 = prompt('Enter second number')\nsum = parseInt(num1) + parseInt(num2) // \"+\" means \"add\"\nalert('Sum = ' + sum) // \"+\" means combine into a string\n```"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "will appear as:",
+          "_key": "08s7q1"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "js",
+      "code": "var num1, num2, sum\nnum1 = prompt('Enter first number')\nnum2 = prompt('Enter second number')\nsum = parseInt(num1) + parseInt(num2) // \"+\" means \"add\"\nalert('Sum = ' + sum) // \"+\" means combine into a string"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "To modify the styles, change the following class selectors in the ",
+          "_key": "xxzc9c"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "prism.css",
+          "_key": "noutih"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " file:",
+          "_key": "xushh2"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "css",
+      "code": ".code-highlight {\n  @apply float-left min-w-full;\n}\n\n.code-line {\n  @apply -mx-4 block border-l-4 border-opacity-0 pl-4 pr-4;\n}\n\n.code-line.inserted {\n  @apply bg-green-500 bg-opacity-20;\n}\n\n.code-line.deleted {\n  @apply bg-red-500 bg-opacity-20;\n}\n\n.highlight-line {\n  @apply -mx-4 border-l-4 border-primary-500 bg-gray-700 bg-opacity-50;\n}\n\n.line-number::before {\n  @apply -ml-2 mr-4 inline-block w-4 text-right text-gray-400;\n  content: attr(line);\n}"
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Newletter component (v1.1.3)",
+          "_key": "0ts2sw"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Introduced in v1.1.3, the newsletter component gives you an easy way to build an audience. It integrates with the following providers:",
+          "_key": "bu5vgl"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "so9clq"
+          ],
+          "text": "Mailchimp",
+          "_key": "c3fye7"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "so9clq",
+          "href": "https://mailchimp.com/"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "noz7ke"
+          ],
+          "text": "Buttondown",
+          "_key": "ognbqe"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "noz7ke",
+          "href": "https://buttondown.email/"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "zbfaod"
+          ],
+          "text": "Convertkit",
+          "_key": "8e8e2g"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "zbfaod",
+          "href": "https://convertkit.com/"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "To use it, specify the provider which you are using in the config file and add the necessary environment variables to the ",
+          "_key": "m0xm4j"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": ".env",
+          "_key": "mv27an"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " file.\nFor more information on the required variables, check out ",
+          "_key": "dqlh1g"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": ".env.sample.",
+          "_key": "jshx52"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Two components are exported, a default ",
+          "_key": "8vouv4"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "NewsletterForm",
+          "_key": "lzakak"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and a ",
+          "_key": "j5vhfy"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "BlogNewsletterForm",
+          "_key": "ohotqi"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " component, which is also passed in as an MDX component\nand can be used in a blog post:",
+          "_key": "e30jki"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "jsx",
+      "code": "<BlogNewsletterForm title=\"Like what you are reading?\" />"
+    },
+    {
+      "_type": "mdxComponent",
+      "name": "BlogNewsletterForm",
+      "attributes": {
+        "title": "Like what you are reading?"
+      },
+      "children": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The component relies on nextjs's ",
+          "_key": "i3244n"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "k8ryyh"
+          ],
+          "text": "API routes",
+          "_key": "vocaut"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " which requires a server-side instance of nextjs to be setup\nand is not compatible with a 100% static site export. Users should either self-host or use a compatible platform like Vercel or Netlify which supports this functionality.",
+          "_key": "xplafw"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "k8ryyh",
+          "href": "https://nextjs.org/docs/api-routes/introduction"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "A static site compatible alternative is to substitute the route in the newsletter component with a form API endpoint provider.",
+          "_key": "2fx0qh"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Bibliography and Citations (v1.2.1)",
+          "_key": "et8ar8"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "rehype-citation",
+          "_key": "umzh6w"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " plugin is added to the xdm processing pipeline in v1.2.1. This allows you to easily format citations and insert bibliography from an existing bibtex or CSL-json file.",
+          "_key": "bkyogp"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "For example, the following markdown code sample:",
+          "_key": "u6acqa"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "md",
+      "code": "Standard citation [@Nash1950]\nIn-text citations e.g. @Nash1951\nMultiple citations [see @Nash1950; @Nash1951, page 50]\n\n**References:**\n\n[^ref]"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "is rendered to the following:",
+          "_key": "89rp08"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Standard citation [@Nash1950]",
+          "_key": "xbejlq"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "In-text citations e.g. @Nash1951",
+          "_key": "s2ejy7"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Multiple citations [see @Nash1950; @Nash1951, page 50]",
+          "_key": "ztwc8x"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "References:",
+          "_key": "l4254y"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "[^ref]",
+          "_key": "bffunq"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "A bibliography will be inserted at the end of the document, but this can be overwritten by specifying a ",
+          "_key": "9xptzj"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "[^Ref]",
+          "_key": "e5u1xh"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " tag at the intended location.\nThe plugin uses APA citation formation, but also supports the following CSLs, 'apa', 'vancouver', 'harvard1', 'chicago', 'mla', or a path to a user-specified CSL file.",
+          "_key": "jp01wj"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "See ",
+          "_key": "87p672"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "5x2yzo"
+          ],
+          "text": "rehype-citation readme",
+          "_key": "8oqrzc"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " for more information on the configuration options.",
+          "_key": "32ekzf"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "5x2yzo",
+          "href": "https://github.com/timlrx/rehype-citation"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Self-hosted font (v1.5.0)",
+          "_key": "qexy4w"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Google font has been replaced with self-hosted font from ",
+          "_key": "gvdplg"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "njsgx9"
+          ],
+          "text": "Fontsource",
+          "_key": "umfegg"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ". This gives the following ",
+          "_key": "fagund"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "p4jrm0"
+          ],
+          "text": "advantages",
+          "_key": "9yuv2k"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ":",
+          "_key": "p3vnoj"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "njsgx9",
+          "href": "https://fontsource.org/"
+        },
+        {
+          "_type": "link",
+          "_key": "p4jrm0",
+          "href": "https://fontsource.org/docs/introduction"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "blockquote",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ""
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "This leads to a smaller font bundle and a 0.1s faster load time (",
+          "_key": "y8bzxw"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "rqg7yt"
+          ],
+          "text": "webpagetest comparison",
+          "_key": "2ev5sy"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ").",
+          "_key": "a8yf1a"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "rqg7yt",
+          "href": "https://www.webpagetest.org/video/compare.php?tests=220201_AiDcFH_f68a69b758454dd52d8e67493fdef7da,220201_BiDcMC_bf2d53f14483814ba61e794311dfa771"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "To change the default Inter font:",
+          "_key": "vmlq2n"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Install the preferred ",
+          "_key": "o6i51k"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "v2t3wv"
+          ],
+          "text": "font",
+          "_key": "170gde"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - ",
+          "_key": "bpfkix"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "npm install -save @fontsource/<font-name>",
+          "_key": "vys0va"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "v2t3wv",
+          "href": "https://fontsource.org/fonts"
+        }
+      ],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Update the import at ",
+          "_key": "gru376"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "pages/_app.js",
+          "_key": "r86omr"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "- ",
+          "_key": "o061su"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "import '@fontsource/<font-name>.css'",
+          "_key": "lyr729"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Update the ",
+          "_key": "g2aejz"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "fontfamily",
+          "_key": "lqjsd6"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " property in the tailwind css config file",
+          "_key": "os4tiy"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Upgrade guide",
+          "_key": "vuzkjh"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "There are significant portions of the code that has been changed from v0 to v1 including support for layouts and a new mdx engine.",
+          "_key": "mpsis3"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "There's also no real reason to change if the previous one serves your needs and it might be easier to copy\nthe component changes you are interested in to your existing blog rather than migrating everything over.",
+          "_key": "v3emzp"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Nonetheless, if you want to do so and have not changed much of the template, you could clone the new version and copy over the blog post over to the new template.",
+          "_key": "id8854"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Another alternative would be to pull the latest template version with the following code:",
+          "_key": "5kupf5"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "bash",
+      "code": "git remote add template git@github.com:timlrx/tailwind-nextjs-starter-blog.git\ngit pull template v1 --allow-unrelated-histories\nrm -rf node_modules"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "You can see an example of such a migration in this ",
+          "_key": "1g3n3e"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "stecyy"
+          ],
+          "text": "commit",
+          "_key": "bx2vwv"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " for my personal blog.",
+          "_key": "pdtlzt"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "stecyy",
+          "href": "https://github.com/timlrx/timlrx.com/commit/bba1c185384fd6d5cdaac15abf802fdcff027286"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "v1 also uses ",
+          "_key": "5b5qz7"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "feed.xml",
+          "_key": "vgil3c"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " rather than ",
+          "_key": "ov2t7w"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "index.xml",
+          "_key": "n2yb6p"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ", to avoid some build issues with Vercel. If you are migrating you should add a redirect to ",
+          "_key": "mobozj"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "next.config.js",
+          "_key": "1te1sg"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " like so:",
+          "_key": "12qgyb"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "js",
+      "code": "async redirects() {\n  return [\n    {\n      source: '/:path/index.xml',\n      destination: '/:path/feed.xml',\n      permanent: true,\n    }\n  ]\n}"
+    }
+  ]
+}

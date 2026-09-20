@@ -1,0 +1,784 @@
+{
+  "title": "Deriving the OLS Estimator",
+  "date": "2020-12-21",
+  "tags": [
+    "next js",
+    "math",
+    "ols"
+  ],
+  "draft": false,
+  "summary": "How to derive the OLS Estimator with matrix notation and a tour of math typesetting using markdown with the help of KaTeX.",
+  "portableTextBody": [
+    {
+      "_type": "block",
+      "style": "h1",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Introduction",
+          "_key": "h5d2z2"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Parsing and display of math equations is included in this blog template. Parsing of math is enabled by ",
+          "_key": "livzkj"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "remark-math",
+          "_key": "42b4gl"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and ",
+          "_key": "wr4d1g"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "rehype-katex",
+          "_key": "kjz34d"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".\nKaTeX and its associated font is included in ",
+          "_key": "not755"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "_document.js",
+          "_key": "r3ngc0"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " so feel free to use it on any page.\n",
+          "_key": "c5ivsh"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "v17u4k"
+          ],
+          "text": "[footnote]",
+          "_key": "3kjuf7"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "v17u4k",
+          "href": "#fn-footnote"
+        }
+      ]
+    },
+    {
+      "_type": "footnoteDefinition",
+      "identifier": "footnote",
+      "children": [
+        {
+          "_type": "block",
+          "style": "normal",
+          "children": [
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "For the full list of supported TeX functions, check out the ",
+              "_key": "0paliv"
+            },
+            {
+              "_type": "span",
+              "marks": [
+                "fprtp1"
+              ],
+              "text": "KaTeX documentation",
+              "_key": "bq1cy5"
+            }
+          ],
+          "markDefs": [
+            {
+              "_type": "link",
+              "_key": "fprtp1",
+              "href": "https://katex.org/docs/supported.html"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Inline math symbols can be included by enclosing the term between the ",
+          "_key": "i1edzr"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "$",
+          "_key": "zdfog5"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " symbol.",
+          "_key": "sdw8o8"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Math code blocks are denoted by ",
+          "_key": "p82e1p"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "$$",
+          "_key": "jrkd3v"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".",
+          "_key": "wbwzas"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "If you intend to use the ",
+          "_key": "so2gj3"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "$",
+          "_key": "49l1jb"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " sign instead of math, you can escape it (",
+          "_key": "wysitg"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "\\$",
+          "_key": "gbkxl1"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "), or specify the HTML entity (",
+          "_key": "bnvehy"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "&dollar;",
+          "_key": "xaxv30"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ") ",
+          "_key": "kamn7t"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "oogp23"
+          ],
+          "text": "[2]",
+          "_key": "lokai1"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "oogp23",
+          "href": "#fn-2"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Inline or manually enumerated footnotes are also supported. Click on the links above to see them in action.",
+          "_key": "kcxkh6"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "footnoteDefinition",
+      "identifier": "2",
+      "children": [
+        {
+          "_type": "block",
+          "style": "normal",
+          "children": [
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "$10 and $20.",
+              "_key": "8lxd2l"
+            }
+          ],
+          "markDefs": []
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h1",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Deriving the OLS Estimator",
+          "_key": "ddi9tm"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Using matrix notation, let ",
+          "_key": "e0sa9e"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$n$",
+          "_key": "nc1uuh"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " denote the number of observations and ",
+          "_key": "8hkkgh"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$k$",
+          "_key": "oqh4vj"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " denote the number of regressors.",
+          "_key": "jf2925"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The vector of outcome variables ",
+          "_key": "vpkdev"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$\\mathbf{Y}$",
+          "_key": "f28j04"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " is a ",
+          "_key": "y0efu6"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$n \\times 1$",
+          "_key": "9j9tc9"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " matrix,",
+          "_key": "eurig9"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "tex",
+      "code": "\\mathbf{Y} = \\left[\\begin{array}\n  {c}\n  y_1 \\\\\n  . \\\\\n  . \\\\\n  . \\\\\n  y_n\n\\end{array}\\right]"
+    },
+    {
+      "_type": "math",
+      "formula": "\\mathbf{Y} = \\left[\\begin{array}\n  {c}\n  y_1 \\\\\n  . \\\\\n  . \\\\\n  . \\\\\n  y_n\n\\end{array}\\right]"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The matrix of regressors ",
+          "_key": "5mplid"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$\\mathbf{X}$",
+          "_key": "u9x22y"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " is a ",
+          "_key": "m48vrt"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$n \\times k$",
+          "_key": "nsms54"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " matrix (or each row is a ",
+          "_key": "3199qb"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$k \\times 1$",
+          "_key": "k4grm1"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " vector),",
+          "_key": "4me5d7"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "latex",
+      "code": "\\mathbf{X} = \\left[\\begin{array}\n  {ccccc}\n  x_{11} & . & . & . & x_{1k} \\\\\n  . & . & . & . & .  \\\\\n  . & . & . & . & .  \\\\\n  . & . & . & . & .  \\\\\n  x_{n1} & . & . & . & x_{nn}\n\\end{array}\\right] =\n\\left[\\begin{array}\n  {c}\n  \\mathbf{x}'_1 \\\\\n  . \\\\\n  . \\\\\n  . \\\\\n  \\mathbf{x}'_n\n\\end{array}\\right]"
+    },
+    {
+      "_type": "math",
+      "formula": "\\mathbf{X} = \\left[\\begin{array}\n  {ccccc}\n  x_{11} & . & . & . & x_{1k} \\\\\n  . & . & . & . & .  \\\\\n  . & . & . & . & .  \\\\\n  . & . & . & . & .  \\\\\n  x_{n1} & . & . & . & x_{nn}\n\\end{array}\\right] =\n\\left[\\begin{array}\n  {c}\n  \\mathbf{x}'_1 \\\\\n  . \\\\\n  . \\\\\n  . \\\\\n  \\mathbf{x}'_n\n\\end{array}\\right]"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The vector of error terms ",
+          "_key": "gktgcu"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$\\mathbf{U}$",
+          "_key": "uy7s6s"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " is also a ",
+          "_key": "r8xvjt"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$n \\times 1$",
+          "_key": "3uhd88"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " matrix.",
+          "_key": "3s0cyk"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "At times it might be easier to use vector notation. For consistency, I will use the bold small x to denote a vector and capital letters to denote a matrix. Single observations are denoted by the subscript.",
+          "_key": "xns09y"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Least Squares",
+          "_key": "5ytvsq"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Start",
+          "_key": "bewbxq"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ":",
+          "_key": "p35pxh"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$y_i = \\mathbf{x}'_i \\beta + u_i$",
+          "_key": "9lcmjf"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Assumptions",
+          "_key": "bgltul"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ":",
+          "_key": "za1nnd"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Linearity (given above)",
+          "_key": "0oglai"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$E(\\mathbf{U}|\\mathbf{X}) = 0$",
+          "_key": "r6t276"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " (conditional independence)",
+          "_key": "o90nzy"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "rank(",
+          "_key": "184ggb"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$\\mathbf{X}$",
+          "_key": "k94zo4"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ") = ",
+          "_key": "7hm0u2"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$k$",
+          "_key": "cnwmer"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " (no multi-collinearity i.e. full rank)",
+          "_key": "99ugmn"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$Var(\\mathbf{U}|\\mathbf{X}) = \\sigma^2 I_n$",
+          "_key": "4mn313"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " (Homoskedascity)",
+          "_key": "g7lqvu"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Aim",
+          "_key": "zrqluz"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ":",
+          "_key": "z2jplb"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Find ",
+          "_key": "z0jf5z"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$\\beta$",
+          "_key": "ak2k0o"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " that minimises the sum of squared errors:",
+          "_key": "5lv1s7"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "math",
+      "formula": "Q = \\sum_{i=1}^{n}{u_i^2} = \\sum_{i=1}^{n}{(y_i - \\mathbf{x}'_i\\beta)^2} = (Y-X\\beta)'(Y-X\\beta)"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Solution",
+          "_key": "itjpkm"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ":",
+          "_key": "3xwldi"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Hints: ",
+          "_key": "dp6for"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$Q$",
+          "_key": "p34ghe"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " is a ",
+          "_key": "l3e5oi"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$1 \\times 1$",
+          "_key": "he75t2"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " scalar, by symmetry ",
+          "_key": "m3zdlj"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$\\frac{\\partial b'Ab}{\\partial b} = 2Ab$",
+          "_key": "y83z87"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".",
+          "_key": "icspho"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Take matrix derivative w.r.t ",
+          "_key": "ffjma0"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "$\\beta$",
+          "_key": "910403"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ":",
+          "_key": "9nt8ot"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "tex",
+      "code": "\\begin{aligned}\n  \\min Q           & = \\min_{\\beta} \\mathbf{Y}'\\mathbf{Y} - 2\\beta'\\mathbf{X}'\\mathbf{Y} +\n  \\beta'\\mathbf{X}'\\mathbf{X}\\beta \\\\\n                   & = \\min_{\\beta} - 2\\beta'\\mathbf{X}'\\mathbf{Y} + \\beta'\\mathbf{X}'\\mathbf{X}\\beta \\\\\n  \\text{[FOC]}~~~0 & =  - 2\\mathbf{X}'\\mathbf{Y} + 2\\mathbf{X}'\\mathbf{X}\\hat{\\beta}                  \\\\\n  \\hat{\\beta}      & = (\\mathbf{X}'\\mathbf{X})^{-1}\\mathbf{X}'\\mathbf{Y}                              \\\\\n                   & = (\\sum^{n} \\mathbf{x}_i \\mathbf{x}'_i)^{-1} \\sum^{n} \\mathbf{x}_i y_i\n\\end{aligned}"
+    },
+    {
+      "_type": "math",
+      "formula": "\\begin{aligned}\n  \\min Q           & = \\min_{\\beta} \\mathbf{Y}'\\mathbf{Y} - 2\\beta'\\mathbf{X}'\\mathbf{Y} +\n  \\beta'\\mathbf{X}'\\mathbf{X}\\beta \\\\\n                   & = \\min_{\\beta} - 2\\beta'\\mathbf{X}'\\mathbf{Y} + \\beta'\\mathbf{X}'\\mathbf{X}\\beta \\\\\n  \\text{[FOC]}~~~0 & =  - 2\\mathbf{X}'\\mathbf{Y} + 2\\mathbf{X}'\\mathbf{X}\\hat{\\beta}                  \\\\\n  \\hat{\\beta}      & = (\\mathbf{X}'\\mathbf{X})^{-1}\\mathbf{X}'\\mathbf{Y}                              \\\\\n                   & = (\\sum^{n} \\mathbf{x}_i \\mathbf{x}'_i)^{-1} \\sum^{n} \\mathbf{x}_i y_i\n\\end{aligned}"
+    }
+  ]
+}

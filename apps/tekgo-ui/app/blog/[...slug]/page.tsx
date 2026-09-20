@@ -1,12 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable prettier/prettier */
+/* eslint-disable jsx-a11y/media-has-caption */
 import 'css/prism.css'
 import 'katex/dist/katex.css'
 
 import PageTitle from '@/components/PageTitle'
-import { components } from '@/components/MDXComponents'
-import { MDXLayoutRenderer } from 'pliny/mdx-components'
-import { sortPosts, coreContent, allCoreContent } from 'pliny/utils/contentlayer'
-import { allBlogs, allAuthors } from 'contentlayer/generated'
-import type { Authors, Blog } from 'contentlayer/generated'
+import { PortableTextRenderer } from '@/components/PortableTextRenderer'
+import { sortPosts, coreContent, allCoreContent } from '@/lib/content'
+import { allBlogs, allAuthors } from '@/lib/content'
+import type { Authors, Blog } from '@/lib/content'
 import PostSimple from '@/layouts/PostSimple'
 import PostLayout from '@/layouts/PostLayout'
 import PostBanner from '@/layouts/PostBanner'
@@ -30,7 +32,7 @@ export async function generateMetadata(props: {
   const authorList = post?.authors || ['default']
   const authorDetails = authorList.map((author) => {
     const authorResults = allAuthors.find((p) => p.slug === author)
-    return coreContent(authorResults as Authors)
+    return coreContent(authorResults as any)
   })
   if (!post) {
     return
@@ -82,7 +84,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
   const slug = decodeURI(params.slug.join('/'))
   // Filter out drafts in production
   const sortedCoreContents = allCoreContent(sortPosts(allBlogs))
-  const postIndex = sortedCoreContents.findIndex((p) => p.slug === slug)
+  const postIndex = sortedCoreContents.findIndex((p: any) => p.slug === slug)
   if (postIndex === -1) {
     return notFound()
   }
@@ -93,9 +95,9 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
   const authorList = post?.authors || ['default']
   const authorDetails = authorList.map((author) => {
     const authorResults = allAuthors.find((p) => p.slug === author)
-    return coreContent(authorResults as Authors)
+    return coreContent(authorResults as any)
   })
-  const mainContent = coreContent(post)
+  const mainContent = coreContent(post as any)
   const jsonLd = post.structuredData
   jsonLd['author'] = authorDetails.map((author) => {
     return {
@@ -112,8 +114,8 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Layout content={mainContent} authorDetails={authorDetails} next={next} prev={prev}>
-        <MDXLayoutRenderer code={post.body.code} components={components} toc={post.toc} />
+      <Layout content={mainContent as any} authorDetails={authorDetails} next={next as any} prev={prev as any}>
+        <PortableTextRenderer content={post.portableTextBody} toc={post.toc} />
       </Layout>
     </>
   )

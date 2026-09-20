@@ -1,0 +1,601 @@
+{
+  "title": "Images in Next.js",
+  "date": "2020-11-11",
+  "tags": [
+    "next js",
+    "guide"
+  ],
+  "draft": false,
+  "summary": "In this article we introduce adding images in the tailwind starter blog and the benefits and limitations of the next/image component.",
+  "authors": [
+    "sparrowhawk"
+  ],
+  "portableTextBody": [
+    {
+      "_type": "block",
+      "style": "h1",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Introduction",
+          "_key": "ibkpmv"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The tailwind starter blog has out of the box support for ",
+          "_key": "62bmsi"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "es8ic2"
+          ],
+          "text": "Next.js's built-in image component",
+          "_key": "rf9ct1"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and automatically swaps out default image tags in markdown or mdx documents to use the Image component provided.",
+          "_key": "hxfm0j"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "es8ic2",
+          "href": "https://nextjs.org/docs/api-reference/next/image"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h1",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Usage",
+          "_key": "sgo6vu"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "To use in a new page route / javascript file, simply import the image component and call it e.g.",
+          "_key": "aux9m9"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "js",
+      "code": "import Image from 'next/image'\n\nfunction Home() {\n  return (\n    <>\n      <h1>My Homepage</h1>\n      <Image src=\"/me.png\" alt=\"Picture of the author\" width={500} height={500} />\n      <p>Welcome to my homepage!</p>\n    </>\n  )\n}\n\nexport default Home"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "For a markdown file, the default image tag can be used and the default ",
+          "_key": "ngsfvo"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "img",
+          "_key": "mjr8fd"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " tag gets replaced by the ",
+          "_key": "1j2i3t"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "Image",
+          "_key": "sg1vd0"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " component in the build process.",
+          "_key": "ptk521"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Assuming we have a file called ",
+          "_key": "c88eqh"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "ocean.jpg",
+          "_key": "o8ugq2"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " in ",
+          "_key": "6l6p9m"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "static/images/ocean.jpg",
+          "_key": "sfwzce"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ", the following line of code would generate the optimized image.",
+          "_key": "cq2sqf"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "![ocean](/static/images/ocean.jpg)"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Alternatively, since we are using mdx, we can just use the image component directly! Note, that you would have to provide a fixed width and height. The ",
+          "_key": "ynbgx5"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "img",
+          "_key": "2txxct"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " tag method parses the dimension automatically.",
+          "_key": "d96yo9"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "js",
+      "code": "<Image alt=\"ocean\" src=\"/static/images/ocean.jpg\" width={256} height={128} />"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "em"
+          ],
+          "text": "Note",
+          "_key": "0wp1g9"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ": If you try to save the image, it is in webp format, if your browser supports it!",
+          "_key": "apsy5m"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "[Image: ocean]",
+          "_key": "8kjzpt"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Photo by ",
+          "_key": "nlo0jt"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "wwztfg"
+          ],
+          "text": "YUCAR FotoGrafik",
+          "_key": "wttzg3"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "\non ",
+          "_key": "nqoj1n"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "fe9cet"
+          ],
+          "text": "Unsplash",
+          "_key": "48ynrf"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "wwztfg",
+          "href": "https://unsplash.com/@yucar?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+        },
+        {
+          "_type": "link",
+          "_key": "fe9cet",
+          "href": "https://unsplash.com/s/photos/sea?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h1",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Benefits",
+          "_key": "rewl4j"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Smaller image size with Webp (~30% smaller than jpeg)",
+          "_key": "c3ryw9"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Responsive images - the correct image size is served based on the user's viewport",
+          "_key": "rg7gyj"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Lazy loading - images load as they are scrolled to the viewport",
+          "_key": "w8d07x"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Avoids ",
+          "_key": "064vlk"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "0otonu"
+          ],
+          "text": "Cumulative Layout Shift",
+          "_key": "dyd4ln"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "0otonu",
+          "href": "https://web.dev/cls/"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Optimization on demand instead of build-time - no increase in build time!",
+          "_key": "92ybci"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "h1",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Limitations",
+          "_key": "x0p8pr"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Due to the reliance on ",
+          "_key": "eyiobg"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "next/image",
+          "_key": "9l8keb"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ", unless you are using an external image CDN like Cloudinary or Imgix, it is practically required to use Vercel for hosting. This is because the component acts like a serverless function that calls a highly optimized image CDN.",
+          "_key": "aic9b5"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "If you do not want to be tied to Vercel, you can remove ",
+          "_key": "ubdu2r"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "imgToJsx",
+          "_key": "b7lxbx"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " in ",
+          "_key": "pm9d4o"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "remarkPlugins",
+          "_key": "k8cmjk"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " in ",
+          "_key": "6nllnb"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "lib/mdx.js",
+          "_key": "woliit"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ". This would avoid substituting the default ",
+          "_key": "ha2b8j"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "img",
+          "_key": "h1qvpq"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " tag.",
+          "_key": "uhh16f"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Alternatively, one could wait for image optimization at build time to be supported. A different library, ",
+          "_key": "fyhd3l"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "o07n8v"
+          ],
+          "text": "next-optimized-images",
+          "_key": "3xl4ew"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " does that, although it requires transforming the images through webpack which is not done here.",
+          "_key": "llktad"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "o07n8v",
+          "href": "https://github.com/cyrilwanner/next-optimized-images"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Images from external links are not passed through ",
+          "_key": "ionj8q"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "next/image",
+          "_key": "q87ib2"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "All images have to be stored in the ",
+          "_key": "6k5r0i"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "public",
+          "_key": "t8f9fg"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " folder e.g ",
+          "_key": "4yjxjq"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "/static/images/ocean.jpeg",
+          "_key": "6xgb07"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    }
+  ]
+}

@@ -1,0 +1,397 @@
+{
+  "title": "Google Mantis: an Agentic Vulnerability Scanning Harness for Reducing False Positives",
+  "date": "2026-09-06",
+  "tags": [
+    "ai",
+    "security",
+    "agents",
+    "google",
+    "devops"
+  ],
+  "draft": false,
+  "summary": "Google has open-sourced Mantis, an AI-agent framework designed to automate the software vulnerability lifecycle using critic agents, sandbox validation, and hierarchical context reduction.",
+  "authors": [
+    "default"
+  ],
+  "portableTextBody": [
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Google has open-sourced ",
+          "_key": "mhwzl6"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Mantis",
+          "_key": "ahei1e"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ", an AI-agent framework designed to automate the software vulnerability lifecycle—from identifying and validating vulnerabilities to reproducing and fixing them. Google developed Mantis to tackle the persistent problem of high false positive rates and hallucinated vulnerabilities typical of traditional AI code scanning.",
+          "_key": "tqet1z"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "mdxComponent",
+      "name": "blockquote",
+      "attributes": {
+        "className": "border-l-4 border-primary-500 pl-4 italic text-gray-700 dark:text-gray-300 my-4"
+      },
+      "children": [
+        {
+          "_type": "block",
+          "style": "normal",
+          "children": [
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "\"While sloppiness in AI code scanning frequently leads to hallucinated bugs and weak true-positive rates under 7%, we designed Mantis to be effective by combining industry-standard agentic techniques like critic and review agents with sandboxed reproduction of vulnerabilities for grounding.\"\n",
+              "_key": "qwg1mu"
+            },
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "— Google Security Team",
+              "_key": "m6u9vl"
+            }
+          ],
+          "markDefs": []
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Google explains that Mantis analyzes repository history, previous security fixes, architecture, and threat models rather than blindly scanning files using brute force. It summarizes the analyzed files into a hierarchical tree containing directory- and repository-level context, ",
+          "_key": "6sn60m"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "reducing token usage by 85%",
+          "_key": "l8va9y"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " while retaining critical structural information.",
+          "_key": "dtht5m"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Mantis combines critic and reviewer agents to eliminate false positives and prioritize high-value findings. Instead of relying solely on an LLM's judgment, it reproduces findings inside a sandboxed environment to gather concrete runtime evidence before flagging an issue.",
+          "_key": "0dhmif"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Multi-Agent Architecture and Skill Suite",
+          "_key": "gsf4x0"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Mantis is part of Google's internal approach to finding and resolving security vulnerabilities at machine speed. Its architecture delegates responsibilities across specialized roles:",
+          "_key": "iwehr5"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Strategist Agent:",
+          "_key": "ctrwbl"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " Evaluates high-level system architecture, threat models, and dependency graphs.",
+          "_key": "r9s3io"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Research Agents:",
+          "_key": "wxyq8v"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " Query internal code indexes and trace data flows, control flows, and sanitization logic across raw source files.",
+          "_key": "n8wn8p"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Critic and Reviewer Agents:",
+          "_key": "fnlpgj"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " Filter noise and validate that proposed vulnerabilities are structurally sound.",
+          "_key": "xl7frd"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Mantis is organized as a modular skill suite containing over 15 discrete tools that execute sequentially or in parallel (such as ",
+          "_key": "xukqwz"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "mantis-summarize",
+          "_key": "apqzix"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ", ",
+          "_key": "6b0vk6"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "mantis-review",
+          "_key": "ljpzaf"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ", and ",
+          "_key": "g86won"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "mantis-critic",
+          "_key": "i97jqu"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "). Pipeline stages synchronize state by reading and writing to a shared, disk-backed state store.",
+          "_key": "iix6qw"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Model Tiering and Execution Strategy",
+          "_key": "8emx7u"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Mantis supports combining heterogeneous model tiers across different phases of the lifecycle:",
+          "_key": "4t5umx"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "mdxComponent",
+      "name": "blockquote",
+      "attributes": {
+        "className": "border-l-4 border-primary-500 pl-4 italic text-gray-700 dark:text-gray-300 my-4"
+      },
+      "children": [
+        {
+          "_type": "block",
+          "style": "normal",
+          "children": [
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "\"To maximize the speed and efficiency of your automated pipeline, you should strategically pair the right AI model class with the specific task. You do not need to use the heaviest, most advanced frontier models for every stage.\"\n",
+              "_key": "0x5u3j"
+            },
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "— Google",
+              "_key": "g548pc"
+            }
+          ],
+          "markDefs": []
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ""
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Handling False Positives",
+          "_key": "38cvk6"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Vulnerability scanners frequently overwhelm security teams with high false-positive volumes. Mantis introduces the ",
+          "_key": "d3amcl"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "mantis-review",
+          "_key": "it1y13"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " stage, which applies a rule-based negative filter to eliminate noise before triage.",
+          "_key": "wuincw"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "However, Google notes that engineering teams must calibrate these negative filters with caution: flagging low-severity or low-risk findings as immediate false positives can overly broaden the filter and cause genuine vulnerabilities to slip through undetected.",
+          "_key": "alypk3"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "em"
+          ],
+          "text": "Mantis is openly available on GitHub alongside official agent reference guides detailing inter-stage communication contracts and deployment recipes.",
+          "_key": "ket2q9"
+        }
+      ],
+      "markDefs": []
+    }
+  ]
+}

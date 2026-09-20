@@ -1,0 +1,276 @@
+{
+  "title": "Introducing Multi-part Posts with Nested Routing",
+  "date": "2021-05-02",
+  "tags": [
+    "multi-author",
+    "next-js",
+    "feature"
+  ],
+  "draft": false,
+  "summary": "The blog template supports posts in nested sub-folders. This can be used to group posts of similar content e.g. a multi-part course. This post is itself an example of a nested route!",
+  "portableTextBody": [
+    {
+      "_type": "block",
+      "style": "h1",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Nested Routes",
+          "_key": "vgw4zm"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The blog template supports posts in nested sub-folders. This helps in organisation and can be used to group posts of similar content e.g. a multi-part series. This post is itself an example of a nested route! It's located in the ",
+          "_key": "zgprxr"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "/data/blog/nested-route",
+          "_key": "37zpzn"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " folder.",
+          "_key": "u35iq4"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "How",
+          "_key": "6cmgrs"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Simplify create multiple folders inside the main ",
+          "_key": "bu068l"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "/data/blog",
+          "_key": "bnz5ix"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " folder and add your ",
+          "_key": "gidpba"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": ".md",
+          "_key": "ttzi9l"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "/",
+          "_key": "mlzftp"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": ".mdx",
+          "_key": "ocrhk6"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " files to them. You can even create something like ",
+          "_key": "vkvhsc"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "/data/blog/nested-route/deeply-nested-route/my-post.md",
+          "_key": "l1rnf4"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "We use Next.js catch all routes to handle the routing and path creations.",
+          "_key": "1aanyw"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Use Cases",
+          "_key": "sjg3il"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Here are some reasons to use nested routes",
+          "_key": "xmga6r"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "More logical content organisation (blogs will still be displayed based on the created date)",
+          "_key": "t60qtt"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Multi-part posts",
+          "_key": "ddbz2r"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Different sub-routes for each author",
+          "_key": "upinfa"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Internationalization (though it would be recommended to use ",
+          "_key": "e2xtzf"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "xp33nz"
+          ],
+          "text": "Next.js built-in i8n routing",
+          "_key": "6twnzu"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ")",
+          "_key": "rrgukk"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "xp33nz",
+          "href": "https://nextjs.org/docs/advanced-features/i18n-routing"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Note",
+          "_key": "dy5949"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The previous/next post links at bottom of the template are currently sorted by date. One could explore modifying the template to refer the reader to the previous/next post in the series, rather than by date.",
+          "_key": "9um14d"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    }
+  ]
+}

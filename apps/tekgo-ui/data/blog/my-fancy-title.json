@@ -1,0 +1,25 @@
+{
+  "title": "My fancy title",
+  "date": "2021-01-31",
+  "tags": [
+    "hello"
+  ],
+  "draft": true,
+  "summary": "draft post",
+  "images": [],
+  "portableTextBody": [
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Draft post which should not display",
+          "_key": "2ng4je"
+        }
+      ],
+      "markDefs": []
+    }
+  ]
+}

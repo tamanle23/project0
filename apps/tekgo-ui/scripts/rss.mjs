@@ -1,11 +1,65 @@
-import { writeFileSync, mkdirSync } from 'fs'
+import { writeFileSync, mkdirSync, existsSync, readdirSync, statSync, readFileSync } from 'fs'
 import path from 'path'
 import { slug } from 'github-slugger'
 import { escape } from 'pliny/utils/htmlEscaper.js'
 import siteMetadata from '../data/siteMetadata.js'
-import tagData from '../app/tag-data.json' with { type: 'json' }
-import { allBlogs } from '../.contentlayer/generated/index.mjs'
-import { sortPosts } from 'pliny/utils/contentlayer.js'
+
+function getFilesRecursively(dir) {
+  let results = []
+  if (!existsSync(dir)) return results
+  const list = readdirSync(dir)
+  for (const file of list) {
+    const filePath = path.join(dir, file)
+    const stat = statSync(filePath)
+    if (stat && stat.isDirectory()) {
+      results = results.concat(getFilesRecursively(filePath))
+    } else {
+      if (filePath.endsWith('.json')) {
+        results.push(filePath)
+      }
+    }
+  }
+  return results
+}
+
+function loadBlogs() {
+  const blogDir = path.join(process.cwd(), 'data', 'blog')
+  const files = getFilesRecursively(blogDir)
+  
+  return files.map((filePath) => {
+    const raw = readFileSync(filePath, 'utf8')
+    const doc = JSON.parse(raw)
+    const relativePath = path.relative(path.join(process.cwd(), 'data'), filePath).replace(/\\/g, '/')
+    const flattenedPath = relativePath.replace(/\.json$/, '')
+    const postSlug = flattenedPath.replace(/^.+?(\/)/, '')
+    return {
+      ...doc,
+      slug: postSlug,
+      tags: doc.tags || [],
+    }
+  })
+}
+
+function sortPosts(posts) {
+  return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+}
+
+function computeTagData(allBlogs) {
+  const tagCount = {}
+  allBlogs.forEach((file) => {
+    if (file.tags && file.draft !== true) {
+      file.tags.forEach((tag) => {
+        const formattedTag = slug(tag)
+        if (formattedTag in tagCount) {
+          tagCount[formattedTag] += 1
+        } else {
+          tagCount[formattedTag] = 1
+        }
+      })
+    }
+  })
+  return tagCount
+}
 
 const outputFolder = process.env.EXPORT ? 'out' : 'public'
 
@@ -46,6 +100,7 @@ async function generateRSS(config, allBlogs, page = 'feed.xml') {
   }
 
   if (publishPosts.length > 0) {
+    const tagData = computeTagData(publishPosts)
     for (const tag of Object.keys(tagData)) {
       const filteredPosts = allBlogs.filter((post) => post.tags.map((t) => slug(t)).includes(tag))
       const rss = generateRss(config, filteredPosts, `tags/${tag}/${page}`)
@@ -56,8 +111,27 @@ async function generateRSS(config, allBlogs, page = 'feed.xml') {
   }
 }
 
+function createSearchIndex(allBlogs) {
+  if (
+    siteMetadata?.search?.provider === 'kbar' &&
+    siteMetadata.search.kbarConfig.searchDocumentsPath
+  ) {
+    const coreContents = allBlogs.map(blog => {
+      const { portableTextBody, structuredData, ...core } = blog
+      return core
+    })
+    writeFileSync(
+      `public/${path.basename(siteMetadata.search.kbarConfig.searchDocumentsPath)}`,
+      JSON.stringify(coreContents)
+    )
+    console.log('Local search index generated...')
+  }
+}
+
 const rss = () => {
+  const allBlogs = loadBlogs()
   generateRSS(siteMetadata, allBlogs)
   console.log('RSS feed generated...')
+  createSearchIndex(allBlogs)
 }
 export default rss

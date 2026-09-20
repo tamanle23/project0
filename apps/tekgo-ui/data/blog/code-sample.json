@@ -1,0 +1,109 @@
+{
+  "title": "Sample .md file",
+  "date": "2016-03-08",
+  "tags": [
+    "markdown",
+    "code",
+    "features"
+  ],
+  "draft": false,
+  "summary": "Example of a markdown file with code blocks and syntax highlighting",
+  "portableTextBody": [
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "A sample post with markdown.",
+          "_key": "63vg16"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Inline Highlighting",
+          "_key": "a5jvkh"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Sample of inline highlighting ",
+          "_key": "cs683c"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "sum = parseInt(num1) + parseInt(num2)",
+          "_key": "5j9xj1"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Code Blocks",
+          "_key": "mszjmv"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Some Javascript code",
+          "_key": "bwnv5h"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "javascript",
+      "code": "var num1, num2, sum\nnum1 = prompt('Enter first number')\nnum2 = prompt('Enter second number')\nsum = parseInt(num1) + parseInt(num2) // \"+\" means \"add\"\nalert('Sum = ' + sum) // \"+\" means combine into a string"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Some Python code 🐍",
+          "_key": "icrgy3"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "python",
+      "code": "def fib():\n    a, b = 0, 1\n    while True:            # First iteration:\n        yield a            # yield 0 to start with and then\n        a, b = b, a + b    # a will now be 1, and b will also be 1, (0 + 1)\n\nfor index, fibonacci_number in zip(range(10), fib()):\n     print('{i:3}: {f:3}'.format(i=index, f=fibonacci_number))"
+    }
+  ]
+}

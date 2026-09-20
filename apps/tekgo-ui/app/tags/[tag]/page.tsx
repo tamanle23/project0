@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable prettier/prettier */
+/* eslint-disable jsx-a11y/media-has-caption */
 import { slug } from 'github-slugger'
-import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer'
+import { allCoreContent, sortPosts } from '@/lib/content'
 import siteMetadata from '@/data/siteMetadata'
 import ListLayout from '@/layouts/ListLayoutWithTags'
-import { allBlogs } from 'contentlayer/generated'
-import tagData from 'app/tag-data.json'
+import { allBlogs } from '@/lib/content'
+import { tagData } from '@/lib/content'
 import { genPageMetadata } from 'app/seo'
 import { Metadata } from 'next'
 
@@ -39,7 +42,7 @@ export default async function TagPage(props: { params: Promise<{ tag: string }> 
   const tag = decodeURI(params.tag)
   const title = tag[0].toUpperCase() + tag.split(' ').join('-').slice(1)
   const filteredPosts = allCoreContent(
-    sortPosts(allBlogs.filter((post) => post.tags && post.tags.map((t) => slug(t)).includes(tag)))
+    sortPosts(allBlogs.filter((post) => post.tags && post.tags.map((t) => slug(t)).includes(tag)) as any) as any
   )
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE)
   const initialDisplayPosts = filteredPosts.slice(0, POSTS_PER_PAGE)
@@ -50,8 +53,8 @@ export default async function TagPage(props: { params: Promise<{ tag: string }> 
 
   return (
     <ListLayout
-      posts={filteredPosts}
-      initialDisplayPosts={initialDisplayPosts}
+      posts={filteredPosts as any}
+      initialDisplayPosts={initialDisplayPosts as any}
       pagination={pagination}
       title={title}
     />

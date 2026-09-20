@@ -1,0 +1,1045 @@
+{
+  "title": "Markdown Guide",
+  "date": "2019-10-11",
+  "tags": [
+    "github",
+    "guide"
+  ],
+  "draft": false,
+  "summary": "Markdown cheatsheet for all your blogging needs - headers, lists, images, tables and more! An illustrated guide based on GitHub Flavored Markdown.",
+  "portableTextBody": [
+    {
+      "_type": "block",
+      "style": "h1",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Introduction",
+          "_key": "7cz7wu"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Markdown and Mdx parsing is supported via ",
+          "_key": "faic93"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "unified",
+          "_key": "r75yzs"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ", and other remark and rehype packages. ",
+          "_key": "v5w5l9"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "next-mdx-remote",
+          "_key": "48bx9o"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " allows us to parse ",
+          "_key": "dnn2rt"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": ".mdx",
+          "_key": "ag1kwy"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and ",
+          "_key": "0f08yv"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": ".md",
+          "_key": "lsri9z"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " files in a more flexible manner without touching webpack.",
+          "_key": "hqca9g"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "GitHub flavored markdown is used. ",
+          "_key": "kc94uj"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "mdx-prism",
+          "_key": "2o808z"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " provides syntax highlighting capabilities for code blocks. Here's a demo of how everything looks.",
+          "_key": "su8ga1"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The following markdown cheatsheet is adapted from: ",
+          "_key": "9i1lar"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "qxyc8w"
+          ],
+          "text": "https://guides.github.com/features/mastering-markdown/",
+          "_key": "eqnszy"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "qxyc8w",
+          "href": "https://guides.github.com/features/mastering-markdown/"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h1",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "What is Markdown?",
+          "_key": "iwy07x"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Markdown is a way to style text on the web. You control the display of the document; formatting words as bold or italic, adding images, and creating lists are just a few of the things we can do with Markdown. Mostly, Markdown is just regular text with a few non-alphabetic characters thrown in, like ",
+          "_key": "xfg5x2"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "#",
+          "_key": "9lkgri"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " or ",
+          "_key": "jttpnb"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "*",
+          "_key": "liqlbj"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".",
+          "_key": "zv9k9h"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h1",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Syntax guide",
+          "_key": "2z3rg9"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Here’s an overview of Markdown syntax that you can use anywhere on GitHub.com or in your own text files.",
+          "_key": "pvtvvt"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Headers",
+          "_key": "imq795"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "# This is a h1 tag\n\n## This is a h2 tag\n\n#### This is a h4 tag"
+    },
+    {
+      "_type": "block",
+      "style": "h1",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "This is a h1 tag",
+          "_key": "esij9b"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "This is a h2 tag",
+          "_key": "n5s70t"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h4",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "This is a h4 tag",
+          "_key": "72st1q"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Emphasis",
+          "_key": "98feor"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "_This text will be italic_\n\n**This text will be bold**\n\n_You **can** combine them_"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "em"
+          ],
+          "text": "This text will be italic",
+          "_key": "v888gb"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "This text will be bold",
+          "_key": "eutwki"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "em"
+          ],
+          "text": "You ",
+          "_key": "rzk8o4"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "em",
+            "strong"
+          ],
+          "text": "can",
+          "_key": "ducrf2"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "em"
+          ],
+          "text": " combine them",
+          "_key": "r8djq0"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Lists",
+          "_key": "rji3ze"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h3",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Unordered",
+          "_key": "g30qgh"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "- Item 1\n- Item 2\n  - Item 2a\n  - Item 2b"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Item 1",
+          "_key": "btsysf"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Item 2",
+          "_key": "20kkb6"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Item 2a",
+          "_key": "bqgz59"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Item 2b",
+          "_key": "yvozeu"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "h3",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Ordered",
+          "_key": "rvb6up"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "1. Item 1\n1. Item 2\n1. Item 3\n   1. Item 3a\n   1. Item 3b"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Item 1",
+          "_key": "sg2rpo"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Item 2",
+          "_key": "z429b3"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Item 3",
+          "_key": "ucy9z6"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Item 3a",
+          "_key": "w11ulw"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Item 3b",
+          "_key": "etrahc"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Images",
+          "_key": "cv9sca"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "![GitHub Logo](https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png)\nFormat: ![Alt Text](url)"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "[Image: GitHub Logo]",
+          "_key": "fa5zgt"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Links",
+          "_key": "nvc78s"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "http://github.com - automatic!\n[GitHub](http://github.com)"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "t25t7o"
+          ],
+          "text": "http://github.com",
+          "_key": "tnao8m"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - automatic!\n",
+          "_key": "ksoavd"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "7p1j1y"
+          ],
+          "text": "GitHub",
+          "_key": "emvyiz"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "t25t7o",
+          "href": "http://github.com"
+        },
+        {
+          "_type": "link",
+          "_key": "7p1j1y",
+          "href": "http://github.com"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Blockquotes",
+          "_key": "tbh3bu"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "As Kanye West said:\n\n> We're living the future so\n> the present is our past."
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "As Kanye West said:",
+          "_key": "uagy9b"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "blockquote",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ""
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Inline code",
+          "_key": "uonzal"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "I think you should use an\n`<addr>` element here instead."
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "I think you should use an\n",
+          "_key": "3lwq3w"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "<addr>",
+          "_key": "4w9j0z"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " element here instead.",
+          "_key": "kerar0"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Syntax highlighting",
+          "_key": "rnmatg"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Here’s an example of how you can use syntax highlighting with ",
+          "_key": "gvky5l"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "ajrc3j"
+          ],
+          "text": "GitHub Flavored Markdown",
+          "_key": "kyhdkt"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ":",
+          "_key": "w24fv2"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "ajrc3j",
+          "href": "https://help.github.com/articles/basic-writing-and-formatting-syntax/"
+        }
+      ]
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "```js:fancyAlert.js\nfunction fancyAlert(arg) {\n  if (arg) {\n    $.facebox({ div: '#foo' })\n  }\n}\n```"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "And here's how it looks - nicely colored with styled code titles!",
+          "_key": "fx4rrq"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "js:fancyAlert.js",
+      "code": "function fancyAlert(arg) {\n  if (arg) {\n    $.facebox({ div: '#foo' })\n  }\n}"
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Footnotes",
+          "_key": "xgas23"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "Here is a simple footnote[^1]. With some additional text after it.\n\n[^1]: My reference."
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Here is a simple footnote",
+          "_key": "cktg91"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "u7pj0f"
+          ],
+          "text": "[1]",
+          "_key": "sunjok"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ". With some additional text after it.",
+          "_key": "l02doa"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "u7pj0f",
+          "href": "#fn-1"
+        }
+      ]
+    },
+    {
+      "_type": "footnoteDefinition",
+      "identifier": "1",
+      "children": [
+        {
+          "_type": "block",
+          "style": "normal",
+          "children": [
+            {
+              "_type": "span",
+              "marks": [],
+              "text": "My reference.",
+              "_key": "l08jdg"
+            }
+          ],
+          "markDefs": []
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Task Lists",
+          "_key": "ywne2o"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "- [x] list syntax required (any unordered or ordered list supported)\n- [x] this is a complete item\n- [ ] this is an incomplete item"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "list syntax required (any unordered or ordered list supported)",
+          "_key": "pstvv8"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "this is a complete item",
+          "_key": "ffi5tn"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "this is an incomplete item",
+          "_key": "msj7ah"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Tables",
+          "_key": "ieico4"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "You can create tables by assembling a list of words and dividing them with hyphens ",
+          "_key": "n2pjkp"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "-",
+          "_key": "03ipkp"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " (for the first row), and then separating each column with a pipe ",
+          "_key": "ybbzdt"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "|",
+          "_key": "e6w0hs"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ":",
+          "_key": "1xt8yw"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "| First Header                | Second Header                |\n| --------------------------- | ---------------------------- |\n| Content from cell 1         | Content from cell 2          |\n| Content in the first column | Content in the second column |"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ""
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Strikethrough",
+          "_key": "zz3zm9"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Any word wrapped with two tildes (like ",
+          "_key": "tkm504"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "~~this~~",
+          "_key": "ql6fnc"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ") will appear ",
+          "_key": "w2qqtu"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".",
+          "_key": "lex2hr"
+        }
+      ],
+      "markDefs": []
+    }
+  ]
+}

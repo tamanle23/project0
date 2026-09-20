@@ -1,0 +1,2464 @@
+{
+  "title": "Introducing Tailwind Nextjs Starter Blog",
+  "date": "2021-01-12",
+  "lastmod": "2024-08-16",
+  "tags": [
+    "next-js",
+    "tailwind",
+    "guide"
+  ],
+  "draft": false,
+  "summary": "Looking for a performant, out of the box template, with all the best in web technology to support your blogging needs? Checkout the Tailwind Nextjs Starter Blog template.",
+  "images": [
+    "/static/images/canada/mountains.jpg",
+    "/static/images/canada/toronto.jpg"
+  ],
+  "authors": [
+    "default",
+    "sparrowhawk"
+  ],
+  "portableTextBody": [
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "[Image: tailwind-nextjs-banner]",
+          "_key": "z1mzra"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h1",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Tailwind Nextjs Starter Blog",
+          "_key": "cpj7j0"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "hpjn3b"
+          ],
+          "text": "[Image: Deploy with Vercel]",
+          "_key": "zitd1v"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "hpjn3b",
+          "href": "https://vercel.com/new/git/external?repository-url=https://github.com/timlrx/tailwind-nextjs-starter-blog"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "blockquote",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ""
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "This is a ",
+          "_key": "c5ezya"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "gjglz6"
+          ],
+          "text": "Next.js",
+          "_key": "nlk5j1"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ", ",
+          "_key": "crydfo"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "ysoc2w"
+          ],
+          "text": "Tailwind CSS",
+          "_key": "uhakfp"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " blogging starter template. Probably the most feature-rich Next.js markdown blogging template out there. Comes out of the box configured with the latest technologies to make technical writing a breeze. Easily configurable and customizable. Perfect as a replacement to existing Jekyll and Hugo individual blogs.",
+          "_key": "slzw5k"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "gjglz6",
+          "href": "https://nextjs.org/"
+        },
+        {
+          "_type": "link",
+          "_key": "ysoc2w",
+          "href": "https://tailwindcss.com/"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Check out the documentation below to get started.",
+          "_key": "ing6lf"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Facing issues? Check the ",
+          "_key": "gmo9jk"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "mvkowl"
+          ],
+          "text": "FAQ page",
+          "_key": "rv0wkc"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and do a search on past issues. Feel free to open a new issue if none has been posted previously.",
+          "_key": "gyydve"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "mvkowl",
+          "href": "https://github.com/timlrx/tailwind-nextjs-starter-blog/wiki"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Feature request? Check the past discussions to see if it has been brought up previously. Otherwise, feel free to start a new discussion thread. All ideas are welcomed!",
+          "_key": "6uv85w"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Examples",
+          "_key": "bn2bku"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "996k1s"
+          ],
+          "text": "Demo Blog",
+          "_key": "axo644"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - this repo",
+          "_key": "uihuo3"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "996k1s",
+          "href": "https://tailwind-nextjs-starter-blog.vercel.app/"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "wxj6tr"
+          ],
+          "text": "My personal blog",
+          "_key": "4qad4o"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - modified to auto-generate blog posts with dates",
+          "_key": "ohcnkq"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "wxj6tr",
+          "href": "https://www.timlrx.com"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "1s1db4"
+          ],
+          "text": "Aloisdg's cookbook",
+          "_key": "hp1jra"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - with pictures and recipes!",
+          "_key": "yp3jqy"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "1s1db4",
+          "href": "https://tambouille.vercel.app/"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "q7advb"
+          ],
+          "text": "GautierArcin's demo with next translate",
+          "_key": "znzl6i"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - includes translation of mdx posts, ",
+          "_key": "okq70h"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "7kbw5i"
+          ],
+          "text": "source code",
+          "_key": "pmnz4e"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "q7advb",
+          "href": "https://tailwind-nextjs-starter-blog-seven.vercel.app/"
+        },
+        {
+          "_type": "link",
+          "_key": "7kbw5i",
+          "href": "https://github.com/GautierArcin/tailwind-nextjs-starter-blog/tree/demo/next-translate"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "rl0byr"
+          ],
+          "text": "David Levai's digital garden",
+          "_key": "nes22w"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - customized design and added email subscriptions",
+          "_key": "srrdjb"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "rl0byr",
+          "href": "https://davidlevai.com/"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "b2o7s2"
+          ],
+          "text": "Thinh's Corner",
+          "_key": "86a7wn"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - ",
+          "_key": "9j9isw"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "58wfzt"
+          ],
+          "text": "customized layout",
+          "_key": "ux9wgc"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " with sticky side table of contents",
+          "_key": "3fxnxu"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "b2o7s2",
+          "href": "https://thinhcorner.com/"
+        },
+        {
+          "_type": "link",
+          "_key": "58wfzt",
+          "href": "https://github.com/Th1nhNg0/th1nhng0.vercel.app/blob/5e73a420828d82f01e7147512a2c3273c4ec19f8/layouts/PostLayout.js"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Using the template? Feel free to create a PR and add your blog to this list.",
+          "_key": "dq5v23"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Motivation",
+          "_key": "to396w"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "I wanted to port my existing blog to Nextjs and Tailwind CSS but there was no easy out of the box template to use so I decided to create one. Design is adapted from ",
+          "_key": "4ynfg9"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "fn2i6f"
+          ],
+          "text": "Tailwindlabs blog",
+          "_key": "wwkluo"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".",
+          "_key": "v8fb9u"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "fn2i6f",
+          "href": "https://github.com/tailwindlabs/blog.tailwindcss.com"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "I wanted it to be nearly as feature-rich as popular blogging templates like ",
+          "_key": "utaqoe"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "ergrjl"
+          ],
+          "text": "beautiful-jekyll",
+          "_key": "a110bd"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and ",
+          "_key": "wbhdnf"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "tljunj"
+          ],
+          "text": "Hugo Academic",
+          "_key": "5tpydn"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " but with the best of React's ecosystem and current web development's best practices.",
+          "_key": "06nqj2"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "ergrjl",
+          "href": "https://github.com/daattali/beautiful-jekyll"
+        },
+        {
+          "_type": "link",
+          "_key": "tljunj",
+          "href": "https://github.com/wowchemy/wowchemy-hugo-modules"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Features",
+          "_key": "r6vgfh"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Easy styling customization with ",
+          "_key": "fcksuq"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "rtiu8j"
+          ],
+          "text": "Tailwind 3.0",
+          "_key": "2hod0z"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and primary color attribute",
+          "_key": "v56svp"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "rtiu8j",
+          "href": "https://tailwindcss.com/blog/tailwindcss-v3"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Near perfect lighthouse score - ",
+          "_key": "3xd178"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "8e89kp"
+          ],
+          "text": "Lighthouse report",
+          "_key": "n99krc"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "8e89kp",
+          "href": "https://www.webpagetest.org/result/210111_DiC1_08f3670c3430bf4a9b76fc3b927716c5/"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Lightweight, 45kB first load JS, uses Preact in production build",
+          "_key": "uf4pn0"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Mobile-friendly view",
+          "_key": "e8lk3k"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Light and dark theme",
+          "_key": "v838si"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Self-hosted font with ",
+          "_key": "fdffxh"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "jp7k4d"
+          ],
+          "text": "Fontsource",
+          "_key": "11xm11"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "jp7k4d",
+          "href": "https://fontsource.org/"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Supports ",
+          "_key": "zw4o17"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "kflzjm"
+          ],
+          "text": "plausible",
+          "_key": "685dp3"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ", ",
+          "_key": "m34nvz"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "iyx6w1"
+          ],
+          "text": "simple analytics",
+          "_key": "uuxxna"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and google analytics",
+          "_key": "24go8d"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "kflzjm",
+          "href": "https://plausible.io/"
+        },
+        {
+          "_type": "link",
+          "_key": "iyx6w1",
+          "href": "https://simpleanalytics.com/"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "igmmko"
+          ],
+          "text": "MDX - write JSX in markdown documents!",
+          "_key": "7b5pte"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "igmmko",
+          "href": "https://mdxjs.com/"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Server-side syntax highlighting with line numbers and line highlighting via ",
+          "_key": "nexn5p"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "15opnn"
+          ],
+          "text": "rehype-prism-plus",
+          "_key": "vs9dgh"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "15opnn",
+          "href": "https://github.com/timlrx/rehype-prism-plus"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Math display supported via ",
+          "_key": "jy1th4"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "p0z0r1"
+          ],
+          "text": "KaTeX",
+          "_key": "epgref"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "p0z0r1",
+          "href": "https://katex.org/"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Citation and bibliography support via ",
+          "_key": "p26y1m"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "99nity"
+          ],
+          "text": "rehype-citation",
+          "_key": "sp57mk"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "99nity",
+          "href": "https://github.com/timlrx/rehype-citation"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Automatic image optimization via ",
+          "_key": "zfpatm"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "lvdd9a"
+          ],
+          "text": "next/image",
+          "_key": "kcqen8"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "lvdd9a",
+          "href": "https://nextjs.org/docs/basic-features/image-optimization"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Flexible data retrieval with ",
+          "_key": "1j7tba"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "dlzvu6"
+          ],
+          "text": "mdx-bundler",
+          "_key": "91h7sk"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "dlzvu6",
+          "href": "https://github.com/kentcdodds/mdx-bundler"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Support for tags - each unique tag will be its own page",
+          "_key": "53b5yb"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Support for multiple authors",
+          "_key": "cg2klt"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Blog templates",
+          "_key": "qge0on"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "TOC component",
+          "_key": "g07nkz"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Support for nested routing of blog posts",
+          "_key": "clqpyp"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Newsletter component with support for Mailchimp, Buttondown, Convertkit, Klaviyo, Revue, Emailoctopus and Beehiiv",
+          "_key": "zk52dt"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Supports ",
+          "_key": "mbm1pj"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "3rwzke"
+          ],
+          "text": "giscus",
+          "_key": "ngwrut"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ", ",
+          "_key": "ejx6sw"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "f0dc7i"
+          ],
+          "text": "utterances",
+          "_key": "lcl1dr"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " or disqus",
+          "_key": "4mu6ug"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "3rwzke",
+          "href": "https://github.com/laymonage/giscus"
+        },
+        {
+          "_type": "link",
+          "_key": "f0dc7i",
+          "href": "https://github.com/utterance/utterances"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Projects page",
+          "_key": "eab0qn"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Preconfigured security headers",
+          "_key": "4pq7rw"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "SEO friendly with RSS feed, sitemaps and more!",
+          "_key": "ufxf2k"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Sample posts",
+          "_key": "w782oz"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "vkarxl"
+          ],
+          "text": "A markdown guide",
+          "_key": "rag486"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "vkarxl",
+          "href": "https://tailwind-nextjs-starter-blog.vercel.app/blog/github-markdown-guide"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "722i6y"
+          ],
+          "text": "Learn more about images in Next.js",
+          "_key": "0kt80f"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "722i6y",
+          "href": "https://tailwind-nextjs-starter-blog.vercel.app/blog/guide-to-using-images-in-nextjs"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "i9lnz8"
+          ],
+          "text": "A tour of math typesetting",
+          "_key": "jpe89e"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "i9lnz8",
+          "href": "https://tailwind-nextjs-starter-blog.vercel.app/blog/deriving-ols-estimator"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "3eozuq"
+          ],
+          "text": "Simple MDX image grid",
+          "_key": "ym4usc"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "3eozuq",
+          "href": "https://tailwind-nextjs-starter-blog.vercel.app/blog/pictures-of-canada"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "ud71lm"
+          ],
+          "text": "Example of long prose",
+          "_key": "roapam"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "ud71lm",
+          "href": "https://tailwind-nextjs-starter-blog.vercel.app/blog/the-time-machine"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "rpztyr"
+          ],
+          "text": "Example of Nested Route Post",
+          "_key": "6crvn2"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "rpztyr",
+          "href": "https://tailwind-nextjs-starter-blog.vercel.app/blog/nested-route/introducing-multi-part-posts-with-nested-routing"
+        }
+      ],
+      "listItem": "bullet",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Quick Start Guide",
+          "_key": "1jpom5"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "JS (official support) - ",
+          "_key": "a6si1a"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "npx degit https://github.com/timlrx/tailwind-nextjs-starter-blog.git",
+          "_key": "8lifir"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " or TS (community support) - ",
+          "_key": "7out52"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "npx degit timlrx/tailwind-nextjs-starter-blog#typescript",
+          "_key": "c6rbti"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Personalize ",
+          "_key": "ad0o31"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "siteMetadata.js",
+          "_key": "fpdmpu"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " (site related information)",
+          "_key": "407481"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Modify the content security policy in ",
+          "_key": "ibf833"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "next.config.js",
+          "_key": "8mq3x8"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " if you want to use\nany analytics provider or a commenting solution other than giscus.",
+          "_key": "97kwa1"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Personalize ",
+          "_key": "78qmzr"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "authors/default.md",
+          "_key": "5fxi29"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " (main author)",
+          "_key": "4np6kl"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Modify ",
+          "_key": "zb0yw5"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "projectsData.ts",
+          "_key": "xgydcv"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Modify ",
+          "_key": "4eet5u"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "headerNavLinks.ts",
+          "_key": "e5pfda"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " to customize navigation links",
+          "_key": "k63cxx"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Add blog posts",
+          "_key": "5ywtak"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Deploy on Vercel",
+          "_key": "0nparu"
+        }
+      ],
+      "markDefs": [],
+      "listItem": "number",
+      "level": 1
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Development",
+          "_key": "23fthw"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "First, run the development server:",
+          "_key": "o9dj62"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": "bash",
+      "code": "npm start\n# or\nnpm run dev"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Open ",
+          "_key": "igzeg8"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "tm8scu"
+          ],
+          "text": "http://localhost:3000",
+          "_key": "6s1qlx"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " with your browser to see the result.",
+          "_key": "kub3u8"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "tm8scu",
+          "href": "http://localhost:3000"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "You can start editing the page by modifying ",
+          "_key": "5muxmu"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "pages/index.js",
+          "_key": "nnsfwg"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ". The page auto-updates as you edit the file.",
+          "_key": "urx0y0"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Extend / Customize",
+          "_key": "ncx9ro"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "data/siteMetadata.js",
+          "_key": "ykpoxu"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - contains most of the site related information which should be modified for a user's need.",
+          "_key": "joa02u"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "data/authors/default.md",
+          "_key": "gvxp1i"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - default author information (required). Additional authors can be added as files in ",
+          "_key": "3kd4tf"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "data/authors",
+          "_key": "tzyk5c"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".",
+          "_key": "7emt51"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "data/projectsData.js",
+          "_key": "yfrr0w"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - data used to generate styled card on the projects page.",
+          "_key": "aki8wm"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "data/headerNavLinks.js",
+          "_key": "hmp2i7"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - navigation links.",
+          "_key": "x7s32q"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "data/logo.svg",
+          "_key": "yogqeb"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - replace with your own logo.",
+          "_key": "m3qt9o"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "data/blog",
+          "_key": "bzlt50"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - replace with your own blog posts.",
+          "_key": "qoujla"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "public/static",
+          "_key": "xpm5zc"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - store assets such as images and favicons.",
+          "_key": "qs8d12"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "tailwind.config.js",
+          "_key": "ewtrca"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and ",
+          "_key": "x2lfry"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "css/tailwind.css",
+          "_key": "8li3cs"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - contain the tailwind stylesheet which can be modified to change the overall look and feel of the site.",
+          "_key": "co0kvp"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "css/prism.css",
+          "_key": "97kvic"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - controls the styles associated with the code blocks. Feel free to customize it and use your preferred prismjs theme e.g. ",
+          "_key": "o5asth"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "gdedgr"
+          ],
+          "text": "prism themes",
+          "_key": "0y0uwi"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".",
+          "_key": "mb9j51"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "gdedgr",
+          "href": "https://github.com/PrismJS/prism-themes"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "components/social-icons",
+          "_key": "qsjt52"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - to add other icons, simply copy an svg file from ",
+          "_key": "r3thsx"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "tr6jbk"
+          ],
+          "text": "Simple Icons",
+          "_key": "93a59g"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " and map them in ",
+          "_key": "96m0ff"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "index.js",
+          "_key": "uj37xt"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ". Other icons use ",
+          "_key": "6ufmju"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "xuaku1"
+          ],
+          "text": "heroicons",
+          "_key": "jiw7hz"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".",
+          "_key": "h2zbjc"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "tr6jbk",
+          "href": "https://simpleicons.org/"
+        },
+        {
+          "_type": "link",
+          "_key": "xuaku1",
+          "href": "https://heroicons.com/"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "components/MDXComponents.js",
+          "_key": "wkyfrc"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - pass your own JSX code or React component by specifying it over here. You can then call them directly in the ",
+          "_key": "9uwcc1"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": ".mdx",
+          "_key": "2m5irl"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " or ",
+          "_key": "1r1303"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": ".md",
+          "_key": "qhh18u"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " file. By default, a custom link and image component is passed.",
+          "_key": "p0an6t"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "layouts",
+          "_key": "i9lfqh"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - main templates used in pages.",
+          "_key": "tykh5j"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "pages",
+          "_key": "1psfl7"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - pages to route to. Read the ",
+          "_key": "m0oeqf"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "o8yp30"
+          ],
+          "text": "Next.js documentation",
+          "_key": "fagpat"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " for more information.",
+          "_key": "e69pej"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "o8yp30",
+          "href": "https://nextjs.org/docs"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "next.config.js",
+          "_key": "4eqcn2"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " - configuration related to Next.js. You need to adapt the Content Security Policy if you want to load scripts, images etc. from other domains.",
+          "_key": "wa72je"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Post",
+          "_key": "f8evqy"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h3",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Frontmatter",
+          "_key": "acudcg"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Frontmatter follows ",
+          "_key": "c9an56"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "bhnawg"
+          ],
+          "text": "Hugo's standards",
+          "_key": "xdrxgc"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".",
+          "_key": "d52a2e"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "bhnawg",
+          "href": "https://gohugo.io/content-management/front-matter/"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Currently 10 fields are supported.",
+          "_key": "xieei3"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "title (required)\ndate (required)\ntags (required, can be empty array)\nlastmod (optional)\ndraft (optional)\nsummary (optional)\nimages (optional, if none provided defaults to socialBanner in siteMetadata config)\nauthors (optional list which should correspond to the file names in `data/authors`. Uses `default` if none is specified)\nlayout (optional list which should correspond to the file names in `data/layouts`)\ncanonicalUrl (optional, canonical url for the post for SEO)"
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Here's an example of a post's frontmatter:",
+          "_key": "9xxjsh"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "code",
+      "language": null,
+      "code": "---\ntitle: 'Introducing Tailwind Nexjs Starter Blog'\ndate: '2021-01-12'\nlastmod: '2021-01-18'\ntags: ['next-js', 'tailwind', 'guide']\ndraft: false\nsummary: 'Looking for a performant, out of the box template, with all the best in web technology to support your blogging needs? Checkout the Tailwind Nextjs Starter Blog template.'\nimages: ['/static/images/canada/mountains.jpg', '/static/images/canada/toronto.jpg']\nauthors: ['default', 'sparrowhawk']\nlayout: PostLayout\ncanonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/introducing-tailwind-nextjs-starter-blog\n---"
+    },
+    {
+      "_type": "block",
+      "style": "h3",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Compose",
+          "_key": "08bcab"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Run ",
+          "_key": "nef3kb"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "node ./scripts/compose.js",
+          "_key": "ca9enj"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " to bootstrap a new post.",
+          "_key": "fcsqk9"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Follow the interactive prompt to generate a post with pre-filled front matter.",
+          "_key": "c3ckg6"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Deploy",
+          "_key": "43f3pt"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Vercel",
+          "_key": "45bbbn"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The easiest way to deploy the template is to use the ",
+          "_key": "fxdkeq"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "fr8cre"
+          ],
+          "text": "Vercel Platform",
+          "_key": "jauylp"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " from the creators of Next.js. Check out the ",
+          "_key": "mds4po"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "eb00a4"
+          ],
+          "text": "Next.js deployment documentation",
+          "_key": "135mfl"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " for more details.",
+          "_key": "dj022d"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "fr8cre",
+          "href": "https://vercel.com"
+        },
+        {
+          "_type": "link",
+          "_key": "eb00a4",
+          "href": "https://nextjs.org/docs/deployment"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Netlify / GitHub Pages / Firebase etc.",
+          "_key": "gewprh"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "As the template uses ",
+          "_key": "86bj93"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "next/image",
+          "_key": "fw3u43"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " for image optimization, additional configurations have to be made to deploy on other popular static hosting websites like ",
+          "_key": "d2sne6"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "ppx5kd"
+          ],
+          "text": "Netlify",
+          "_key": "t727e8"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " or ",
+          "_key": "9ihu2x"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "f7lrf9"
+          ],
+          "text": "GitHub Pages",
+          "_key": "et62ei"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ". An alternative image optimization provider such as Imgix, Cloudinary or Akamai has to be used. Alternatively, replace the ",
+          "_key": "ah23m9"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "next/image",
+          "_key": "fiemp5"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " component with a standard ",
+          "_key": "mganut"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "code"
+          ],
+          "text": "<img>",
+          "_key": "61n6b2"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " tag. See ",
+          "_key": "tlf419"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "ry0ldd",
+            "code"
+          ],
+          "text": "next/image",
+          "_key": "hzym0z"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "ry0ldd"
+          ],
+          "text": " documentation",
+          "_key": "0o7xcn"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " for more details.",
+          "_key": "49fjjz"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "ppx5kd",
+          "href": "https://www.netlify.com/"
+        },
+        {
+          "_type": "link",
+          "_key": "f7lrf9",
+          "href": "https://pages.github.com/"
+        },
+        {
+          "_type": "link",
+          "_key": "ry0ldd",
+          "href": "https://nextjs.org/docs/basic-features/image-optimization"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "The API routes used in the newsletter component cannot be used in a static site export. You will need to use a form API endpoint provider and substitute the route in the newsletter component accordingly. Other hosting platforms such as Netlify also offer alternative solutions - please refer to their docs for more information.",
+          "_key": "0reyr2"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Support",
+          "_key": "32lj1u"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Using the template? Support this effort by giving a star on GitHub, sharing your own blog and giving a shoutout on Twitter or be a project ",
+          "_key": "vybtuw"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "uzn6lo"
+          ],
+          "text": "sponsor",
+          "_key": "anlhls"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": ".",
+          "_key": "oo5g2w"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "uzn6lo",
+          "href": "https://github.com/sponsors/timlrx"
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "style": "h2",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "Licence",
+          "_key": "lxfj17"
+        }
+      ],
+      "markDefs": []
+    },
+    {
+      "_type": "block",
+      "style": "normal",
+      "children": [
+        {
+          "_type": "span",
+          "marks": [
+            "uj4esy"
+          ],
+          "text": "MIT",
+          "_key": "pzt1w2"
+        },
+        {
+          "_type": "span",
+          "marks": [],
+          "text": " © ",
+          "_key": "j8azcd"
+        },
+        {
+          "_type": "span",
+          "marks": [
+            "wqovp1"
+          ],
+          "text": "Timothy Lin",
+          "_key": "z30qb9"
+        }
+      ],
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "uj4esy",
+          "href": "https://github.com/timlrx/tailwind-nextjs-starter-blog/blob/main/LICENSE"
+        },
+        {
+          "_type": "link",
+          "_key": "wqovp1",
+          "href": "https://www.timrlx.com"
+        }
+      ]
+    }
+  ]
+}
