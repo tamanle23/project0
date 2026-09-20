@@ -73,6 +73,11 @@ export const sidebarData: SidebarData = {
           badge: '3',
           icon: MessagesSquare,
         },
+      ],
+    },
+    {
+      title: 'Admin',
+      items: [
         {
           title: 'Users',
           url: '/users',
