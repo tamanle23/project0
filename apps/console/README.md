@@ -1,4 +1,4 @@
-# Shadcn Admin Dashboard
+# Project0 Console
 
 Admin Dashboard UI crafted with Shadcn and Vite. Built with responsiveness and accessibility in mind.
 
