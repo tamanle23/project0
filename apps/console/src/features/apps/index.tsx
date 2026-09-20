@@ -18,6 +18,7 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { toast } from 'sonner'
 import { FacebookConnectModal } from './components/facebook-connect-modal'
 import { apps } from './data/apps'
 import { useFacebookStore } from './stores/facebook-store'
@@ -190,6 +191,8 @@ export function Apps() {
                           onClick={() => {
                             if (app.name === 'Facebook') {
                               setFacebookModalOpen(true)
+                            } else if (app.name === 'Internal Blog') {
+                              toast.info('Internal Blog is active and managed by the system.')
                             }
                           }}
                         >
@@ -222,7 +225,14 @@ export function Apps() {
                   </div>
                 </div>
                 <div>
-                  <h2 className='mb-1 font-semibold tracking-tight text-card-foreground'>{app.name}</h2>
+                  <div className='mb-1 flex items-center gap-2'>
+                    <h2 className='font-semibold tracking-tight text-card-foreground'>{app.name}</h2>
+                    {app.name === 'Internal Blog' && (
+                      <span className='rounded-md border border-blue-500/30 bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-700 dark:text-blue-300'>
+                        System Default
+                      </span>
+                    )}
+                  </div>
                   <p className='line-clamp-2 text-sm text-muted-foreground'>{app.desc}</p>
                 </div>
               </Card>

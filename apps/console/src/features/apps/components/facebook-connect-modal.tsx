@@ -7,7 +7,6 @@ import {
   ExternalLink,
   Eye,
   EyeOff,
-  Globe,
   Key,
   Layers,
   Loader2,
@@ -132,8 +131,7 @@ export function FacebookConnectModal({
       } else {
         setConnectedPage(pages[0])
         toast.success(
-          `Connected! Found ${pages.length} Facebook Page${
-            pages.length > 1 ? 's' : ''
+          `Connected! Found ${pages.length} Facebook Page${pages.length > 1 ? 's' : ''
           }.`
         )
       }
@@ -212,9 +210,7 @@ export function FacebookConnectModal({
       <DialogContent className='max-w-xl rounded-2xl border border-white/20 bg-white/90 p-6 shadow-2xl backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/90'>
         <DialogHeader className='text-start'>
           <div className='flex items-center gap-3'>
-            <div className='flex size-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/20'>
-              <IconFacebook className='size-6 fill-white text-white' />
-            </div>
+
             <div>
               <DialogTitle className='text-lg font-semibold'>
                 Facebook Page Integration
@@ -322,9 +318,8 @@ export function FacebookConnectModal({
                   <Settings2 className='size-3.5' /> Advanced Developer Settings
                 </span>
                 <ChevronDown
-                  className={`size-3.5 transition-transform duration-200 ${
-                    showAdvanced ? 'rotate-180' : ''
-                  }`}
+                  className={`size-3.5 transition-transform duration-200 ${showAdvanced ? 'rotate-180' : ''
+                    }`}
                 />
               </button>
 
@@ -414,7 +409,7 @@ export function FacebookConnectModal({
               <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-3'>
                   <div className='flex size-10 items-center justify-center rounded-xl bg-blue-600/15 text-blue-600 dark:text-blue-400'>
-                    <Globe className='size-5' />
+                    <IconFacebook className='size-6 fill-white text-white' />
                   </div>
                   <div>
                     <div className='flex items-center gap-2'>
@@ -571,11 +566,10 @@ export function FacebookConnectModal({
                       <div
                         key={page.id}
                         onClick={() => handleSelectPage(page)}
-                        className={`flex items-center justify-between rounded-lg p-2 text-xs transition-colors cursor-pointer border ${
-                          isSelected
-                            ? 'border-blue-500/40 bg-blue-500/10 font-medium'
-                            : 'border-transparent hover:bg-muted/60'
-                        }`}
+                        className={`flex items-center justify-between rounded-lg p-2 text-xs transition-colors cursor-pointer border ${isSelected
+                          ? 'border-blue-500/40 bg-blue-500/10 font-medium'
+                          : 'border-transparent hover:bg-muted/60'
+                          }`}
                       >
                         <div className='flex items-center gap-2'>
                           <span>{page.name}</span>
