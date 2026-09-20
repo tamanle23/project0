@@ -15,6 +15,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import React, { Suspense } from 'react'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { useProfile } from '@/context/profile-provider'
 import { RecentSales } from './components/recent-sales'
 
 const Overview = React.lazy(() =>
@@ -25,6 +26,8 @@ const Analytics = React.lazy(() =>
 )
 
 export function Dashboard() {
+  const { currentProfile } = useProfile()
+
   return (
     <>
       {/* ===== Top Heading ===== */}
@@ -41,7 +44,18 @@ export function Dashboard() {
       {/* ===== Main ===== */}
       <Main>
         <div className='mb-2 flex items-center justify-between space-y-2'>
-          <h1 className='text-2xl font-bold tracking-tight'>Dashboard</h1>
+          <div>
+            <h1 className='text-2xl font-bold tracking-tight'>Dashboard</h1>
+            {currentProfile && (
+              <p className='text-xs text-muted-foreground'>
+                Active Workspace:{' '}
+                <span className='font-medium text-foreground'>
+                  {currentProfile.name}
+                </span>
+                {currentProfile.plan ? ` (${currentProfile.plan})` : ''}
+              </p>
+            )}
+          </div>
           <div className='flex items-center space-x-2'>
             <Button>Download</Button>
           </div>
