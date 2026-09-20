@@ -1,6 +1,6 @@
 import { type ChangeEvent, useState } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
-import { SlidersHorizontal, ArrowUpAZ, ArrowDownAZ } from 'lucide-react'
+import { SlidersHorizontal, ArrowUpAZ, ArrowDownAZ, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -180,26 +180,46 @@ export function Apps() {
                   >
                     {app.logo}
                   </div>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    className={
-                      app.connected
-                        ? 'border border-blue-400/50 bg-blue-500/15 text-blue-700 dark:text-blue-300 hover:bg-blue-500/25 shadow-xs'
-                        : 'liquid-glass-interactive'
-                    }
-                    onClick={() => {
-                      if (app.name === 'Facebook') {
-                        setFacebookModalOpen(true)
-                      }
-                    }}
-                  >
-                    {app.name === 'Facebook' && app.connected
-                      ? 'Manage'
-                      : app.connected
-                        ? 'Connected'
-                        : 'Connect'}
-                  </Button>
+                  <div className='flex items-center gap-2'>
+                    {app.connected ? (
+                      <>
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          className='liquid-glass-interactive h-8 text-xs'
+                          onClick={() => {
+                            if (app.name === 'Facebook') {
+                              setFacebookModalOpen(true)
+                            }
+                          }}
+                        >
+                          Manage
+                        </Button>
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          disabled
+                          className='h-8 border border-emerald-500/40 bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-xs font-medium shadow-xs disabled:opacity-100'
+                        >
+                          <Check className='me-1 size-3.5 stroke-[2.5]' />
+                          Connected
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        className='liquid-glass-interactive h-8 text-xs'
+                        onClick={() => {
+                          if (app.name === 'Facebook') {
+                            setFacebookModalOpen(true)
+                          }
+                        }}
+                      >
+                        Connect
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <h2 className='mb-1 font-semibold tracking-tight text-card-foreground'>{app.name}</h2>
