@@ -69,8 +69,8 @@ const initialSaved = loadPersistedState()
 
 export const useFacebookStore = create<FacebookState>()((set, get) => ({
   isConnected: initialSaved.isConnected ?? false,
-  appId: (initialSaved.appId && initialSaved.appId.trim()) || envAppId,
-  appSecret: (initialSaved.appSecret && initialSaved.appSecret.trim()) || envAppSecret,
+  appId: envAppId || (initialSaved.appId && initialSaved.appId.trim()) || '',
+  appSecret: envAppSecret || (initialSaved.appSecret && initialSaved.appSecret.trim()) || '',
   userToken: initialSaved.userToken ?? '',
   connectedPage: initialSaved.connectedPage ?? null,
   availablePages: initialSaved.availablePages ?? [],

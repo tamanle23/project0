@@ -78,8 +78,8 @@ export function FacebookConnectModal({
 
   const handleOpenChange = (newOpen: boolean) => {
     if (newOpen) {
-      setInputAppId(appId)
-      setInputAppSecret(appSecret)
+      setInputAppId(appId || FACEBOOK_ENV_CONFIG.envAppId)
+      setInputAppSecret(appSecret || FACEBOOK_ENV_CONFIG.envAppSecret)
     }
     onOpenChange(newOpen)
   }
