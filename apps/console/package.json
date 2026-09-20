@@ -3,7 +3,7 @@
   "version": "2.2.1",
   "type": "module",
   "scripts": {
-    "dev": "vite -mode no-devtools",
+    "dev": "vite --mode no-devtools",
     "dev:no-devtools": "vite --mode no-devtools",
     "dev:theme-settings": "vite --theme-settings",
     "build": "tsc -b && vite build --config vite.config.ts && vite build --config vite.electron.config.ts --mode electron",

@@ -18,7 +18,9 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { FacebookConnectModal } from './components/facebook-connect-modal'
 import { apps } from './data/apps'
+import { useFacebookStore } from './stores/facebook-store'
 
 const route = getRouteApi('/_authenticated/apps/')
 
@@ -38,11 +40,32 @@ export function Apps() {
   } = route.useSearch()
   const navigate = route.useNavigate()
 
+  const [facebookModalOpen, setFacebookModalOpen] = useState(false)
+  const { isConnected: isFacebookConnected, connectedPage } = useFacebookStore()
+
   const [sort, setSort] = useState(initSort)
   const [appType, setAppType] = useState(type)
   const [searchTerm, setSearchTerm] = useState(filter)
 
-  const filteredApps = apps
+  const dynamicApps = apps.map((app) => {
+    if (app.name === 'Facebook') {
+      return {
+        ...app,
+        connected: isFacebookConnected,
+        desc:
+          isFacebookConnected && connectedPage
+            ? `Connected to Page: "${connectedPage.name}" (${
+                connectedPage.isLongLived
+                  ? 'Permanent Long-Lived Token'
+                  : 'Short-Lived Token'
+              })`
+            : app.desc,
+      }
+    }
+    return app
+  })
+
+  const filteredApps = dynamicApps
     .sort((a, b) =>
       sort === 'asc'
         ? a.name.localeCompare(b.name)
@@ -165,8 +188,17 @@ export function Apps() {
                         ? 'border border-blue-400/50 bg-blue-500/15 text-blue-700 dark:text-blue-300 hover:bg-blue-500/25 shadow-xs'
                         : 'liquid-glass-interactive'
                     }
+                    onClick={() => {
+                      if (app.name === 'Facebook') {
+                        setFacebookModalOpen(true)
+                      }
+                    }}
                   >
-                    {app.connected ? 'Connected' : 'Connect'}
+                    {app.name === 'Facebook' && app.connected
+                      ? 'Manage'
+                      : app.connected
+                        ? 'Connected'
+                        : 'Connect'}
                   </Button>
                 </div>
                 <div>
@@ -178,6 +210,11 @@ export function Apps() {
           ))}
         </ul>
       </Main>
+
+      <FacebookConnectModal
+        open={facebookModalOpen}
+        onOpenChange={setFacebookModalOpen}
+      />
     </>
   )
 }
