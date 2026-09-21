@@ -4,3 +4,4 @@ resources:
   - tekgo-ui.yaml
   - console.yaml
   - backend.yaml
+  - postgres.yaml
