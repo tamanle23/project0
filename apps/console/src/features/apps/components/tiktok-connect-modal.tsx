@@ -227,7 +227,7 @@ export function TikTokConnectModal({
             <div className='rounded-2xl border border-white/20 bg-gradient-to-b from-zinc-500/[0.08] to-zinc-500/[0.02] p-5 shadow-xs backdrop-blur-md dark:border-white/10 dark:from-zinc-500/[0.12] dark:to-transparent'>
               <div className='flex items-start gap-3.5'>
                 <div className='flex size-11 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-white shadow-md shadow-zinc-900/25 dark:bg-zinc-100 dark:text-zinc-900'>
-                  <IconTiktok className='size-6 fill-white dark:fill-zinc-900' />
+                  <IconTiktok className='size-[22px] fill-white dark:fill-zinc-900' />
                 </div>
                 <div className='space-y-1'>
                   <h3 className='text-sm font-semibold text-foreground'>
