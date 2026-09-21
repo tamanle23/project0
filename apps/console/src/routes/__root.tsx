@@ -7,6 +7,8 @@ import { NavigationProgress } from '@/components/navigation-progress'
 import { GeneralError } from '@/features/errors/general-error'
 import { NotFoundError } from '@/features/errors/not-found-error'
 
+import { SandboxPanel } from '@/features/spring-auth';
+
 const isDevtoolsDisabled =
   import.meta.env.MODE === 'production' ||
   import.meta.env.VITE_DISABLE_DEVTOOLS === 'true'
@@ -35,6 +37,7 @@ export const Route = createRootRouteWithContext<{
       <>
         <NavigationProgress />
         <Outlet />
+        <SandboxPanel />
         <Toaster duration={5000} />
         {!isDevtoolsDisabled && import.meta.env.MODE === 'development' && (
           <Suspense fallback={null}>
