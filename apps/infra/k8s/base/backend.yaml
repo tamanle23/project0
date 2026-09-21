@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
       - name: backend
-        image: node:18-alpine # Replace with your actual image
+        image: project0/backend:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
 ---

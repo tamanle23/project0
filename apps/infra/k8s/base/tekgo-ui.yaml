@@ -16,9 +16,10 @@ spec:
     spec:
       containers:
       - name: tekgo-ui
-        image: nginx:alpine # Replace with your actual image
+        image: project0/tekgo-ui:latest
+        imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 80
+        - containerPort: 3000
 ---
 apiVersion: v1
 kind: Service
@@ -30,4 +31,4 @@ spec:
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 80
+    targetPort: 3000

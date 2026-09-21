@@ -14,7 +14,21 @@ This workspace contains the Kubernetes and Crossplane manifests for the Project0
    kind create cluster --name project0-local
    ```
 
-2. **Install NGINX Ingress Controller**
+2. **Build and Load Docker Images**
+   *(Run these commands from the root of the monorepo)*
+   ```bash
+   # Build images
+   docker build -t project0/tekgo-ui:latest -f apps/tekgo-ui/Dockerfile .
+   docker build -t project0/console:latest -f apps/console/Dockerfile .
+   docker build -t project0/backend:latest -f apps/backend/project0-ms-aio/deloyment/Dockerfile .
+
+   # Load images into Kind
+   kind load docker-image project0/tekgo-ui:latest --name project0-local
+   kind load docker-image project0/console:latest --name project0-local
+   kind load docker-image project0/backend:latest --name project0-local
+   ```
+
+3. **Install NGINX Ingress Controller**
    ```bash
    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
    

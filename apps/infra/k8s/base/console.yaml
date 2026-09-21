@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
       - name: console
-        image: nginx:alpine # Replace with your actual image
+        image: project0/console:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
 ---
