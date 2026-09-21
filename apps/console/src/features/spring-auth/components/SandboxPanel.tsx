@@ -1,28 +1,15 @@
 import { useState } from 'react';
 import { useSpringAuthStore } from '../store';
 import { springApiClient } from '../api-client';
-import { ShieldAlert, Zap, LogOut, Database, TestTube2, KeyRound } from 'lucide-react';
+import { ShieldAlert, Zap, LogOut, Database, TestTube2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 export function SandboxPanel() {
-  const { isSandbox, isAuthenticated, user, expireAccessToken, expireRefreshToken, setTokens, clearTokens } = useSpringAuthStore();
+  const { isSandbox, isAuthenticated, user, expireAccessToken, expireRefreshToken, clearTokens } = useSpringAuthStore();
   const [dashboardData, setDashboardData] = useState<any>(null);
   
   if (!isSandbox) return null;
-
-  const handleMockLogin = async () => {
-    try {
-      const { data } = await springApiClient.post('/api/auth/login', {
-        username: 'admin',
-        password: 'admin'
-      });
-      setTokens(data.accessToken, data.refreshToken);
-      toast.success('Mock Login Successful');
-    } catch (e) {
-      toast.error('Mock Login Failed');
-    }
-  };
 
   const handleTestDashboard = async () => {
     try {
@@ -43,9 +30,9 @@ export function SandboxPanel() {
       </div>
 
       {!isAuthenticated ? (
-        <Button onClick={handleMockLogin} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" size="sm">
-          <KeyRound className="me-2 size-4" /> Simulate Login (Admin)
-        </Button>
+        <div className="text-xs text-muted-foreground text-center p-2">
+          Sandbox enabled. Use the bypass button in the Login Modal to authenticate.
+        </div>
       ) : (
         <div className="space-y-3">
           <div className="rounded-lg bg-black/5 dark:bg-white/5 p-2 text-xs font-mono break-all text-muted-foreground max-h-24 overflow-y-auto">
