@@ -5,16 +5,13 @@ export function IconTiktok({ className, ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
       role='img'
-      viewBox='0 0 24 24'
+      viewBox='0 0 512 512'
       xmlns='http://www.w3.org/2000/svg'
       width='24'
       height='24'
-      className={cn('[&>path]:stroke-current', className)}
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
+      className={cn('[&>path]:fill-current', className)}
+      fill='currentColor'
+      stroke='none'
       {...props}
     >
       <title>Tiktok</title>

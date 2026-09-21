@@ -54,7 +54,6 @@ export function TikTokConnectModal({
     expiresAt,
     connectedProfile,
     isDemoMode,
-    setCredentials,
     setAuthCode,
     setTokens,
     setConnectedProfile,
@@ -76,12 +75,6 @@ export function TikTokConnectModal({
 
   const activeClientKey = customClientKey || TIKTOK_ENV_CONFIG.clientKey
   const activeClientSecret = customClientSecret || TIKTOK_ENV_CONFIG.clientSecret
-
-  const handleSaveConfig = () => {
-    setCredentials(customClientKey, customClientSecret)
-    toast.success('Custom TikTok credentials saved locally')
-    setShowConfig(false)
-  }
 
   // --- STAGE 1: Launch OAuth to get Authorization Code ---
   const handleLaunchOAuth = () => {
@@ -208,141 +201,247 @@ export function TikTokConnectModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-[500px] bg-white/65 dark:bg-slate-900/65 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] rounded-2xl'>
-        <DialogHeader>
-          <DialogTitle className='flex items-center gap-2'>
-            <IconTiktok className='size-5' />
-            Connect TikTok
-          </DialogTitle>
-          <DialogDescription>
-            {isConnected
-              ? 'Manage your TikTok Account connection and active OAuth tokens.'
-              : 'Authorize access to publish videos and view your TikTok profile stats.'}
-          </DialogDescription>
+      <DialogContent className='max-w-xl rounded-2xl border border-white/20 bg-white/95 p-6 shadow-2xl backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/95'>
+        <DialogHeader className='text-start'>
+          <div className='flex items-center gap-3'>
+            <div className='flex size-10 items-center justify-center rounded-xl bg-zinc-900 text-white shadow-md shadow-zinc-900/20 dark:bg-zinc-100 dark:text-zinc-900 dark:shadow-white/20'>
+              <IconTiktok className='size-6 fill-white dark:fill-zinc-900' />
+            </div>
+            <div>
+              <DialogTitle className='text-lg font-semibold'>
+                TikTok Profile Integration
+              </DialogTitle>
+              <DialogDescription className='text-xs text-muted-foreground'>
+                {isConnected
+                  ? 'Manage your TikTok Account connection and active OAuth tokens.'
+                  : 'Authorize access to publish videos and view your TikTok profile stats.'}
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
-        {!isConnected ? (
-          <div className='flex flex-col gap-4 mt-2'>
-            {/* Configuration Dropdown */}
-            <div className='rounded-xl border border-border/60 bg-muted/20'>
-              <button
-                onClick={() => setShowConfig(!showConfig)}
-                className='flex w-full items-center justify-between p-3 text-sm font-medium hover:bg-muted/40 transition-colors rounded-xl'
-              >
-                <div className='flex items-center gap-2'>
-                  <Settings2 className='size-4 text-muted-foreground' />
-                  OAuth Application Credentials
+        {/* View 1: Not Connected & No Authorization Code yet -> Initiate Auth */}
+        {!isConnected && !authCode ? (
+          <div className='space-y-4 pt-1'>
+            {/* Value Proposition */}
+            <div className='rounded-2xl border border-white/20 bg-gradient-to-b from-zinc-500/[0.08] to-zinc-500/[0.02] p-5 shadow-xs backdrop-blur-md dark:border-white/10 dark:from-zinc-500/[0.12] dark:to-transparent'>
+              <div className='flex items-start gap-3.5'>
+                <div className='flex size-11 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-white shadow-md shadow-zinc-900/25 dark:bg-zinc-100 dark:text-zinc-900'>
+                  <IconTiktok className='size-6 fill-white dark:fill-zinc-900' />
                 </div>
-                <ChevronDown
-                  className={`size-4 text-muted-foreground transition-transform ${showConfig ? 'rotate-180' : ''}`}
-                />
-              </button>
-              
-              {showConfig && (
-                <div className='border-t border-border/60 p-4 space-y-3'>
-                  <div className='space-y-1.5'>
-                    <label className='text-xs font-medium text-foreground'>Client Key</label>
-                    <Input
-                      type='text'
-                      value={customClientKey}
-                      onChange={(e) => setCustomClientKey(e.target.value)}
-                      placeholder='TikTok Client Key'
-                      className='h-8 bg-background/50'
-                    />
-                  </div>
-                  <div className='space-y-1.5'>
-                    <label className='text-xs font-medium text-foreground'>Client Secret</label>
-                    <Input
-                      type='password'
-                      value={customClientSecret}
-                      onChange={(e) => setCustomClientSecret(e.target.value)}
-                      placeholder='TikTok Client Secret'
-                      className='h-8 bg-background/50'
-                    />
-                  </div>
-                  <Button onClick={handleSaveConfig} size='sm' className='w-full h-8'>
-                    Save Client Credentials
-                  </Button>
+                <div className='space-y-1'>
+                  <h3 className='text-sm font-semibold text-foreground'>
+                    Connect your TikTok Profile
+                  </h3>
+                  <p className='text-xs text-muted-foreground leading-relaxed'>
+                    Authorize Console to manage your TikTok videos, playlists, monitor video engagement, and sync channel statistics.
+                  </p>
                 </div>
-              )}
+              </div>
+
+              <div className='mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2'>
+                <div className='flex items-center gap-2 rounded-lg bg-background/60 p-2 text-xs text-foreground/90 backdrop-blur-xs border border-border/40'>
+                  <IconTiktok className='size-3.5 text-zinc-900 dark:text-zinc-100 shrink-0 fill-current' />
+                  <span className='font-medium text-[11px]'>Video Uploads</span>
+                </div>
+                <div className='flex items-center gap-2 rounded-lg bg-background/60 p-2 text-xs text-foreground/90 backdrop-blur-xs border border-border/40'>
+                  <IconTiktok className='size-3.5 text-zinc-900 dark:text-zinc-100 shrink-0 fill-current' />
+                  <span className='font-medium text-[11px]'>Analytics</span>
+                </div>
+              </div>
             </div>
 
-            {/* If NO Auth Code yet (Stage 1) */}
-            {!authCode && (
-              <div className='space-y-3 mt-2'>
-                <Button
-                  onClick={handleLaunchOAuth}
-                  className='w-full h-11 relative overflow-hidden bg-black hover:bg-black/80 dark:bg-white dark:hover:bg-white/90 text-white dark:text-black font-semibold'
-                >
-                  <ExternalLink className='me-2 size-4' />
-                  Launch TikTok Login
-                </Button>
-                <div className='relative'>
-                  <div className='absolute inset-0 flex items-center'>
-                    <span className='w-full border-t border-muted-foreground/20' />
-                  </div>
-                  <div className='relative flex justify-center text-xs uppercase'>
-                    <span className='bg-background/80 px-2 text-muted-foreground backdrop-blur-md'>
-                      Or for local testing
-                    </span>
-                  </div>
-                </div>
-                <Button
-                  variant='outline'
-                  onClick={handleSandboxDemoAuth}
-                  className='w-full h-11 border-dashed border-border/80 text-muted-foreground hover:text-foreground'
-                >
-                  Try Sandbox Demo Flow
-                </Button>
+            {/* Requested Scopes */}
+            <div className='rounded-xl border border-border/60 bg-muted/20 p-3 text-xs text-muted-foreground'>
+              <div className='flex flex-wrap items-center gap-2'>
+                <ShieldCheck className='size-4 text-zinc-900 shrink-0 dark:text-zinc-100' />
+                <span className='font-medium text-foreground text-[11px]'>
+                  TikTok Scopes:
+                </span>
+                <code className='rounded bg-zinc-500/10 px-1.5 py-0.5 text-[10px] text-zinc-700 dark:text-zinc-300 font-mono'>
+                  user.info.basic
+                </code>
+                <code className='rounded bg-zinc-500/10 px-1.5 py-0.5 text-[10px] text-zinc-700 dark:text-zinc-300 font-mono'>
+                  video.list
+                </code>
+                <code className='rounded bg-zinc-500/10 px-1.5 py-0.5 text-[10px] text-zinc-700 dark:text-zinc-300 font-mono'>
+                  video.upload
+                </code>
               </div>
-            )}
+            </div>
 
-            {/* If Auth Code exists (Stage 2: Exchange) */}
-            {authCode && (
-              <div className='space-y-4 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 mt-2'>
-                <div className='flex items-start gap-3'>
-                  <div className='rounded-full bg-emerald-500/20 p-1.5'>
-                    <Check className='size-4 text-emerald-600 dark:text-emerald-400' />
+            {/* Action Buttons */}
+            <div className='space-y-2 pt-1'>
+              <Button
+                size='lg'
+                onClick={handleLaunchOAuth}
+                disabled={isProcessing}
+                className='w-full bg-zinc-900 text-white hover:bg-zinc-800 shadow-md shadow-zinc-900/25 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-sm font-medium h-10 transition-all'
+              >
+                {isProcessing ? (
+                  <>
+                    <Loader2 className='me-2 size-4 animate-spin' /> Authorizing with TikTok...
+                  </>
+                ) : (
+                  <>
+                    <IconTiktok className='me-2 size-5 fill-white dark:fill-zinc-900' /> Continue with TikTok
+                  </>
+                )}
+              </Button>
+
+              <Button
+                variant='ghost'
+                size='sm'
+                onClick={handleSandboxDemoAuth}
+                disabled={isProcessing}
+                className='w-full text-xs text-muted-foreground hover:text-foreground h-8'
+              >
+                Need to test without TikTok? Try Sandbox Demo Mode
+              </Button>
+            </div>
+
+            {/* Collapsible Advanced Developer Settings */}
+            <div className='border-t border-border/50 pt-2'>
+              <button
+                type='button'
+                onClick={() => setShowConfig(!showConfig)}
+                className='flex w-full items-center justify-between py-1 text-xs text-muted-foreground hover:text-foreground transition-colors'
+              >
+                <span className='flex items-center gap-1.5 font-medium'>
+                  <Settings2 className='size-3.5' /> Advanced Developer Settings
+                </span>
+                <ChevronDown
+                  className={`size-3.5 transition-transform duration-200 ${
+                    showConfig ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+
+              {showConfig && (
+                <div className='mt-2 space-y-3 rounded-xl border border-border/60 bg-muted/25 p-3.5'>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-[11px] font-semibold uppercase tracking-wider text-muted-foreground'>
+                      TikTok Login Kit v2 Credentials
+                    </span>
+                    <a
+                      href='https://developers.tiktok.com/apps'
+                      target='_blank'
+                      rel='noreferrer'
+                      className='flex items-center gap-1 text-[11px] text-zinc-900 hover:underline dark:text-zinc-100'
+                    >
+                      Developer Portal <ExternalLink className='size-3' />
+                    </a>
                   </div>
-                  <div>
-                    <h4 className='text-sm font-semibold text-emerald-900 dark:text-emerald-400'>
-                      Authorization Code Acquired
-                    </h4>
-                    <p className='text-xs text-emerald-700/80 dark:text-emerald-500/80 mt-0.5 mb-2'>
-                      The user has authorized your application. Exchange this short-lived code for access and refresh tokens.
-                    </p>
-                    <div className='flex items-center gap-1.5 bg-black/5 dark:bg-white/5 p-1.5 rounded text-xs font-mono break-all text-muted-foreground mb-3'>
-                      <Key className='size-3.5 shrink-0' />
-                      {maskString(authCode)}
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        onClick={() => handleCopy(authCode, 'code')}
-                        className='size-5 p-0 ms-auto shrink-0'
-                      >
-                        {copiedToken === 'code' ? <Check className='size-3 text-emerald-600' /> : <Copy className='size-3' />}
-                      </Button>
+
+                  <div className='space-y-3'>
+                    <div>
+                      <label className='text-xs font-medium text-foreground mb-1 block'>
+                        Client Key
+                      </label>
+                      <Input
+                        placeholder='awX...'
+                        value={customClientKey}
+                        onChange={(e) => setCustomClientKey(e.target.value)}
+                        className='h-8 bg-background/70 text-xs font-mono'
+                      />
+                    </div>
+
+                    <div>
+                      <label className='text-xs font-medium text-foreground mb-1 block'>
+                        Client Secret
+                      </label>
+                      <Input
+                        type='password'
+                        placeholder='e.g. 1a2b3c...'
+                        value={customClientSecret}
+                        onChange={(e) => setCustomClientSecret(e.target.value)}
+                        className='h-8 bg-background/70 text-xs font-mono'
+                      />
                     </div>
                   </div>
                 </div>
-
-                <Button
-                  onClick={handleExchangeTokens}
-                  disabled={isProcessing}
-                  className='w-full h-10 bg-emerald-600 hover:bg-emerald-700 text-white'
+              )}
+            </div>
+          </div>
+        ) : !isConnected && authCode ? (
+          <div className='space-y-4 pt-1'>
+            <div className='rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4'>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-2'>
+                  <div className='flex size-8 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'>
+                    <Check className='size-4 stroke-[3]' />
+                  </div>
+                  <div>
+                    <h4 className='text-sm font-semibold'>Authorization Code Acquired</h4>
+                    <p className='text-xs text-muted-foreground'>
+                      Ready to exchange for TikTok Access and Refresh tokens.
+                    </p>
+                  </div>
+                </div>
+                <Badge
+                  variant='outline'
+                  className='border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-[10px]'
                 >
-                  {isProcessing ? (
-                    <>
-                      <Loader2 className='me-2 size-4 animate-spin' /> Exchanging...
-                    </>
+                  Step 2 of 2
+                </Badge>
+              </div>
+
+              <div className='mt-3 flex items-center justify-between rounded-lg border border-border/60 bg-background/80 p-2.5'>
+                <div className='flex items-center gap-2 font-mono text-xs text-foreground/80 truncate me-2'>
+                  <Key className='size-3.5 text-muted-foreground shrink-0' />
+                  <span className='truncate'>{authCode}</span>
+                </div>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={() => handleCopy(authCode, 'code')}
+                  className='h-7 px-2 text-xs shrink-0'
+                >
+                  {copiedToken === 'code' ? (
+                    <Check className='size-3.5 text-emerald-600' />
                   ) : (
-                    <>
-                      <ShieldCheck className='me-2 size-4' /> Exchange for Access & Refresh Tokens
-                    </>
+                    <Copy className='size-3.5' />
                   )}
                 </Button>
               </div>
-            )}
+            </div>
+
+            <div className='rounded-xl border border-border/60 bg-muted/20 p-3.5 text-xs text-muted-foreground'>
+              <span className='font-medium text-foreground'>What happens next:</span>
+              <ul className='mt-1.5 list-disc list-inside space-y-1 text-xs'>
+                <li>Exchanges the code via <code className='font-mono text-[10px]'>open.tiktokapis.com/v2/oauth/token/</code>.</li>
+                <li>Receives a 24-hour <strong>Access Token</strong> for TikTok Login Kit calls.</li>
+                <li>Receives a 1-year <strong>Refresh Token</strong> for automatic background renewals.</li>
+              </ul>
+            </div>
+
+            <div className='flex gap-2 pt-1'>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => {
+                  setAuthCode('')
+                }}
+                disabled={isProcessing}
+                className='text-xs'
+              >
+                Re-authorize
+              </Button>
+              <Button
+                size='sm'
+                onClick={handleExchangeTokens}
+                disabled={isProcessing}
+                className='flex-1 bg-zinc-900 text-white hover:bg-zinc-800 shadow-md shadow-zinc-900/25 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-xs h-9'
+              >
+                {isProcessing ? (
+                  <Loader2 className='size-4 animate-spin' />
+                ) : (
+                  <>
+                    <IconTiktok className='me-1.5 size-4 fill-white dark:fill-zinc-900' /> Exchange Code
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         ) : (
           <div className='flex flex-col gap-5 mt-2'>
