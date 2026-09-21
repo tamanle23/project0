@@ -11,20 +11,36 @@ const createMockJwt = (payload: any) => {
   return `${header}.${body}.${signature}`;
 };
 
+const getHeader = (headers: any, key: string): string | null => {
+  if (!headers) return null;
+  if (typeof headers.get === 'function') {
+    const val = headers.get(key);
+    return val ? String(val) : null;
+  }
+  return (headers[key] || headers[key.toLowerCase()]) as string | null;
+};
+
 export function enableSandboxMockEngine(apiClient: AxiosInstance) {
   const originalAdapter = apiClient.defaults.adapter;
   
-  // Intercept the Axios adapter entirely to mock out our target endpoints locally
-  // @ts-ignore - Adapters have complex internal types in axios 1.x
+  // Intercept the Axios adapter conditionally
+  // @ts-ignore
   apiClient.defaults.adapter = async (config) => {
     const url = config.url || '';
     const method = config.method?.toUpperCase();
 
+    // Determine if this specific request should be mocked
+    const isMockRequest = getHeader(config.headers, 'X-Sandbox-Mock') === 'true';
+    const authHeader = getHeader(config.headers, 'Authorization');
+    const isMockToken = authHeader && authHeader.includes('mock_signature');
+    
+    let body: any = {};
+    try { body = config.data ? JSON.parse(config.data) : {}; } catch (e) {}
+    const isMockRefresh = body.refreshToken && String(body.refreshToken).startsWith('mock_refresh_token_');
+
     // 1. Mock Login (POST /api/auth/login)
-    if (url === '/api/auth/login' && method === 'POST') {
-      const body = JSON.parse(config.data || '{}');
+    if (url === '/api/auth/login' && method === 'POST' && isMockRequest) {
       
-      // Sandbox bypass dictionary for local testing
       const sandboxUsers: Record<string, string[]> = {
         'admin_bypass': ['ROLE_USER', 'ROLE_ADMIN'],
         'creator_bypass': ['ROLE_USER', 'ROLE_CREATOR'],
@@ -33,13 +49,13 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
 
       if (body.username in sandboxUsers && body.password === 'bypass') {
         const roles = sandboxUsers[body.username];
-        const sub = body.username.split('_')[0]; // 'admin', 'creator', 'user'
+        const sub = body.username.split('_')[0];
 
         const token = createMockJwt({
           sub,
           roles,
           iat: Math.floor(Date.now() / 1000),
-          exp: Math.floor(Date.now() / 1000) + 60 * 15 // 15 mins
+          exp: Math.floor(Date.now() / 1000) + 60 * 15
         });
         
         return {
@@ -51,9 +67,7 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
     }
 
     // 2. Mock Refresh (POST /api/auth/refresh)
-    if (url === '/api/auth/refresh' && method === 'POST') {
-      const body = JSON.parse(config.data || '{}');
-      
+    if (url === '/api/auth/refresh' && method === 'POST' && isMockRefresh) {
       const refreshTokens: Record<string, string[]> = {
         'mock_refresh_token_admin': ['ROLE_USER', 'ROLE_ADMIN'],
         'mock_refresh_token_creator': ['ROLE_USER', 'ROLE_CREATOR'],
@@ -76,12 +90,11 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
           status: 200, statusText: 'OK', headers: {}, config, request: {}
         };
       }
-      // If refresh token is expired/invalid (simulated)
       return Promise.reject({ response: { data: { message: 'Invalid refresh token' }, status: 401, statusText: 'Unauthorized' }, config });
     }
 
     // 3. Mock Logout (POST /api/auth/logout)
-    if (url === '/api/auth/logout' && method === 'POST') {
+    if (url === '/api/auth/logout' && method === 'POST' && isMockToken) {
       return {
         data: { message: 'Successfully logged out' },
         status: 200, statusText: 'OK', headers: {}, config, request: {}
@@ -89,9 +102,7 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
     }
 
     // 4. Mock Protected Endpoint (GET /api/admin/dashboard)
-    if (url === '/api/admin/dashboard' && method === 'GET') {
-      const authHeader = config.headers?.['Authorization'] as string;
-      
+    if (url === '/api/admin/dashboard' && method === 'GET' && isMockToken) {
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return Promise.reject({ response: { data: { message: 'Missing token' }, status: 401, statusText: 'Unauthorized' }, config });
       }
@@ -113,7 +124,7 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
       };
     }
 
-    // Fallback to real network request if not intercepted
+    // Fallback to real network request if NO mock conditions were met
     if (originalAdapter) {
       // @ts-ignore
       return originalAdapter(config);

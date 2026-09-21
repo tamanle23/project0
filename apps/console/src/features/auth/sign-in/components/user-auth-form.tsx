@@ -85,6 +85,10 @@ export function UserAuthForm({
       const response = await springApiClient.post('/api/auth/login', {
         username: `${role}_bypass`,
         password: 'bypass',
+      }, {
+        headers: {
+          'X-Sandbox-Mock': 'true'
+        }
       });
 
       setTokens(response.data.accessToken, response.data.refreshToken);
