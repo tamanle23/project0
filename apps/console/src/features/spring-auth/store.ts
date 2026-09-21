@@ -2,20 +2,17 @@ import { create } from 'zustand';
 import { decodeJwt } from './utils/jwt';
 import type { AuthState } from './types';
 
-// Sandbox fallback uses localStorage for refresh tokens; Prod relies on HttpOnly cookies via backend.
-const isSandbox = import.meta.env.VITE_USE_SANDBOX === 'true';
 const REFRESH_STORAGE_KEY = 'sandbox_refresh_token';
 
 export const useSpringAuthStore = create<AuthState>((set, get) => ({
   accessToken: null,
-  refreshToken: isSandbox ? localStorage.getItem(REFRESH_STORAGE_KEY) : null,
+  refreshToken: localStorage.getItem(REFRESH_STORAGE_KEY),
   user: null,
   isAuthenticated: false,
-  isSandbox,
 
   setTokens: (access: string, refresh: string) => {
     const user = decodeJwt(access);
-    if (isSandbox && refresh) {
+    if (refresh) {
       localStorage.setItem(REFRESH_STORAGE_KEY, refresh);
     }
     set({
@@ -27,9 +24,7 @@ export const useSpringAuthStore = create<AuthState>((set, get) => ({
   },
 
   clearTokens: () => {
-    if (isSandbox) {
-      localStorage.removeItem(REFRESH_STORAGE_KEY);
-    }
+    localStorage.removeItem(REFRESH_STORAGE_KEY);
     set({
       accessToken: null,
       refreshToken: null,
@@ -48,9 +43,7 @@ export const useSpringAuthStore = create<AuthState>((set, get) => ({
 
   expireRefreshToken: () => {
     // Dev helper: corrupts refresh token
-    if (isSandbox) {
-      localStorage.setItem(REFRESH_STORAGE_KEY, 'expired_mock_refresh_token');
-      set({ refreshToken: 'expired_mock_refresh_token' });
-    }
+    localStorage.setItem(REFRESH_STORAGE_KEY, 'expired_mock_refresh_token');
+    set({ refreshToken: 'expired_mock_refresh_token' });
   },
 }));

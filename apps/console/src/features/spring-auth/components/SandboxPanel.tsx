@@ -6,10 +6,8 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 export function SandboxPanel() {
-  const { isSandbox, isAuthenticated, user, expireAccessToken, expireRefreshToken, clearTokens } = useSpringAuthStore();
+  const { isAuthenticated, user, expireAccessToken, expireRefreshToken, clearTokens } = useSpringAuthStore();
   const [dashboardData, setDashboardData] = useState<any>(null);
-  
-  if (!isSandbox) return null;
 
   const handleTestDashboard = async () => {
     try {

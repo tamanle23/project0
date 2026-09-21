@@ -7,14 +7,11 @@ export const springApiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  // Essential for sending HttpOnly cookies (refresh tokens) in production
   withCredentials: true,
 });
 
-// Initialize Sandbox mock intercepts if enabled
-if (import.meta.env.VITE_USE_SANDBOX === 'true') {
-  enableSandboxMockEngine(springApiClient);
-}
+// Always initialize Sandbox mock intercepts for this interactive demo
+enableSandboxMockEngine(springApiClient);
 
 // Queue for pending requests while silent refresh is occurring
 let isRefreshing = false;
@@ -51,7 +48,6 @@ springApiClient.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== '/api/auth/refresh') {
       
-      // If already refreshing, queue this request
       if (isRefreshing) {
         return new Promise<string | undefined>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -69,14 +65,11 @@ springApiClient.interceptors.response.use(
       const state = useSpringAuthStore.getState();
 
       try {
-        // In Prod, 'withCredentials' automatically sends the HttpOnly refresh token cookie.
-        // In Sandbox, we inject it manually from localStorage fallback.
-        const payload = state.isSandbox ? { refreshToken: state.refreshToken } : {};
+        const payload = { refreshToken: state.refreshToken };
         
         const { data } = await springApiClient.post('/api/auth/refresh', payload);
         
         const newAccess = data.accessToken;
-        // Optionally rotate refresh token if the backend provides a new one
         const newRefresh = data.refreshToken || state.refreshToken;
         
         state.setTokens(newAccess, newRefresh);
@@ -86,11 +79,8 @@ springApiClient.interceptors.response.use(
         return springApiClient(originalRequest);
         
       } catch (refreshError) {
-        // Silent refresh failed -> hard logout
         processQueue(refreshError as Error, null);
         state.clearTokens();
-        // Option to redirect to a hardcoded login route:
-        // window.location.href = '/login';
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

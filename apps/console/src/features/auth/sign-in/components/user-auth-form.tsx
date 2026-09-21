@@ -41,7 +41,7 @@ export function UserAuthForm({
   const navigate = useNavigate()
   
   // Use the new Spring Security dual-token store
-  const { setTokens, isSandbox } = useSpringAuthStore()
+  const { setTokens } = useSpringAuthStore()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -137,18 +137,16 @@ export function UserAuthForm({
           Sign in
         </Button>
 
-        {isSandbox && (
-          <Button
-            type='button'
-            variant='outline'
-            className='border-emerald-500/30 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400'
-            onClick={handleSandboxBypass}
-            disabled={isLoading}
-          >
-            <ShieldAlert className='me-2 size-4' />
-            Bypass with Sandbox (Admin)
-          </Button>
-        )}
+        <Button
+          type='button'
+          variant='outline'
+          className='border-emerald-500/30 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400'
+          onClick={handleSandboxBypass}
+          disabled={isLoading}
+        >
+          <ShieldAlert className='me-2 size-4' />
+          Bypass with Sandbox (Admin)
+        </Button>
 
         <div className='relative my-2'>
           <div className='absolute inset-0 flex items-center'>

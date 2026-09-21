@@ -11,7 +11,6 @@ export interface AuthState {
   refreshToken: string | null;
   user: JwtPayload | null;
   isAuthenticated: boolean;
-  isSandbox: boolean;
 
   setTokens: (access: string, refresh: string) => void;
   clearTokens: () => void;
