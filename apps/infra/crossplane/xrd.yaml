@@ -1,0 +1,38 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xapploadbalancers.infra.project0.io
+spec:
+  group: infra.project0.io
+  names:
+    kind: XAppLoadBalancer
+    plural: xapploadbalancers
+  claimNames:
+    kind: AppLoadBalancer
+    plural: apploadbalancers
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              uiDomain:
+                type: string
+                description: "The specific domain name for routing traffic to tekgo-ui"
+              vpcId:
+                type: string
+                description: "VPC ID where the load balancer should be created"
+              subnetIds:
+                type: array
+                items:
+                  type: string
+                description: "Subnets for the load balancer"
+            required:
+              - uiDomain
+              - vpcId
+              - subnetIds

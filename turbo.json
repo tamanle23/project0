@@ -13,6 +13,9 @@
     "test": {
       "dependsOn": ["^test"]
     },
+    "validate:infra": {
+      "dependsOn": ["^validate:infra"]
+    },
     "check-types": {
       "dependsOn": ["^check-types"]
     },

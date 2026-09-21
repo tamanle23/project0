@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tekgo-ui
+  labels:
+    app: tekgo-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tekgo-ui
+  template:
+    metadata:
+      labels:
+        app: tekgo-ui
+    spec:
+      containers:
+      - name: tekgo-ui
+        image: nginx:alpine # Replace with your actual image
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tekgo-ui
+spec:
+  selector:
+    app: tekgo-ui
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80

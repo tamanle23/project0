@@ -1,0 +1,8 @@
+{
+  "name": "@project0/infra",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "validate:infra": "echo \"Dry-run validation for Kubernetes and Crossplane manifests...\""
+  }
+}

@@ -255,6 +255,8 @@ importers:
         specifier: ~4.5.4
         version: 4.5.5
 
+  apps/infra: {}
+
   apps/mobile-ui:
     dependencies:
       '@react-native-async-storage/async-storage':

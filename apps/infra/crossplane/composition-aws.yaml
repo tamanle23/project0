@@ -1,0 +1,130 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: xapploadbalancers.aws.infra.project0.io
+  labels:
+    provider: aws
+spec:
+  compositeTypeRef:
+    apiVersion: infra.project0.io/v1alpha1
+    kind: XAppLoadBalancer
+  resources:
+    # 1. Application Load Balancer
+    - name: applicationLoadBalancer
+      base:
+        apiVersion: elbv2.aws.upbound.io/v1beta1
+        kind: LB
+        spec:
+          forProvider:
+            loadBalancerType: application
+      patches:
+        - fromFieldPath: spec.subnetIds
+          toFieldPath: spec.forProvider.subnets
+
+    # 2. HTTP Listener
+    - name: httpListener
+      base:
+        apiVersion: elbv2.aws.upbound.io/v1beta1
+        kind: Listener
+        spec:
+          forProvider:
+            protocol: HTTP
+            port: 80
+            defaultAction:
+              - type: fixed-response
+                fixedResponseConfig:
+                  - contentType: text/plain
+                    messageBody: "404 Not Found"
+                    statusCode: "404"
+      patches:
+        - fromFieldPath: status.atProvider.arn
+          toFieldPath: spec.forProvider.loadBalancerArn
+
+    # 3. Target Group for tekgo-ui
+    - name: targetGroupTekgoUI
+      base:
+        apiVersion: elbv2.aws.upbound.io/v1beta1
+        kind: TargetGroup
+        spec:
+          forProvider:
+            port: 80
+            protocol: HTTP
+            targetType: ip
+      patches:
+        - fromFieldPath: spec.vpcId
+          toFieldPath: spec.forProvider.vpcId
+
+    # 4. Listener Rule for tekgo-ui (Host-based on configured domain)
+    - name: listenerRuleTekgoUI
+      base:
+        apiVersion: elbv2.aws.upbound.io/v1beta1
+        kind: ListenerRule
+        spec:
+          forProvider:
+            action:
+              - type: forward
+            condition:
+              - hostHeader:
+                  - values: ["app.local"] # Patched from composite
+              - pathPattern:
+                  - values: ["/*"]
+            priority: 10
+      patches:
+        - fromFieldPath: spec.uiDomain
+          toFieldPath: spec.forProvider.condition[0].hostHeader[0].values[0]
+
+    # 5. Target Group for Console (Admin)
+    - name: targetGroupConsole
+      base:
+        apiVersion: elbv2.aws.upbound.io/v1beta1
+        kind: TargetGroup
+        spec:
+          forProvider:
+            port: 80
+            protocol: HTTP
+            targetType: ip
+      patches:
+        - fromFieldPath: spec.vpcId
+          toFieldPath: spec.forProvider.vpcId
+
+    # 6. Listener Rule for Console (/admin)
+    - name: listenerRuleConsole
+      base:
+        apiVersion: elbv2.aws.upbound.io/v1beta1
+        kind: ListenerRule
+        spec:
+          forProvider:
+            action:
+              - type: forward
+            condition:
+              - pathPattern:
+                  - values: ["/admin*"]
+            priority: 20
+
+    # 7. Target Group for Backend (API)
+    - name: targetGroupBackend
+      base:
+        apiVersion: elbv2.aws.upbound.io/v1beta1
+        kind: TargetGroup
+        spec:
+          forProvider:
+            port: 80
+            protocol: HTTP
+            targetType: ip
+      patches:
+        - fromFieldPath: spec.vpcId
+          toFieldPath: spec.forProvider.vpcId
+
+    # 8. Listener Rule for Backend (/api)
+    - name: listenerRuleBackend
+      base:
+        apiVersion: elbv2.aws.upbound.io/v1beta1
+        kind: ListenerRule
+        spec:
+          forProvider:
+            action:
+              - type: forward
+            condition:
+              - pathPattern:
+                  - values: ["/api*"]
+            priority: 30
