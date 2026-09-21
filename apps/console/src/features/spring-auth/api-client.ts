@@ -10,8 +10,10 @@ export const springApiClient = axios.create({
   withCredentials: true,
 });
 
-// Always initialize Sandbox mock intercepts for this interactive demo
-enableSandboxMockEngine(springApiClient);
+// Only initialize Sandbox mock intercepts in development mode
+if (import.meta.env.DEV) {
+  enableSandboxMockEngine(springApiClient);
+}
 
 // Queue for pending requests while silent refresh is occurring
 let isRefreshing = false;
