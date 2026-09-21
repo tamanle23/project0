@@ -47,7 +47,7 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
           status: 200, statusText: 'OK', headers: {}, config, request: {}
         };
       }
-      return { data: { message: 'Bad credentials' }, status: 401, statusText: 'Unauthorized', headers: {}, config, request: {} };
+      return Promise.reject({ response: { data: { message: 'Bad credentials' }, status: 401, statusText: 'Unauthorized' }, config });
     }
 
     // 2. Mock Refresh (POST /api/auth/refresh)
@@ -77,7 +77,7 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
         };
       }
       // If refresh token is expired/invalid (simulated)
-      return { data: { message: 'Invalid refresh token' }, status: 401, statusText: 'Unauthorized', headers: {}, config, request: {} };
+      return Promise.reject({ response: { data: { message: 'Invalid refresh token' }, status: 401, statusText: 'Unauthorized' }, config });
     }
 
     // 3. Mock Logout (POST /api/auth/logout)

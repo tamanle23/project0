@@ -46,7 +46,11 @@ springApiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== '/api/auth/refresh') {
+    if (
+      error.response?.status === 401 && 
+      !originalRequest._retry && 
+      !['/api/auth/refresh', '/api/auth/login'].includes(originalRequest.url)
+    ) {
       
       if (isRefreshing) {
         return new Promise<string | undefined>((resolve, reject) => {
