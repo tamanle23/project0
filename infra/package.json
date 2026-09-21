@@ -3,6 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "validate:infra": "echo \"Dry-run validation for Kubernetes and Crossplane manifests...\""
+    "validate:infra": "node scripts/validate.js"
   }
 }
