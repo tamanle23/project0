@@ -14,13 +14,13 @@ export const apps = [
   },
   {
     name: 'Facebook',
-    logo: <IconFacebook />,
+    logo: <IconFacebook className='size-6 text-blue-600 dark:text-blue-500 fill-blue-600/10' />,
     connected: false,
     desc: 'Connect with Facebook profile for management.',
   },
   {
     name: 'Tiktok',
-    logo: <IconTiktok className='size-6' />,
+    logo: <IconTiktok className='size-6 text-zinc-900 dark:text-zinc-100 fill-zinc-900/10 dark:fill-zinc-100/10' />,
     connected: false,
     desc: 'Connect with TikTok account to manage videos, and interactions.',
   },
