@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { useSpringAuthStore } from '../store';
 import { Loader2 } from 'lucide-react';
 
@@ -20,6 +20,14 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { isAuthenticated, user, isHydrating } = useSpringAuthStore();
 
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (!isHydrating && (!isAuthenticated || !user) && !fallbackUnauthenticated) {
+      navigate({ to: '/sign-in', replace: true });
+    }
+  }, [isHydrating, isAuthenticated, user, fallbackUnauthenticated, navigate]);
+
   if (isHydrating) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
@@ -29,7 +37,7 @@ export function ProtectedRoute({
   }
 
   if (!isAuthenticated || !user) {
-    return fallbackUnauthenticated || <Navigate to="/sign-in" replace />;
+    return fallbackUnauthenticated || null;
   }
 
   if (requiredRoles.length > 0) {
