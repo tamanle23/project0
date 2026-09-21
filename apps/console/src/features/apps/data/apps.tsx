@@ -1,7 +1,7 @@
 import { Newspaper } from 'lucide-react';
 import {
   IconFacebook,
-  IconTelegram,
+  IconTiktok,
   IconYoutube,
 } from '@/assets/brand-icons';
 
@@ -20,9 +20,9 @@ export const apps = [
   },
   {
     name: 'Tiktok',
-    logo: <IconTelegram />,
+    logo: <IconTiktok className='size-6' />,
     connected: false,
-    desc: 'Connect with Telegram for real-time communication.',
+    desc: 'Connect with TikTok account to manage videos, and interactions.',
   },
   {
     name: 'Youtube',

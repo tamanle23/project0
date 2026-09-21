@@ -20,9 +20,11 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { toast } from 'sonner'
 import { FacebookConnectModal } from './components/facebook-connect-modal'
+import { TikTokConnectModal } from './components/tiktok-connect-modal'
 import { YouTubeConnectModal } from './components/youtube-connect-modal'
 import { apps } from './data/apps'
 import { useFacebookStore } from './stores/facebook-store'
+import { useTikTokStore } from './stores/tiktok-store'
 import { useYouTubeStore } from './stores/youtube-store'
 
 const route = getRouteApi('/_authenticated/apps/')
@@ -46,6 +48,9 @@ export function Apps() {
   const [facebookModalOpen, setFacebookModalOpen] = useState(false)
   const { isConnected: isFacebookConnected, connectedPage } = useFacebookStore()
 
+  const [tiktokModalOpen, setTikTokModalOpen] = useState(false)
+  const { isConnected: isTikTokConnected, connectedProfile } = useTikTokStore()
+
   const [youtubeModalOpen, setYouTubeModalOpen] = useState(false)
   const { isConnected: isYouTubeConnected, connectedChannel } = useYouTubeStore()
 
@@ -65,6 +70,16 @@ export function Apps() {
                   ? 'Permanent Long-Lived Token'
                   : 'Short-Lived Token'
               })`
+            : app.desc,
+      }
+    }
+    if (app.name === 'Tiktok') {
+      return {
+        ...app,
+        connected: isTikTokConnected,
+        desc:
+          isTikTokConnected && connectedProfile
+            ? `Connected to Profile: "${connectedProfile.display_name}"`
             : app.desc,
       }
     }
@@ -206,6 +221,8 @@ export function Apps() {
                           onClick={() => {
                             if (app.name === 'Facebook') {
                               setFacebookModalOpen(true)
+                            } else if (app.name === 'Tiktok') {
+                              setTikTokModalOpen(true)
                             } else if (app.name === 'Youtube') {
                               setYouTubeModalOpen(true)
                             } else if (app.name === 'Internal Blog') {
@@ -233,6 +250,8 @@ export function Apps() {
                         onClick={() => {
                           if (app.name === 'Facebook') {
                             setFacebookModalOpen(true)
+                          } else if (app.name === 'Tiktok') {
+                            setTikTokModalOpen(true)
                           } else if (app.name === 'Youtube') {
                             setYouTubeModalOpen(true)
                           }
@@ -263,6 +282,10 @@ export function Apps() {
       <FacebookConnectModal
         open={facebookModalOpen}
         onOpenChange={setFacebookModalOpen}
+      />
+      <TikTokConnectModal
+        open={tiktokModalOpen}
+        onOpenChange={setTikTokModalOpen}
       />
       <YouTubeConnectModal
         open={youtubeModalOpen}
