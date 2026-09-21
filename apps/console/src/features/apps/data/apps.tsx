@@ -1,8 +1,8 @@
 import { Newspaper } from 'lucide-react';
 import {
   IconFacebook,
-  IconNotion,
   IconTelegram,
+  IconYoutube,
 } from '@/assets/brand-icons';
 
 export const apps = [
@@ -26,8 +26,8 @@ export const apps = [
   },
   {
     name: 'Youtube',
-    logo: <IconNotion />,
-    connected: true,
-    desc: 'Effortlessly sync Notion pages for seamless collaboration.',
+    logo: <IconYoutube className='size-6 text-red-600 dark:text-red-500 fill-red-600/10' />,
+    connected: false,
+    desc: 'Connect with YouTube channel to manage videos, playlists, and community posts.',
   },
 ]
