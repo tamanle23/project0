@@ -27,7 +27,7 @@ This workspace contains the Kubernetes and Crossplane manifests for the Project0
 
 3. **Apply the Local Manifests**
    ```bash
-   kubectl apply -f k8s/
+   kubectl apply -k k8s/overlays/local/
    ```
 
 4. **Testing Routing**

@@ -1,0 +1,8 @@
+apiVersion: infra.project0.io/v1alpha1
+kind: AppLoadBalancer
+metadata:
+  name: staging-ingress
+spec:
+  uiDomain: "staging.app.yourdomain.com"
+  vpcId: "vpc-staging-123"
+  subnetIds: ["subnet-staging-a", "subnet-staging-b"]

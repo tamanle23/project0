@@ -1,0 +1,8 @@
+apiVersion: infra.project0.io/v1alpha1
+kind: AppLoadBalancer
+metadata:
+  name: prod-ingress
+spec:
+  uiDomain: "app.yourdomain.com"
+  vpcId: "vpc-prod-123"
+  subnetIds: ["subnet-prod-a", "subnet-prod-b"]
