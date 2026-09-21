@@ -3,7 +3,7 @@ import { useSpringAuthStore } from '../store';
 import { springApiClient } from '../api-client';
 
 export function useAuthHydration() {
-  const { refreshToken, setTokens, clearTokens, setHydrating } = useSpringAuthStore();
+  const { refreshToken, setTokens, clearTokens, setHydrating, isHydrating } = useSpringAuthStore();
 
   useEffect(() => {
     let mounted = true;
