@@ -7,7 +7,7 @@ import { NavigationProgress } from '@/components/navigation-progress'
 import { GeneralError } from '@/features/errors/general-error'
 import { NotFoundError } from '@/features/errors/not-found-error'
 
-import { SandboxPanel } from '@/features/spring-auth';
+import { SandboxPanel, useAuthHydration } from '@/features/spring-auth';
 
 const isDevtoolsDisabled =
   import.meta.env.MODE === 'production' ||
@@ -29,25 +29,29 @@ const TanStackRouterDevtools = isDevtoolsDisabled
       }))
     )
 
+function RootComponent() {
+  useAuthHydration(); // Hydrate the Spring Security token on app boot
+
+  return (
+    <>
+      <NavigationProgress />
+      <Outlet />
+      <SandboxPanel />
+      <Toaster duration={5000} />
+      {!isDevtoolsDisabled && import.meta.env.MODE === 'development' && (
+        <Suspense fallback={null}>
+          <ReactQueryDevtools buttonPosition='bottom-left' />
+          <TanStackRouterDevtools position='bottom-right' />
+        </Suspense>
+      )}
+    </>
+  );
+}
+
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
 }>()({
-  component: () => {
-    return (
-      <>
-        <NavigationProgress />
-        <Outlet />
-        <SandboxPanel />
-        <Toaster duration={5000} />
-        {!isDevtoolsDisabled && import.meta.env.MODE === 'development' && (
-          <Suspense fallback={null}>
-            <ReactQueryDevtools buttonPosition='bottom-left' />
-            <TanStackRouterDevtools position='bottom-right' />
-          </Suspense>
-        )}
-      </>
-    )
-  },
+  component: RootComponent,
   notFoundComponent: NotFoundError,
   errorComponent: GeneralError,
 })
