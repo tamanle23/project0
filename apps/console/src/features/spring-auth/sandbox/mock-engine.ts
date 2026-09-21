@@ -24,22 +24,27 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
     if (url === '/api/auth/login' && method === 'POST') {
       const body = JSON.parse(config.data || '{}');
       
-      // Admin bypass for local testing
-      if (body.username === 'admin' && body.password === 'admin') {
+      // Sandbox bypass dictionary for local testing
+      const sandboxUsers: Record<string, string[]> = {
+        'admin_bypass': ['ROLE_USER', 'ROLE_ADMIN'],
+        'creator_bypass': ['ROLE_USER', 'ROLE_CREATOR'],
+        'user_bypass': ['ROLE_USER']
+      };
+
+      if (body.username in sandboxUsers && body.password === 'bypass') {
+        const roles = sandboxUsers[body.username];
+        const sub = body.username.split('_')[0]; // 'admin', 'creator', 'user'
+
         const token = createMockJwt({
-          sub: 'admin',
-          roles: ['ROLE_USER', 'ROLE_ADMIN'],
+          sub,
+          roles,
           iat: Math.floor(Date.now() / 1000),
           exp: Math.floor(Date.now() / 1000) + 60 * 15 // 15 mins
         });
         
         return {
-          data: { accessToken: token, refreshToken: 'mock_refresh_token_admin' },
-          status: 200,
-          statusText: 'OK',
-          headers: {},
-          config,
-          request: {}
+          data: { accessToken: token, refreshToken: `mock_refresh_token_${sub}` },
+          status: 200, statusText: 'OK', headers: {}, config, request: {}
         };
       }
       return { data: { message: 'Bad credentials' }, status: 401, statusText: 'Unauthorized', headers: {}, config, request: {} };
@@ -49,16 +54,25 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
     if (url === '/api/auth/refresh' && method === 'POST') {
       const body = JSON.parse(config.data || '{}');
       
-      if (body.refreshToken === 'mock_refresh_token_admin') {
+      const refreshTokens: Record<string, string[]> = {
+        'mock_refresh_token_admin': ['ROLE_USER', 'ROLE_ADMIN'],
+        'mock_refresh_token_creator': ['ROLE_USER', 'ROLE_CREATOR'],
+        'mock_refresh_token_user': ['ROLE_USER']
+      };
+
+      if (body.refreshToken in refreshTokens) {
+        const roles = refreshTokens[body.refreshToken];
+        const sub = body.refreshToken.split('_').pop();
+
         const token = createMockJwt({
-          sub: 'admin',
-          roles: ['ROLE_USER', 'ROLE_ADMIN'],
+          sub,
+          roles,
           iat: Math.floor(Date.now() / 1000),
           exp: Math.floor(Date.now() / 1000) + 60 * 15
         });
         
         return {
-          data: { accessToken: token, refreshToken: 'mock_refresh_token_admin' },
+          data: { accessToken: token, refreshToken: body.refreshToken },
           status: 200, statusText: 'OK', headers: {}, config, request: {}
         };
       }
