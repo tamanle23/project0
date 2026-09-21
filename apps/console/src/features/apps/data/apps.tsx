@@ -20,7 +20,7 @@ export const apps = [
   },
   {
     name: 'Tiktok',
-    logo: <IconTiktok className='size-6 text-zinc-900 dark:text-zinc-100 fill-zinc-900/10 dark:fill-zinc-100/10' />,
+    logo: <IconTiktok className='size-6' />,
     connected: false,
     desc: 'Connect with TikTok account to manage videos, and interactions.',
   },
