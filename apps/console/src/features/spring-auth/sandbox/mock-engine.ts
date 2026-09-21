@@ -66,7 +66,15 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
       return { data: { message: 'Invalid refresh token' }, status: 401, statusText: 'Unauthorized', headers: {}, config, request: {} };
     }
 
-    // 3. Mock Protected Endpoint (GET /api/admin/dashboard)
+    // 3. Mock Logout (POST /api/auth/logout)
+    if (url === '/api/auth/logout' && method === 'POST') {
+      return {
+        data: { message: 'Successfully logged out' },
+        status: 200, statusText: 'OK', headers: {}, config, request: {}
+      };
+    }
+
+    // 4. Mock Protected Endpoint (GET /api/admin/dashboard)
     if (url === '/api/admin/dashboard' && method === 'GET') {
       const authHeader = config.headers?.['Authorization'] as string;
       

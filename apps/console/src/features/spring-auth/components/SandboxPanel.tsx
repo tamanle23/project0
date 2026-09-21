@@ -20,6 +20,17 @@ export function SandboxPanel() {
     }
   };
 
+  const handleHardLogout = async () => {
+    try {
+      await springApiClient.post('/api/auth/logout');
+    } catch (e) {
+      // Ignore
+    } finally {
+      clearTokens();
+      toast.success('Hard Logout Complete');
+    }
+  };
+
   return (
     <div className="fixed bottom-4 right-4 z-50 w-80 rounded-2xl border border-white/20 bg-background/80 p-4 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/80">
       <div className="flex items-center gap-2 mb-3 border-b border-border/50 pb-2">
@@ -51,7 +62,7 @@ export function SandboxPanel() {
             <Button variant="outline" size="sm" onClick={handleTestDashboard} className="text-[10px] h-8">
               <Database className="me-1.5 size-3 text-blue-500" /> Test Dashboard
             </Button>
-            <Button variant="outline" size="sm" onClick={clearTokens} className="text-[10px] h-8 hover:bg-destructive hover:text-destructive-foreground">
+            <Button variant="outline" size="sm" onClick={handleHardLogout} className="text-[10px] h-8 hover:bg-destructive hover:text-destructive-foreground">
               <LogOut className="me-1.5 size-3" /> Hard Logout
             </Button>
           </div>
