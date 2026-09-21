@@ -3,8 +3,7 @@ import { useSpringAuthStore } from '../store';
 import { springApiClient } from '../api-client';
 
 export function useAuthHydration() {
-  const { refreshToken, setTokens, clearTokens } = useSpringAuthStore();
-  const [isHydrating, setIsHydrating] = useState(true);
+  const { refreshToken, setTokens, clearTokens, setHydrating } = useSpringAuthStore();
 
   useEffect(() => {
     let mounted = true;
@@ -13,7 +12,7 @@ export function useAuthHydration() {
       // If we don't have a refresh token (even in cookies, though we check local state here), we can skip.
       // In a real prod app with HttpOnly cookies, you might always attempt this on boot.
       if (!refreshToken) {
-        if (mounted) setIsHydrating(false);
+        if (mounted) setHydrating(false);
         return;
       }
 
@@ -31,7 +30,7 @@ export function useAuthHydration() {
         }
       } finally {
         if (mounted) {
-          setIsHydrating(false);
+          setHydrating(false);
         }
       }
     };

@@ -9,6 +9,9 @@ export const useSpringAuthStore = create<AuthState>((set, get) => ({
   refreshToken: localStorage.getItem(REFRESH_STORAGE_KEY),
   user: null,
   isAuthenticated: false,
+  isHydrating: true, // Start in hydrating mode
+
+  setHydrating: (val: boolean) => set({ isHydrating: val }),
 
   setTokens: (access: string, refresh: string) => {
     const user = decodeJwt(access);

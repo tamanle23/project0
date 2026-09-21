@@ -11,11 +11,13 @@ export interface AuthState {
   refreshToken: string | null;
   user: JwtPayload | null;
   isAuthenticated: boolean;
+  isHydrating: boolean;
 
   setTokens: (access: string, refresh: string) => void;
   clearTokens: () => void;
   expireAccessToken: () => void; // Dev helper
   expireRefreshToken: () => void; // Dev helper
+  setHydrating: (val: boolean) => void;
 }
 
 export interface LoginResponse {
