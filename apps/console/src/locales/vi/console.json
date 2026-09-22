@@ -1,0 +1,49 @@
+{
+  "dashboard": {
+    "title": "Bảng điều khiển",
+    "welcome": "Chào mừng bạn quay lại Console"
+  },
+  "navUser": {
+    "account": "Tài khoản",
+    "notifications": "Thông báo",
+    "signOut": "Đăng xuất"
+  },
+  "sidebar": {
+    "groups": {
+      "general": "Chung",
+      "admin": "Quản trị",
+      "pages": "Trang",
+      "other": "Khác"
+    },
+    "items": {
+      "dashboard": "Bảng điều khiển",
+      "tasks": "Nhiệm vụ",
+      "apps": "Ứng dụng",
+      "chats": "Trò chuyện",
+      "users": "Người dùng",
+      "clerk": "Bảo mật bởi Clerk",
+      "clerkSignIn": "Đăng nhập",
+      "clerkSignUp": "Đăng ký",
+      "clerkUserManagement": "Quản lý người dùng",
+      "auth": "Xác thực",
+      "signIn": "Đăng nhập",
+      "signIn2Col": "Đăng nhập (2 Cột)",
+      "signUp": "Đăng ký",
+      "forgotPassword": "Quên mật khẩu",
+      "otp": "OTP",
+      "errors": "Lỗi",
+      "unauthorized": "Không có quyền",
+      "forbidden": "Bị cấm",
+      "notFound": "Không tìm thấy",
+      "internalError": "Lỗi máy chủ nội bộ",
+      "maintenanceError": "Lỗi bảo trì",
+      "settings": "Cài đặt",
+      "profile": "Hồ sơ",
+      "account": "Tài khoản",
+      "appearance": "Giao diện",
+      "notifications": "Thông báo",
+      "display": "Hiển thị",
+      "helpCenter": "Trung tâm trợ giúp"
+    }
+  }
+}
