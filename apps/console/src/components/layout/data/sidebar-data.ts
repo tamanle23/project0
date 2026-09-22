@@ -1,7 +1,6 @@
 import {
   Construction,
   LayoutDashboard,
-  Monitor,
   Bug,
   ListTodo,
   FileX,
@@ -197,11 +196,6 @@ export const useSidebarData = (): SidebarData => {
                 title: t('sidebar.items.notifications', 'Notifications'),
                 url: '/settings/notifications',
                 icon: Bell,
-              },
-              {
-                title: t('sidebar.items.display', 'Display'),
-                url: '/settings/display',
-                icon: Monitor,
               },
             ],
           },
