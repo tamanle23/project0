@@ -114,3 +114,8 @@ mybatis:
       default-fetch-size: 100
       default-statement-timeout: 30
 
+
+springdoc:
+  show-spring-data-pageable: false
+  show-spring-data-rest: false
+

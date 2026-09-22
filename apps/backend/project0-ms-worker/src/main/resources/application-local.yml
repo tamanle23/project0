@@ -87,3 +87,8 @@ spring:
             enable: true
           timeout: 8000
 
+
+springdoc:
+  show-spring-data-pageable: false
+  show-spring-data-rest: false
+
