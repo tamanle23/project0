@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
+import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { LanguageSwitch } from '@/components/language-switch'
@@ -35,6 +36,7 @@ function RouteComponent() {
           <LanguageSwitch />
           <ThemeSwitch />
           <ConfigDrawer />
+          <ProfileDropdown />
         </div>
       </Header>
       <div className='flex-1 [&>div]:h-full'>
