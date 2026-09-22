@@ -67,6 +67,10 @@ const defaultValues: Partial<ProfileFormValues> = {
 }
 
 export function ProfileForm() {
+  // Flag to determine if settings should be sent to server on update, 
+  // or applied immediately to the client UI.
+  const isServerSide = true
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues,
@@ -81,7 +85,12 @@ export function ProfileForm() {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((data) => showSubmittedData(data))}
+        onSubmit={form.handleSubmit((data) => {
+          if (isServerSide) {
+            // Simulate server-side API call
+            showSubmittedData(data)
+          }
+        })}
         className='space-y-8'
       >
         <FormField

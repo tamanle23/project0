@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { ChevronDown } from 'lucide-react'
@@ -35,6 +35,10 @@ export function AppearanceForm() {
   const { theme, setTheme, glassIntensity, setGlassIntensity, previewGlassIntensity, wallpaper, setWallpaper } = useTheme()
   const [previewIntensity, setPreviewIntensity] = useState<number>(glassIntensity ?? 20)
 
+  // Flag to determine if settings should be sent to server on update, 
+  // or applied immediately to the client UI.
+  const isServerSide = false
+
   // This can come from your database or API.
   const defaultValues: Partial<AppearanceFormValues> = {
     theme: theme as 'light' | 'dark',
@@ -48,17 +52,28 @@ export function AppearanceForm() {
     defaultValues,
   })
 
-  function onSubmit(data: AppearanceFormValues) {
-    if (data.font != font) setFont(data.font)
-    if (data.theme != theme) setTheme(data.theme)
-    if (data.glassIntensity !== undefined && data.glassIntensity !== glassIntensity) {
-      setGlassIntensity(data.glassIntensity)
+  // Watch for immediate client-side UI updates
+  const formValues = form.watch()
+  useEffect(() => {
+    if (!isServerSide) {
+      if (formValues.font && formValues.font !== font) setFont(formValues.font)
+      if (formValues.theme && formValues.theme !== theme) setTheme(formValues.theme)
+      // glassIntensity and wallpaper are handled by their immediate onValueChange props.
     }
-    if (data.wallpaper && data.wallpaper !== wallpaper) {
-      setWallpaper(data.wallpaper)
-    }
+  }, [formValues.font, formValues.theme, isServerSide, font, theme, setFont, setTheme])
 
-    showSubmittedData(data)
+  function onSubmit(data: AppearanceFormValues) {
+    if (isServerSide) {
+      if (data.font != font) setFont(data.font)
+      if (data.theme != theme) setTheme(data.theme)
+      if (data.glassIntensity !== undefined && data.glassIntensity !== glassIntensity) {
+        setGlassIntensity(data.glassIntensity)
+      }
+      if (data.wallpaper && data.wallpaper !== wallpaper) {
+        setWallpaper(data.wallpaper)
+      }
+      showSubmittedData(data)
+    }
   }
 
   return (
@@ -345,7 +360,7 @@ export function AppearanceForm() {
           )}
         />
 
-        <Button type='submit'>Update preferences</Button>
+        {isServerSide && <Button type='submit'>Update preferences</Button>}
       </form>
     </Form>
   )

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { Check, ChevronsUpDown } from 'lucide-react'
@@ -52,6 +53,10 @@ type AccountFormValues = z.infer<typeof accountFormSchema>
 
 export function AccountForm() {
   const { i18n } = useTranslation('console')
+  
+  // Flag to determine if settings should be sent to server on update, 
+  // or applied immediately to the client UI.
+  const isServerSide = false
 
   const defaultValues: Partial<AccountFormValues> = {
     language: i18n.language || 'en',
@@ -62,8 +67,17 @@ export function AccountForm() {
     defaultValues,
   })
 
+  // Watch for immediate client-side UI updates
+  const languageValue = form.watch('language')
+  
+  useEffect(() => {
+    if (!isServerSide && languageValue && languageValue !== i18n.language) {
+      i18n.changeLanguage(languageValue)
+    }
+  }, [languageValue, isServerSide, i18n])
+
   function onSubmit(data: AccountFormValues) {
-    if (data.language !== i18n.language) {
+    if (isServerSide && data.language !== i18n.language) {
       i18n.changeLanguage(data.language)
     }
     showSubmittedData(data)
@@ -135,7 +149,7 @@ export function AccountForm() {
             </FormItem>
           )}
         />
-        <Button type='submit'>Update account</Button>
+        {isServerSide && <Button type='submit'>Update account</Button>}
       </form>
     </Form>
   )

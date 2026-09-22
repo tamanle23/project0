@@ -55,6 +55,10 @@ const defaultValues: Partial<DisplayFormValues> = {
 }
 
 export function DisplayForm() {
+  // Flag to determine if settings should be sent to server on update, 
+  // or applied immediately to the client UI.
+  const isServerSide = false
+
   const form = useForm<DisplayFormValues>({
     resolver: zodResolver(displayFormSchema),
     defaultValues,
@@ -63,7 +67,11 @@ export function DisplayForm() {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((data) => showSubmittedData(data))}
+        onSubmit={form.handleSubmit((data) => {
+          if (isServerSide) {
+            showSubmittedData(data)
+          }
+        })}
         className='space-y-8'
       >
         <FormField
@@ -114,7 +122,7 @@ export function DisplayForm() {
             </FormItem>
           )}
         />
-        <Button type='submit'>Update display</Button>
+        {isServerSide && <Button type='submit'>Update display</Button>}
       </form>
     </Form>
   )
