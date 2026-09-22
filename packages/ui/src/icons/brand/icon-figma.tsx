@@ -1,7 +1,7 @@
 import { type SVGProps } from 'react'
-import { cn } from '@/lib/utils'
+import { cn } from '../../lib/utils'
 
-export function IconWhatsapp({ className, ...props }: SVGProps<SVGSVGElement>) {
+export function IconFigma({ className, ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
       role='img'
@@ -17,10 +17,11 @@ export function IconWhatsapp({ className, ...props }: SVGProps<SVGSVGElement>) {
       strokeLinejoin='round'
       {...props}
     >
-      <title>WhatsApp</title>
+      <title>Figma</title>
       <path strokeWidth='0' d='M0 0h24v24H0z' fill='none' />
-      <path d='M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9' />
-      <path d='M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1' />
+      <path d='M15 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0' />
+      <path d='M6 3m0 3a3 3 0 0 1 3 -3h6a3 3 0 0 1 3 3v0a3 3 0 0 1 -3 3h-6a3 3 0 0 1 -3 -3z' />
+      <path d='M9 9a3 3 0 0 0 0 6h3m-3 0a3 3 0 1 0 3 3v-15' />
     </svg>
   )
 }

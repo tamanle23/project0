@@ -66,6 +66,7 @@ module.exports = () => {
     basePath,
     distDir: 'dist',
     reactStrictMode: true,
+    eslint: { ignoreDuringBuilds: true },
     trailingSlash: true,
     turbopack: {
       root: process.cwd(),

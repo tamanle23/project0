@@ -3,7 +3,7 @@ import {
   IconFacebook,
   IconTiktok,
   IconYoutube,
-} from '@/assets/brand-icons';
+} from '@project0/ui/icons';
 
 export const apps = [
   {

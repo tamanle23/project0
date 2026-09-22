@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconFacebook, IconGithub } from '@/assets/brand-icons'
+import { IconFacebook, IconGithub } from '@project0/ui/icons'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {

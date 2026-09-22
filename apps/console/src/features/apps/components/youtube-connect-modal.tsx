@@ -18,7 +18,7 @@ import {
   Video,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { IconYoutube } from '@/assets/brand-icons'
+import { IconYoutube } from '@project0/ui/icons'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {

@@ -1,7 +1,7 @@
 import { type SVGProps } from 'react'
-import { cn } from '@/lib/utils'
+import { cn } from '../../lib/utils'
 
-export function IconGitlab({ className, ...props }: SVGProps<SVGSVGElement>) {
+export function IconFacebook({ className, ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
       role='img'
@@ -17,9 +17,10 @@ export function IconGitlab({ className, ...props }: SVGProps<SVGSVGElement>) {
       strokeLinejoin='round'
       {...props}
     >
-      <title>GitLab</title>
+      <title>Facebook</title>
       <path strokeWidth='0' d='M0 0h24v24H0z' fill='none' />
-      <path d='M21 14l-9 7l-9 -7l3 -11l3 7h6l3 -7z' />
+      <rect x='3' y='3' width='18' height='18' rx='4' />
+      <path d='M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3' fill='currentColor' strokeWidth='0' />
     </svg>
   )
 }

@@ -1,7 +1,7 @@
 import { type SVGProps } from 'react'
-import { cn } from '@/lib/utils'
+import { cn } from '../../lib/utils'
 
-export function IconMedium({ className, ...props }: SVGProps<SVGSVGElement>) {
+export function IconGithub({ className, ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
       role='img'
@@ -17,14 +17,9 @@ export function IconMedium({ className, ...props }: SVGProps<SVGSVGElement>) {
       strokeLinejoin='round'
       {...props}
     >
-      <title>Medium</title>
+      <title>GitHub</title>
       <path strokeWidth='0' d='M0 0h24v24H0z' fill='none' />
-      <path d='M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z' />
-      <path d='M8 9h1l3 3l3 -3h1' />
-      <path d='M8 15l2 0' />
-      <path d='M14 15l2 0' />
-      <path d='M9 9l0 6' />
-      <path d='M15 9l0 6' />
+      <path d='M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5' />
     </svg>
   )
 }
