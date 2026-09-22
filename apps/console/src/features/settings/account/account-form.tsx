@@ -23,13 +23,11 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { DatePicker } from '@/components/date-picker'
 
 const languages = [
   { label: 'English', value: 'en' },
@@ -45,14 +43,6 @@ const languages = [
 ] as const
 
 const accountFormSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Please enter your name.')
-    .min(2, 'Name must be at least 2 characters.')
-    .max(30, 'Name must not be longer than 30 characters.'),
-  dob: z.date({
-    error: 'Please select your date of birth.',
-  }),
   language: z.string({
     error: 'Please select a language.',
   }),
@@ -64,7 +54,6 @@ export function AccountForm() {
   const { i18n } = useTranslation('console')
 
   const defaultValues: Partial<AccountFormValues> = {
-    name: '',
     language: i18n.language || 'en',
   }
 
@@ -83,37 +72,6 @@ export function AccountForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-        <FormField
-          control={form.control}
-          name='name'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder='Your name' {...field} />
-              </FormControl>
-              <FormDescription>
-                This is the name that will be displayed on your profile and in
-                emails.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='dob'
-          render={({ field }) => (
-            <FormItem className='flex flex-col'>
-              <FormLabel>Date of birth</FormLabel>
-              <DatePicker selected={field.value} onSelect={field.onChange} />
-              <FormDescription>
-                Your date of birth is used to calculate your age.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <FormField
           control={form.control}
           name='language'

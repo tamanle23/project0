@@ -23,8 +23,17 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { DatePicker } from '@/components/date-picker'
 
 const profileFormSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Please enter your name.')
+    .min(2, 'Name must be at least 2 characters.')
+    .max(30, 'Name must not be longer than 30 characters.'),
+  dob: z.date({
+    error: 'Please select your date of birth.',
+  }),
   username: z
     .string('Please enter your username.')
     .min(2, 'Username must be at least 2 characters.')
@@ -49,6 +58,7 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>
 
 // This can come from your database or API.
 const defaultValues: Partial<ProfileFormValues> = {
+  name: '',
   bio: 'I own a computer.',
   urls: [
     { value: 'https://shadcn.com' },
@@ -74,6 +84,37 @@ export function ProfileForm() {
         onSubmit={form.handleSubmit((data) => showSubmittedData(data))}
         className='space-y-8'
       >
+        <FormField
+          control={form.control}
+          name='name'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input placeholder='Your name' {...field} />
+              </FormControl>
+              <FormDescription>
+                This is the name that will be displayed on your profile and in
+                emails.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='dob'
+          render={({ field }) => (
+            <FormItem className='flex flex-col'>
+              <FormLabel>Date of birth</FormLabel>
+              <DatePicker selected={field.value} onSelect={field.onChange} />
+              <FormDescription>
+                Your date of birth is used to calculate your age.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name='username'
