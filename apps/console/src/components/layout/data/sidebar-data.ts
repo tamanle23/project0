@@ -171,6 +171,7 @@ export const useSidebarData = (): SidebarData => {
       },
       {
         title: t('sidebar.groups.other', 'Other'),
+        hideWhenInactive: true,
         items: [
           {
             title: t('sidebar.items.settings', 'Settings'),

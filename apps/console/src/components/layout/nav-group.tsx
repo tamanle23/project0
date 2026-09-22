@@ -33,15 +33,15 @@ import {
   type NavGroup as NavGroupProps,
 } from './types'
 
-export function NavGroup({ title, items }: NavGroupProps) {
+export function NavGroup({ title, items, hideWhenInactive }: NavGroupProps) {
   const { state, isMobile } = useSidebar()
   const href = useLocation({ select: (location) => location.href })
 
-  // A group is "active" when any of its items (or their sub-items) match the current route
-  const isGroupActive = items.some((item) => checkIsActive(href, item, true))
-
-  // Hide groups that don't contain the active route
-  if (!isGroupActive) return null
+  // If this group is flagged as hideWhenInactive, only render when an item inside is active
+  if (hideWhenInactive) {
+    const isGroupActive = items.some((item) => checkIsActive(href, item, true))
+    if (!isGroupActive) return null
+  }
 
   return (
     <SidebarGroup>
