@@ -19,6 +19,9 @@ application:
       - /api/auth/token
       - /api/scheduler/**
       - /fs/explorer/**
+      - /v3/api-docs/**
+      - /swagger-ui/**
+      - /swagger-ui.html
     jwtCookieName: X-AUTH-TOKEN
     jwtCookieDomain:
     jwtCookiePath: /

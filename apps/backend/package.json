@@ -5,7 +5,7 @@
   "description": "Project0 Java Spring Modulith backend with project0-ms-aio wrapper application",
   "scripts": {
     "build": "node mvnw.cjs clean package -DskipTests",
-    "dev": "node mvnw.cjs -pl project0-ms-aio spring-boot:run -Dspring-boot.run.profiles=dev",
+    "dev": "node mvnw.cjs -pl project0-ms-aio spring-boot:run -Dspring-boot.run.profiles=local",
     "test": "node mvnw.cjs test",
     "test:modulith": "node mvnw.cjs -pl project0-ms-aio test -Dtest=ModularityTests",
     "lint": "node mvnw.cjs test-compile -DskipTests",

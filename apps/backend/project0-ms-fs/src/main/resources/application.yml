@@ -8,6 +8,9 @@ application:
       - /resources/**
       - /jsMsgSource*
       - /**/*
+      - /v3/api-docs/**
+      - /swagger-ui/**
+      - /swagger-ui.html
     jwtTokenHeader: Authorization
     jwtTokenSecret: VEdiOCM5e1soNSFKZV1eVw==
     jwtTokenExpiration: 604800
