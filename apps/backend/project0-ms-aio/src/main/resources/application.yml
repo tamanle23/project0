@@ -49,10 +49,8 @@ spring:
         enabled: false
   graphql:
     schema:
-      # Directory locations — Spring for GraphQL appends file-extensions (.graphqls) automatically
-      locations:
-        - classpath:graphql/
-        - classpath*:graphql/
+      # classpath*: scans ALL classpath roots (app + every dependency JAR)
+      locations: classpath*:graphql/
       file-extensions: .graphqls
     graphiql:
       enabled: true
