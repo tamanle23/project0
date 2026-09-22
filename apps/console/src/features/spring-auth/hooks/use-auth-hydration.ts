@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSpringAuthStore } from '../store';
 import { springApiClient } from '../api-client';
 

@@ -31,7 +31,9 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
     const isMockToken = authHeader && authHeader.includes('mock_signature');
     
     let body: any = {};
-    try { body = config.data ? JSON.parse(config.data) : {}; } catch (e) {}
+    try {
+      body = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
+    } catch (e) {}
     const isMockRefresh = body.refreshToken && String(body.refreshToken).startsWith('mock_refresh_token_');
 
     const shouldMock = 
