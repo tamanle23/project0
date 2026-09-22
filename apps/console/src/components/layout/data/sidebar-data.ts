@@ -26,6 +26,24 @@ import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
 import { useTranslation } from 'react-i18next'
 
+export const sidebarTeams = [
+  {
+    name: 'Project0',
+    logo: Command,
+    plan: 'Vite + ShadcnUI',
+  },
+  {
+    name: 'Acme Inc',
+    logo: GalleryVerticalEnd,
+    plan: 'Enterprise',
+  },
+  {
+    name: 'Acme Corp.',
+    logo: AudioWaveform,
+    plan: 'Startup',
+  },
+];
+
 export const useSidebarData = (): SidebarData => {
   const { t } = useTranslation('console');
 
@@ -35,23 +53,7 @@ export const useSidebarData = (): SidebarData => {
       email: 'satnaingdev@gmail.com',
       avatar: '/avatars/shadcn.jpg',
     },
-    teams: [
-      {
-        name: 'Project0',
-        logo: Command,
-        plan: 'Vite + ShadcnUI',
-      },
-      {
-        name: 'Acme Inc',
-        logo: GalleryVerticalEnd,
-        plan: 'Enterprise',
-      },
-      {
-        name: 'Acme Corp.',
-        logo: AudioWaveform,
-        plan: 'Startup',
-      },
-    ],
+    teams: sidebarTeams,
     navGroups: [
       {
         title: t('sidebar.groups.general', 'General'),

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { getCookie, setCookie } from '@/lib/cookies'
-import { sidebarData } from '@/components/layout/data/sidebar-data'
+import { sidebarTeams } from '@/components/layout/data/sidebar-data'
 
 export type Profile = {
   id?: string
@@ -21,7 +21,7 @@ interface ProfileState {
 }
 
 export const useProfileStore = create<ProfileState>()((set, get) => {
-  const defaultProfiles = sidebarData.teams as Profile[]
+  const defaultProfiles = sidebarTeams as Profile[]
   let initialProfile = defaultProfiles[0]
 
   const savedProfileName = getCookie(PROFILE_COOKIE_NAME)
