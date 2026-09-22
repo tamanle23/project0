@@ -17,29 +17,45 @@ To maintain complete development traceability across all applications and packag
      - Target path: `apps/<target-app>/doc/`
    - If the `doc/` directory does not exist in the target app, create it automatically.
 
-2. **Sequential Incremental Numbering**:
-   - Every new artifact must follow an incremental numerical sequence based on the highest existing index in that app's `doc/` directory:
-     - Plans: `doc/implementation_plan_<NN>.md` (e.g., `implementation_plan_01.md`, `implementation_plan_02.md`)
-     - Walkthroughs: `doc/walkthrough_<NN>.md` (e.g., `walkthrough_01.md`, `walkthrough_02.md`)
-     - Alternatively, for apps already utilizing descriptive slug prefixes (e.g. `tekgo-ui`): `doc/<NNN>-<topic>-plan.md` and `doc/<NNN>-<topic>-walkthrough.md`.
-   - Never overwrite previous iterations in `doc/`. Always calculate `MAX(existing_index) + 1` to preserve complete chronological history.
+2. **Single Shared Counter**:
+   - Plans and walkthroughs share **one global counter** per `doc/` directory.
+   - Before creating any artifact, scan the `doc/` directory and compute:
+     ```
+     NEXT = MAX(all existing NN indices across both plans and walkthroughs) + 1
+     ```
+   - A plan and its corresponding walkthrough **always use the same index number**, making them a matched pair:
+     - `doc/implementation_plan_<NN>.md` ← planned before execution
+     - `doc/walkthrough_<NN>.md` ← written after execution
+   - For **reactive tasks** (bug fixes, debugging) where no planning phase occurs, only a walkthrough is written — the plan file is skipped — but the shared counter still advances by 1.
+   - Never overwrite previous iterations in `doc/`. The counter only ever goes up.
+
+   **Example — correct numbering:**
+   ```
+   implementation_plan_01.md  ←→  walkthrough_01.md   (planned feature)
+   implementation_plan_02.md  ←→  walkthrough_02.md   (planned feature)
+                                   walkthrough_03.md   (reactive fix — no plan)
+   implementation_plan_04.md  ←→  walkthrough_04.md   (planned feature)
+   ```
 
 3. **Dual-Persistence Requirement**:
    - Internal conversation artifacts (such as `<appDataDir>\brain\<conversation-id>/implementation_plan.md` and `walkthrough.md`) serve interactive UI review and feedback mechanisms.
-   - Concurrently, the exact content **must also be copied or written to the app's version-controlled `doc/` directory** (`apps/<target-app>/doc/implementation_plan_<NN>.md` and `doc/walkthrough_<NN>.md`).
+   - Concurrently, the exact content **must also be copied or written to the app's version-controlled `doc/` directory**.
 
 ---
 
 ## 2. Step-by-Step Workflow for Agents
 
-1. **Before Starting a Task**:
-   - Scan `apps/<target-app>/doc/` to find the current highest iteration index.
-   - If no files exist, initialize with index `01` (or `001`).
+1. **Before Starting Any Task**:
+   - Scan `apps/<target-app>/doc/` and compute `NEXT = MAX(all existing NN) + 1`.
+   - If no files exist, initialize with index `01`.
 
-2. **When Creating an Implementation Plan**:
+2. **When Creating an Implementation Plan** (planned features only):
    - Generate the session implementation plan artifact (`implementation_plan.md`).
-   - Simultaneously create `apps/<target-app>/doc/implementation_plan_<NN>.md` with the full technical specification.
+   - Simultaneously create `apps/<target-app>/doc/implementation_plan_<NEXT>.md`.
+   - Reserve this `NEXT` index — the matching walkthrough will use the same number.
 
 3. **When Concluding & Verifying a Task**:
    - Generate the session walkthrough artifact (`walkthrough.md`).
-   - Simultaneously create `apps/<target-app>/doc/walkthrough_<NN>.md` detailing completed changes, validation results, and testing evidence.
+   - Simultaneously create `apps/<target-app>/doc/walkthrough_<NN>.md`:
+     - If a plan was created for this task: use the **same** `NN` as the plan.
+     - If this was a reactive task (no plan): use `NEXT = MAX(all existing) + 1`.
