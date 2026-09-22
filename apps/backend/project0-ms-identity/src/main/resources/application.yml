@@ -115,3 +115,12 @@ springdoc:
   show-spring-data-pageable: false
   show-spring-data-rest: false
 
+spring:
+  graphql:
+    path: /graphql
+    graphiql:
+      enabled: true
+      path: /graphiql
+    schema:
+      locations: classpath:graphql/**/
+      file-extensions: .graphqls

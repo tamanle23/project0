@@ -1,0 +1,127 @@
+extend type Query {
+    # Get a single user by UID
+    user(uid: String!): UserVm
+
+    # Search / list users with pagination
+    users(request: UserSearchInput): UserPage
+
+    # Get a user's assigned permissions (paginated)
+    userPermissions(uid: String!, request: PageInput): PermissionPage
+
+    # Get a user's assigned roles (paginated)
+    userRoles(uid: String!, request: PageInput): RolePage
+
+    # Get a user's profile (language preferences, etc.)
+    userProfile(uid: String!): UserProfileVm
+
+    # Get a user with their fully-expanded permissions list
+    userWithPermissions(uid: String!): UserVm
+}
+
+# ─── Input Types ─────────────────────────────────────────────────────────────
+
+input UserSearchInput {
+    userName: String
+    userTypes: [UserType]
+    page: Int
+    size: Int
+}
+
+input PageInput {
+    page: Int
+    size: Int
+}
+
+# ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserType {
+    ANONYMOUS
+    REGISTERED
+    SUPER
+    ADMIN
+    AUTOLOGIN
+}
+
+enum UserStatus {
+    APPROVED
+    DISAPPROVED
+    PENDING
+    ENABLED
+    DISABLED
+}
+
+# ─── Output Types ────────────────────────────────────────────────────────────
+
+type UserVm {
+    id: ID
+    uid: String
+    userName: String
+    email: String
+    firstName: String
+    lastName: String
+    nonExpired: Boolean
+    nonLocked: Boolean
+    credentialsNonExpired: Boolean
+    status: UserStatus
+    type: UserType
+    userPermissions: [UserPermissionVm]
+    userRoles: [UserRoleVm]
+}
+
+type UserPage {
+    content: [UserVm]
+    totalElements: Int
+    totalPages: Int
+    size: Int
+    number: Int
+}
+
+type UserProfileVm {
+    lang: String
+}
+
+type PermissionVm {
+    id: ID
+    uid: String
+    code: String
+    description: String
+}
+
+type UserPermissionVm {
+    id: ID
+    permission: PermissionVm
+    status: Int
+    enabled: Boolean
+    inheritingRoles: [String]
+}
+
+type RoleVm {
+    id: ID
+    uid: String
+    code: String
+    description: String
+    numberOfUsers: Int
+}
+
+type UserRoleVm {
+    id: ID
+    uid: String
+    role: RoleVm
+    enabled: Boolean
+}
+
+type RolePage {
+    content: [RoleVm]
+    totalElements: Int
+    totalPages: Int
+    size: Int
+    number: Int
+}
+
+type PermissionPage {
+    content: [PermissionVm]
+    totalElements: Int
+    totalPages: Int
+    size: Int
+    number: Int
+}
