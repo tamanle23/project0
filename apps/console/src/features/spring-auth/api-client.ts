@@ -3,7 +3,7 @@ import { useSpringAuthStore } from './store';
 import { enableSandboxMockEngine } from './sandbox/mock-engine';
 
 export const springApiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '',
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -17,7 +17,7 @@ if (import.meta.env.DEV) {
 
 // Queue for pending requests while silent refresh is occurring
 let isRefreshing = false;
-let failedQueue: Array<{ resolve: (value?: string) => void; reject: (reason?: any) => void }> = [];
+let failedQueue: Array<{ resolve: (value?: string) => void; reject: (reason?: unknown) => void }> = [];
 
 const processQueue = (error: Error | null, token: string | null = null) => {
   failedQueue.forEach((prom) => {
@@ -51,7 +51,7 @@ springApiClient.interceptors.response.use(
     if (
       error.response?.status === 401 && 
       !originalRequest._retry && 
-      !['/api/auth/refresh', '/api/auth/login'].includes(originalRequest.url)
+      !['/auth/refresh', '/auth/token'].includes(originalRequest.url)
     ) {
       
       if (isRefreshing) {
@@ -73,7 +73,7 @@ springApiClient.interceptors.response.use(
       try {
         const payload = { refreshToken: state.refreshToken };
         
-        const { data } = await springApiClient.post('/api/auth/refresh', payload);
+        const { data } = await springApiClient.post('/auth/refresh', payload);
         
         const newAccess = data.accessToken;
         const newRefresh = data.refreshToken || state.refreshToken;

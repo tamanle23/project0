@@ -45,7 +45,7 @@ export function UserAuthForm({
 }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
-  
+
   // Use the new Spring Security dual-token store
   const { setTokens } = useSpringAuthStore()
 
@@ -61,17 +61,17 @@ export function UserAuthForm({
     setIsLoading(true)
 
     try {
-      const response = await springApiClient.post('/api/auth/login', {
-        username: data.email,
+      const response = await springApiClient.post('/auth/token', {
+        userName: data.email,
         password: data.password,
       });
 
-      setTokens(response.data.accessToken, response.data.refreshToken);
+      setTokens(response.data.body.accessToken, response.data.body.refreshToken);
       toast.success(`Welcome back, ${data.email}!`);
-      
+
       const targetPath = redirectTo || '/'
       navigate({ to: targetPath, replace: true })
-    } catch (error) {
+    } catch (_error) {
       toast.error('Invalid credentials or network error');
     } finally {
       setIsLoading(false);
@@ -82,7 +82,7 @@ export function UserAuthForm({
   const handleSandboxBypass = async (role: 'admin' | 'creator' | 'user') => {
     setIsLoading(true);
     try {
-      const response = await springApiClient.post('/api/auth/login', {
+      const response = await springApiClient.post('/auth/token', {
         username: `${role}_bypass`,
         password: 'bypass',
       }, {
@@ -93,10 +93,10 @@ export function UserAuthForm({
 
       setTokens(response.data.accessToken, response.data.refreshToken);
       toast.success(`Sandbox Login Successful (${role.toUpperCase()})`);
-      
+
       const targetPath = redirectTo || '/';
       navigate({ to: targetPath, replace: true });
-    } catch (e) {
+    } catch (_e) {
       toast.error('Sandbox login failed');
     } finally {
       setIsLoading(false);

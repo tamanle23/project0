@@ -3,7 +3,8 @@ export interface JwtPayload {
   roles: string[];
   iat: number;
   exp: number;
-  [key: string]: any;
+  isSandbox?: boolean;
+  [key: string]: unknown;
 }
 
 export interface AuthState {
@@ -12,6 +13,7 @@ export interface AuthState {
   user: JwtPayload | null;
   isAuthenticated: boolean;
   isHydrating: boolean;
+  isSandbox: boolean;
 
   setTokens: (access: string, refresh: string) => void;
   clearTokens: () => void;

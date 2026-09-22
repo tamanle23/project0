@@ -31,24 +31,33 @@ export default defineConfig(({ mode }) => {
         enableThemeSettings ? 'true' : 'false'
       ),
     },
-  plugins: [
-    tanstackRouter({
-      target: 'react',
-      autoCodeSplitting: true,
-    }),
-    react(),
-    tailwindcss(),
-  ],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
+    plugins: [
+      tanstackRouter({
+        target: 'react',
+        autoCodeSplitting: true,
+      }),
+      react(),
+      tailwindcss(),
+    ],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
     },
-  },
     ssr: {
       // Force Vite to bundle all npm packages into your server chunk
       noExternal: true,
       // Specify target environment constraints
       target: 'webworker'
-    }
+    },
+    server: {
+      proxy: {
+        '/api': {
+          target: process.env.VITE_API_BASE_URL || 'http://localhost:8080', // Your Spring Boot backend
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
   }
 })

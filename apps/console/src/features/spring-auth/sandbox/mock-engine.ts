@@ -4,7 +4,7 @@ import { decodeJwt } from '../utils/jwt';
 // Helper to base64 encode without padding/symbols standard for JWTs
 const b64 = (str: string) => btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
-const createMockJwt = (payload: any) => {
+const createMockJwt = (payload: Record<string, unknown>) => {
   const header = b64(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
   const body = b64(JSON.stringify(payload));
   const signature = b64('mock_signature');
@@ -29,25 +29,26 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
     const isMockRequest = getHeader(config.headers, 'X-Sandbox-Mock') === 'true';
     const authHeader = getHeader(config.headers, 'Authorization');
     const isMockToken = authHeader && authHeader.includes('mock_signature');
-    
-    let body: any = {};
+
+    let body: Record<string, any> = {};
     try {
       body = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
-    } catch (e) {}
+    } catch {
+      /* ignore */
+    }
     const isMockRefresh = body.refreshToken && String(body.refreshToken).startsWith('mock_refresh_token_');
 
-    const shouldMock = 
-      (url === '/api/auth/login' && method === 'POST' && isMockRequest) ||
+    const shouldMock =
+      (url === '/api/auth/token' && method === 'POST' && isMockRequest) ||
       (url === '/api/auth/refresh' && method === 'POST' && isMockRefresh) ||
       (url === '/api/auth/logout' && method === 'POST' && isMockToken) ||
       (url === '/api/admin/dashboard' && method === 'GET' && isMockToken);
 
     if (shouldMock) {
       // Apply mock adapter only for this specific request
-      // @ts-ignore
       config.adapter = async (mockConfig) => {
         // 1. Mock Login
-        if (url === '/api/auth/login') {
+        if (url === '/api/auth/token') {
           const sandboxUsers: Record<string, string[]> = {
             'admin_bypass': ['ROLE_USER', 'ROLE_ADMIN'],
             'creator_bypass': ['ROLE_USER', 'ROLE_CREATOR'],
@@ -61,10 +62,11 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
             const token = createMockJwt({
               sub,
               roles,
+              isSandbox: true,
               iat: Math.floor(Date.now() / 1000),
               exp: Math.floor(Date.now() / 1000) + 60 * 15
             });
-            
+
             return {
               data: { accessToken: token, refreshToken: `mock_refresh_token_${sub}` },
               status: 200, statusText: 'OK', headers: {}, config: mockConfig, request: {}
@@ -88,10 +90,11 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
             const token = createMockJwt({
               sub,
               roles,
+              isSandbox: true,
               iat: Math.floor(Date.now() / 1000),
               exp: Math.floor(Date.now() / 1000) + 60 * 15
             });
-            
+
             return {
               data: { accessToken: token, refreshToken: body.refreshToken },
               status: 200, statusText: 'OK', headers: {}, config: mockConfig, request: {}
@@ -113,14 +116,14 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
           if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return Promise.reject({ response: { data: { message: 'Missing token' }, status: 401, statusText: 'Unauthorized' }, config: mockConfig });
           }
-          
+
           const token = authHeader.split(' ')[1];
           const decoded = decodeJwt(token);
-          
+
           if (!decoded || (decoded.exp * 1000) < Date.now()) {
             return Promise.reject({ response: { data: { message: 'Token expired' }, status: 401, statusText: 'Unauthorized' }, config: mockConfig });
           }
-          
+
           if (!decoded.roles.includes('ROLE_ADMIN')) {
             return Promise.reject({ response: { data: { message: 'Forbidden' }, status: 403, statusText: 'Forbidden' }, config: mockConfig });
           }
@@ -130,7 +133,7 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
             status: 200, statusText: 'OK', headers: {}, config: mockConfig, request: {}
           };
         }
-        
+
         throw new Error('Unmatched mock route');
       };
     }

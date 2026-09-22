@@ -24,7 +24,7 @@ export function useAuthHydration() {
         if (mounted) {
           setTokens(data.accessToken, data.refreshToken || refreshToken);
         }
-      } catch (error) {
+      } catch (_error) {
         if (mounted) {
           clearTokens();
         }

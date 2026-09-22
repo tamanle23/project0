@@ -10,6 +10,7 @@ export const useSpringAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isAuthenticated: false,
   isHydrating: true, // Start in hydrating mode
+  isSandbox: false,
 
   setHydrating: (val: boolean) => set({ isHydrating: val }),
 
@@ -18,11 +19,17 @@ export const useSpringAuthStore = create<AuthState>((set, get) => ({
     if (refresh) {
       localStorage.setItem(REFRESH_STORAGE_KEY, refresh);
     }
+    const isSandbox = Boolean(
+      user?.isSandbox ||
+      access?.endsWith('.mock_signature') ||
+      refresh?.startsWith('mock_refresh_token_')
+    );
     set({
       accessToken: access,
       refreshToken: refresh,
       user,
       isAuthenticated: !!user,
+      isSandbox,
     });
   },
 
@@ -33,6 +40,7 @@ export const useSpringAuthStore = create<AuthState>((set, get) => ({
       refreshToken: null,
       user: null,
       isAuthenticated: false,
+      isSandbox: false,
     });
   },
 
