@@ -1,0 +1,10 @@
+{
+  "extends": "@project0/typescript-config/base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "baseUrl": ".",
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"]
+}

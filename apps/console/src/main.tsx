@@ -18,6 +18,7 @@ import { ProfileProvider } from './context/profile-provider'
 import { routeTree } from './routeTree.gen'
 // Styles
 import './styles/index.css'
+import './i18n'
 
 declare global {
   interface Window {
