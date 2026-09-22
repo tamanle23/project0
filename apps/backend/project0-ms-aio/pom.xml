@@ -52,6 +52,29 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>com.github.sylvainlaurent.maven</groupId>
+        <artifactId>yaml-json-validator-maven-plugin</artifactId>
+        <version>1.0.4</version>
+        <executions>
+          <execution>
+            <id>validate</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>validate</goal>
+            </goals>
+            <configuration>
+              <validationSets>
+                <validationSet>
+                  <includes>
+                    <include>src/main/resources/**/*.yml</include>
+                  </includes>
+                </validationSet>
+              </validationSets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>${springboot.version}</version>
