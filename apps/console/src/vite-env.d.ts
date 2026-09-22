@@ -8,6 +8,8 @@ interface ImportMetaEnv {
   readonly VITE_YOUTUBE_CLIENT_SECRET?: string
   readonly VITE_TIKTOK_CLIENT_KEY?: string
   readonly VITE_TIKTOK_CLIENT_SECRET?: string
+  readonly VITE_ROUTER_MODE?: 'browser' | 'hash' | 'memory' | 'auto'
+  readonly VITE_DESKTOP_ROUTER_MODE?: 'browser' | 'hash' | 'memory'
 }
 
 interface ImportMeta {
