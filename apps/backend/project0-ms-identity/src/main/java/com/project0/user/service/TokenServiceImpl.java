@@ -27,6 +27,9 @@ import com.project0.service.authentication.UserDetailsImpl;
 import com.project0.user.controller.request.AuthenticationRequestBody;
 import com.project0.user.model.User;
 
+import org.apache.commons.lang3.StringUtils;
+import io.jsonwebtoken.Claims;
+
 @Service
 @Transactional
 public class TokenServiceImpl extends CommonReponseBuilder implements TokenService {
@@ -60,10 +63,21 @@ public class TokenServiceImpl extends CommonReponseBuilder implements TokenServi
   }
 
   public ResponseWrapper<ContextHeader, AuthenticationToken> refreshToken(RequestWrapper<ContextHeader, AuthenticationToken> request) {
-    // TODO: need to verify token-refreshToken pair
-    Optional<String> tokenOpt = jwtHelper.refreshToken(request.getBody().getToken());
-    if(tokenOpt.isPresent()) {
-      return success(AuthenticationToken.builder().token(tokenOpt.get()).refreshToken(request.getBody().getRefreshToken()).build());
+    String refreshTokenStr = request.getBody() != null ? request.getBody().getRefreshToken() : null;
+    if (StringUtils.isBlank(refreshTokenStr) && request.getBody() != null) {
+      refreshTokenStr = request.getBody().getToken();
+    }
+    if (StringUtils.isNotBlank(refreshTokenStr)) {
+      Optional<Claims> claimsOpt = jwtHelper.getClaims(refreshTokenStr);
+      if (claimsOpt.isPresent()) {
+        Claims claims = claimsOpt.get();
+        String username = claims.getSubject();
+        String clientType = request.getHeader() != null ? request.getHeader().getClientType() : null;
+        if (StringUtils.isNotBlank(username) && jwtHelper.validate(claims, clientType)) {
+          final UserDetailsImpl userDetails = userService.loadUserByUserName(username);
+          return success(jwtHelper.generateToken(userDetails, clientType));
+        }
+      }
     }
     throw BusinessException.create().add(ErrorCodes.ERROR).setHttpCode(HttpStatus.UNAUTHORIZED.value());
   }

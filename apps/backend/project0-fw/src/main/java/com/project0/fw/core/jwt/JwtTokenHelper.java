@@ -23,6 +23,7 @@ import com.project0.domain.AuthenticationToken;
 import com.project0.service.authentication.UserDetailsImpl;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -39,6 +40,8 @@ public class JwtTokenHelper implements Serializable {
   public static final String CLAIM_KEY_CREATED = "created";
   public static final String CLAIM_KEY_AUTHORITIES = "authorities";
   public static final String CLAIM_KEY_USER_DETAILS = "userDetails";
+  public static final String CLAIM_KEY_TYPE = "type";
+  public static final String TOKEN_TYPE_REFRESH = "refresh";
 
   private static final String AUDIENCE_UNKNOWN = "unknown";
   private static final String AUDIENCE_WEB = "web";
@@ -54,13 +57,13 @@ public class JwtTokenHelper implements Serializable {
   @Value("${application.security.jwtTokenExpiration}")
   private Long expiration;
 
-  @Value("${application.security.jwtTokenExpirationWeb}")
+  @Value("${application.security.jwtTokenExpirationWeb:#{null}}")
   private Long webExpiration;
 
-  @Value("${application.security.jwtTokenExpirationMobile}")
+  @Value("${application.security.jwtTokenExpirationMobile:#{null}}")
   private Long mobileExpiration;
 
-  @Value("${application.security.jwtRefreshTokenExpiration}")
+  @Value("${application.security.jwtRefreshTokenExpiration:2592000000}")
   private Long refreshExpiration;
 
   @Value("${application.security.jwtCookieName}")
@@ -115,6 +118,8 @@ public class JwtTokenHelper implements Serializable {
                                   .build()
                                   .parseClaimsJws(token);
       claims = jwsClaims.getBody();
+    } catch (ExpiredJwtException e) {
+      claims = e.getClaims();
     } catch (Exception e) {
       claims = null;
     }
@@ -133,9 +138,8 @@ public class JwtTokenHelper implements Serializable {
   private boolean isTokenExpired(Claims claims) {
     Date currentDate = new Date();
     return getExpirationDateFromToken(claims)
-              .filter(d->d.before(currentDate) || (d.getTime()-expiration) > currentDate.getTime())
-              .isPresent()
-              ;
+              .map(d -> d.before(currentDate))
+              .orElse(true);
   }
 
   public boolean validate(Claims claims, String userAgent) {
@@ -167,8 +171,24 @@ public class JwtTokenHelper implements Serializable {
   }
 
   public String generateRefreshToken() {
+    return generateRefreshToken(new HashMap<>());
+  }
+
+  public String generateRefreshToken(Map<String, Object> claims) {
     SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+    Map<String, Object> refreshClaims = new HashMap<>();
+    if (claims != null) {
+      if (claims.containsKey(CLAIM_KEY_USERNAME)) {
+        refreshClaims.put(CLAIM_KEY_USERNAME, claims.get(CLAIM_KEY_USERNAME));
+      }
+      if (claims.containsKey(CLAIM_KEY_AUDIENCE)) {
+        refreshClaims.put(CLAIM_KEY_AUDIENCE, claims.get(CLAIM_KEY_AUDIENCE));
+      }
+    }
+    refreshClaims.put(CLAIM_KEY_CREATED, new Date());
+    refreshClaims.put(CLAIM_KEY_TYPE, TOKEN_TYPE_REFRESH);
     return Jwts.builder()
+        .setClaims(refreshClaims)
         .setExpiration(getRefreshExpDate())
         .signWith(key, SignatureAlgorithm.HS512)
         .compact();
@@ -177,9 +197,11 @@ public class JwtTokenHelper implements Serializable {
   AuthenticationToken getAuthenticationToken(Map<String, Object> claims) {
     Date exp = getExpDate(expiration);
     String token = this.generateToken(claims, exp);
+    String refreshToken = this.generateRefreshToken(claims);
     Cookie cookie = this.getTokenCookie(token);
     return AuthenticationToken.builder()
                               .token(token)
+                              .refreshToken(refreshToken)
                               .tokenAge(exp.getTime())
                               .cookie(cookie)
                               .authorities((List<String>) claims.get(CLAIM_KEY_AUTHORITIES))
