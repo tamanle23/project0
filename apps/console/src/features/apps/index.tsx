@@ -18,6 +18,7 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { LanguageSwitch } from '@/components/language-switch'
 import { toast } from 'sonner'
 import { FacebookConnectModal } from './components/facebook-connect-modal'
 import { TikTokConnectModal } from './components/tiktok-connect-modal'
@@ -142,6 +143,7 @@ export function Apps() {
       <Header>
         <Search />
         <div className='ms-auto flex items-center gap-4'>
+          <LanguageSwitch />
           <ThemeSwitch />
           <ConfigDrawer />
           <ProfileDropdown />

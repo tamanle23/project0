@@ -24,6 +24,26 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/date-picker'
+import { Check, ChevronsUpDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+
+const languages = [
+  { label: 'English', value: 'en' },
+  { label: 'Vietnamese', value: 'vi' },
+] as const
 
 const profileFormSchema = z.object({
   name: z
@@ -33,6 +53,9 @@ const profileFormSchema = z.object({
     .max(30, 'Name must not be longer than 30 characters.'),
   dob: z.date({
     error: 'Please select your date of birth.',
+  }),
+  language: z.string({
+    error: 'Please select a language.',
   }),
   username: z
     .string('Please enter your username.')
@@ -56,20 +79,23 @@ const profileFormSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
-// This can come from your database or API.
-const defaultValues: Partial<ProfileFormValues> = {
-  name: '',
-  bio: 'I own a computer.',
-  urls: [
-    { value: 'https://shadcn.com' },
-    { value: 'http://twitter.com/shadcn' },
-  ],
-}
-
 export function ProfileForm() {
+  const { i18n } = useTranslation(['console', 'common'])
+
   // Flag to determine if settings should be sent to server on update, 
   // or applied immediately to the client UI.
   const isServerSide = true
+
+  // This can come from your database or API.
+  const defaultValues: Partial<ProfileFormValues> = {
+    name: '',
+    language: i18n.language || 'en',
+    bio: 'I own a computer.',
+    urls: [
+      { value: 'https://shadcn.com' },
+      { value: 'http://twitter.com/shadcn' },
+    ],
+  }
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -87,12 +113,78 @@ export function ProfileForm() {
       <form
         onSubmit={form.handleSubmit((data) => {
           if (isServerSide) {
+            if (data.language !== i18n.language) {
+              i18n.changeLanguage(data.language)
+            }
             // Simulate server-side API call
             showSubmittedData(data)
           }
         })}
         className='space-y-8'
       >
+        <FormField
+          control={form.control}
+          name='language'
+          render={({ field }) => (
+            <FormItem className='flex flex-col'>
+              <FormLabel>Language</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant='outline'
+                      role='combobox'
+                      className={cn(
+                        'w-[200px] justify-between',
+                        !field.value && 'text-muted-foreground'
+                      )}
+                    >
+                      {field.value
+                        ? languages.find(
+                            (language) => language.value === field.value
+                          )?.label
+                        : 'Select language'}
+                      <ChevronsUpDown className='ms-2 h-4 w-4 shrink-0 opacity-50' />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className='w-[200px] p-0'>
+                  <Command>
+                    <CommandInput placeholder='Search language...' />
+                    <CommandEmpty>No language found.</CommandEmpty>
+                    <CommandGroup>
+                      <CommandList>
+                        {languages.map((language) => (
+                          <CommandItem
+                            value={language.label}
+                            key={language.value}
+                            onSelect={() => {
+                              form.setValue('language', language.value)
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                'size-4',
+                                language.value === field.value
+                                  ? 'opacity-100'
+                                  : 'opacity-0'
+                              )}
+                            />
+                            {language.label}
+                          </CommandItem>
+                        ))}
+                      </CommandList>
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <FormDescription>
+                This is the language that will be used in the dashboard.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name='name'
