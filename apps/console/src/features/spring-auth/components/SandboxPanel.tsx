@@ -32,7 +32,7 @@ export function SandboxPanel() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-80 rounded-2xl border border-white/20 bg-background/80 p-4 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/80">
+    <div className="fixed bottom-4 right-4 z-50 w-80 rounded-2xl bg-white/65 dark:bg-slate-900/65 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/30 p-4">
       <div className="flex items-center gap-2 mb-3 border-b border-border/50 pb-2">
         <TestTube2 className="size-5 text-emerald-500" />
         <h3 className="font-semibold text-sm">Auth Sandbox Engine</h3>
