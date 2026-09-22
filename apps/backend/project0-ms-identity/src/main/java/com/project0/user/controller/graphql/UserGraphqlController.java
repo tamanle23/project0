@@ -47,7 +47,7 @@ public class UserGraphqlController extends CommonController {
    */
   @QueryMapping
   @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionConstants.LIST + "')")
-  public UserVm user(@Argument String uid) {
+  public UserVm user(@Argument("uid") String uid) {
     return userMapper.userToResponseModel(userService.findByUid(uid));
   }
 
@@ -59,7 +59,7 @@ public class UserGraphqlController extends CommonController {
    */
   @QueryMapping
   @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionConstants.LIST + "')")
-  public Page<UserVm> users(@Argument UserSearchInput request) {
+  public Page<UserVm> users(@Argument("request") UserSearchInput request) {
     UserSearchCondition condition = toSearchCondition(request);
     RequestWrapper<ContextHeader, UserSearchCondition> wrapped = extractRequest(condition);
     return userMapper.pageToResponsePage(userService.findBy(wrapped));
@@ -74,7 +74,7 @@ public class UserGraphqlController extends CommonController {
    */
   @QueryMapping
   @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionConstants.LIST + "')")
-  public Page<PermissionVm> userPermissions(@Argument String uid, @Argument PageInput request) {
+  public Page<PermissionVm> userPermissions(@Argument("uid") String uid, @Argument("request") PageInput request) {
     UserPermissionSearchCondition condition = new UserPermissionSearchCondition();
     applyPagination(condition, request);
     return userService.findUserPermissions(uid, extractRequest(condition));
@@ -89,7 +89,7 @@ public class UserGraphqlController extends CommonController {
    */
   @QueryMapping
   @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionConstants.LIST + "')")
-  public Page<RoleVm> userRoles(@Argument String uid, @Argument PageInput request) {
+  public Page<RoleVm> userRoles(@Argument("uid") String uid, @Argument("request") PageInput request) {
     UserRoleSearchCondition condition = new UserRoleSearchCondition();
     applyPagination(condition, request);
     return userService.findUserRoles(uid, extractRequest(condition));
@@ -103,7 +103,7 @@ public class UserGraphqlController extends CommonController {
    */
   @QueryMapping
   @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionConstants.LIST + "')")
-  public UserProfileVm userProfile(@Argument String uid) {
+  public UserProfileVm userProfile(@Argument("uid") String uid) {
     return userMapper.userProfileToResponseBody(userService.getUserProfile(uid));
   }
 
@@ -115,7 +115,7 @@ public class UserGraphqlController extends CommonController {
    */
   @QueryMapping
   @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionConstants.LIST + "')")
-  public UserVm userWithPermissions(@Argument String uid) {
+  public UserVm userWithPermissions(@Argument("uid") String uid) {
     return userService.findUserWithPermissions(uid);
   }
 
