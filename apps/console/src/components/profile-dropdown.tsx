@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { HelpCircle } from 'lucide-react'
+import { Bell, HelpCircle, LogOut, Settings } from 'lucide-react'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -42,19 +42,27 @@ export function ProfileDropdown() {
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
               <Link to='/settings'>
+                <Settings />
                 Settings
                 <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
+              <Link to='/settings/notifications'>
+                <Bell />
+                Notifications
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link to='/help-center'>
-                <HelpCircle className='mr-2 h-4 w-4' />
+                <HelpCircle />
                 Help Center
               </Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem variant='destructive' onClick={() => setOpen(true)}>
+            <LogOut />
             Sign out
             <DropdownMenuShortcut className='text-current'>
               ⇧⌘Q

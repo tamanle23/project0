@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { Bell, ChevronsUpDown, HelpCircle, LogOut } from 'lucide-react'
+import { Bell, ChevronsUpDown, HelpCircle, LogOut, Settings } from 'lucide-react'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -74,6 +74,12 @@ export function NavUser({ user }: NavUserProps) {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
+                <DropdownMenuItem asChild>
+                  <Link to='/settings'>
+                    <Settings />
+                    {t('navUser.settings', 'Settings')}
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to='/settings/notifications'>
                     <Bell />
