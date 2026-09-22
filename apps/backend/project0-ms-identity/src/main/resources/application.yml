@@ -11,9 +11,6 @@ application:
       - /v3/api-docs/**
       - /swagger-ui/**
       - /swagger-ui.html
-      - /graphql
-      - /graphiql
-      - /graphiql/**
     jwtTokenHeader: Authorization
     jwtTokenSecret: VEdiOCM5e1soNSFKZV1eVw==
     jwtTokenExpiration: 604800
@@ -104,14 +101,6 @@ spring:
       FAIL_ON_UNKNOWN_PROPERTIES: false
     serialization:
       FAIL_ON_EMPTY_BEANS: false
-  graphql:
-    path: /graphql
-    graphiql:
-      enabled: true
-      path: /graphiql
-    schema:
-      locations: classpath:graphql/**/
-      file-extensions: .graphqls
 security:
   filter:
     order: 5

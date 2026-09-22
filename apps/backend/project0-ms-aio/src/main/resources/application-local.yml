@@ -22,6 +22,9 @@ application:
       - /v3/api-docs/**
       - /swagger-ui/**
       - /swagger-ui.html
+      - /graphql
+      - /graphiql
+      - /graphiql/**
     jwtCookieName: X-AUTH-TOKEN
     jwtCookieDomain:
     jwtCookiePath: /
@@ -68,7 +71,7 @@ feign:
 logging:
   config: classpath:logback-local.xml
 
-#Spring actuator configuration
+#Spring actuator configuration1
 management:
   health:
     mail:
