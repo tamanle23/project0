@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslation } from 'react-i18next'
 import { showSubmittedData } from '@/lib/show-submitted-data'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -32,6 +33,7 @@ import { DatePicker } from '@/components/date-picker'
 
 const languages = [
   { label: 'English', value: 'en' },
+  { label: 'Vietnamese', value: 'vi' },
   { label: 'French', value: 'fr' },
   { label: 'German', value: 'de' },
   { label: 'Spanish', value: 'es' },
@@ -48,24 +50,33 @@ const accountFormSchema = z.object({
     .min(1, 'Please enter your name.')
     .min(2, 'Name must be at least 2 characters.')
     .max(30, 'Name must not be longer than 30 characters.'),
-  dob: z.date('Please select your date of birth.'),
-  language: z.string('Please select a language.'),
+  dob: z.date({
+    error: 'Please select your date of birth.',
+  }),
+  language: z.string({
+    error: 'Please select a language.',
+  }),
 })
 
 type AccountFormValues = z.infer<typeof accountFormSchema>
 
-// This can come from your database or API.
-const defaultValues: Partial<AccountFormValues> = {
-  name: '',
-}
-
 export function AccountForm() {
+  const { i18n } = useTranslation('console')
+
+  const defaultValues: Partial<AccountFormValues> = {
+    name: '',
+    language: i18n.language || 'en',
+  }
+
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema),
     defaultValues,
   })
 
   function onSubmit(data: AccountFormValues) {
+    if (data.language !== i18n.language) {
+      i18n.changeLanguage(data.language)
+    }
     showSubmittedData(data)
   }
 
