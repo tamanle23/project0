@@ -11,7 +11,6 @@ import {
   Palette,
   ServerOff,
   Settings,
-  Wrench,
   UserCog,
   UserX,
   Users,
@@ -181,11 +180,6 @@ export const useSidebarData = (): SidebarData => {
                 title: t('sidebar.items.profile', 'Profile'),
                 url: '/settings',
                 icon: UserCog,
-              },
-              {
-                title: t('sidebar.items.account', 'Account'),
-                url: '/settings/account',
-                icon: Wrench,
               },
               {
                 title: t('sidebar.items.appearance', 'Appearance'),
