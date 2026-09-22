@@ -38,16 +38,18 @@ export function NavGroup({ title, items, hideWhenInactive }: NavGroupProps) {
   const href = useLocation({ select: (location) => location.href })
 
   // If this group is flagged as hideWhenInactive, only render when an item inside is active
+  // and filter out non-active sibling items
+  let visibleItems = items
   if (hideWhenInactive) {
-    const isGroupActive = items.some((item) => checkIsActive(href, item, true))
-    if (!isGroupActive) return null
+    visibleItems = items.filter((item) => checkIsActive(href, item, true))
+    if (visibleItems.length === 0) return null
   }
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{title}</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => {
+        {visibleItems.map((item) => {
           const key = `${item.title}-${item.url}`
 
           if (!item.items)
