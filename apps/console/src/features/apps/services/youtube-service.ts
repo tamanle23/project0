@@ -18,7 +18,7 @@ export interface YouTubeTokens {
   scope: string
 }
 
-export const YOUTUBE_SCOPES = [
+const YOUTUBE_SCOPES = [
   'https://www.googleapis.com/auth/youtube.readonly',
   'https://www.googleapis.com/auth/youtube.upload',
   'https://www.googleapis.com/auth/youtube.force-ssl',

@@ -20,7 +20,7 @@ export interface TikTokTokens {
   scope: string
 }
 
-export const TIKTOK_SCOPES = [
+const TIKTOK_SCOPES = [
   'user.info.basic',
   'video.list',
   'video.upload'

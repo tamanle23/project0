@@ -55,13 +55,13 @@ declare global {
 }
 
 // Scopes required to manage Pages and acquire Page Access Tokens
-export const FACEBOOK_PAGE_SCOPES =
+const FACEBOOK_PAGE_SCOPES =
   'public_profile,pages_show_list,pages_read_engagement,pages_manage_posts'
 
 /**
  * Dynamically load and initialize Facebook JavaScript SDK
  */
-export async function loadFacebookSdk(appId: string): Promise<boolean> {
+async function loadFacebookSdk(appId: string): Promise<boolean> {
   if (typeof window === 'undefined') return false
 
   // If already initialized
