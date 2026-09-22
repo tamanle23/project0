@@ -52,7 +52,7 @@ const accountFormSchema = z.object({
 type AccountFormValues = z.infer<typeof accountFormSchema>
 
 export function AccountForm() {
-  const { i18n } = useTranslation('console')
+  const { t, i18n } = useTranslation(['console', 'common'])
   
   // Flag to determine if settings should be sent to server on update, 
   // or applied immediately to the client UI.
@@ -149,7 +149,7 @@ export function AccountForm() {
             </FormItem>
           )}
         />
-        {isServerSide && <Button type='submit'>Update account</Button>}
+        {isServerSide && <Button type='submit'>{t('common:update', 'Update')}</Button>}
       </form>
     </Form>
   )

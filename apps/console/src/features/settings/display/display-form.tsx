@@ -122,7 +122,7 @@ export function DisplayForm() {
             </FormItem>
           )}
         />
-        {isServerSide && <Button type='submit'>Update display</Button>}
+        {isServerSide && <Button type='submit'>Update</Button>}
       </form>
     </Form>
   )

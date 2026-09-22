@@ -213,7 +213,7 @@ export function NotificationsForm() {
             </FormItem>
           )}
         />
-        <Button type='submit'>Update notifications</Button>
+        <Button type='submit'>Update</Button>
       </form>
     </Form>
   )

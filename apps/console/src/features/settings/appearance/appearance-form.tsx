@@ -360,7 +360,7 @@ export function AppearanceForm() {
           )}
         />
 
-        {isServerSide && <Button type='submit'>Update preferences</Button>}
+        {isServerSide && <Button type='submit'>Update</Button>}
       </form>
     </Form>
   )
