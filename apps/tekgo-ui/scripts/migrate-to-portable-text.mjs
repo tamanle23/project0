@@ -17,28 +17,28 @@ function generateKey() {
 
 function mdastToPortableText(nodes) {
   let blocks = []
-  
+
   for (const node of nodes) {
     if (node.type === 'paragraph' || node.type === 'heading' || node.type === 'blockquote') {
       let style = 'normal'
       if (node.type === 'heading') style = `h${node.depth}`
       if (node.type === 'blockquote') style = 'blockquote'
-      
+
       const markDefs = []
       const children = extractSpans(node.children, [], markDefs)
-      
+
       blocks.push({
         _type: 'block',
         style,
         children: children.length > 0 ? children : [{ _type: 'span', marks: [], text: '' }],
-        markDefs
+        markDefs,
       })
     } else if (node.type === 'list') {
       const listItemStyle = node.ordered ? 'number' : 'bullet'
       for (const item of node.children) {
         const itemChildren = mdastToPortableText(item.children)
         // Lists in Portable Text are blocks with listItem and level
-        itemChildren.forEach(b => {
+        itemChildren.forEach((b) => {
           if (b._type === 'block') {
             b.listItem = listItemStyle
             b.level = 1
@@ -50,18 +50,18 @@ function mdastToPortableText(nodes) {
       blocks.push({
         _type: 'code',
         language: node.lang,
-        code: node.value
+        code: node.value,
       })
     } else if (node.type === 'math') {
       blocks.push({
         _type: 'math',
-        formula: node.value
+        formula: node.value,
       })
     } else if (node.type === 'image') {
       blocks.push({
         _type: 'image',
         alt: node.alt,
-        src: node.url
+        src: node.url,
       })
     } else if (node.type === 'thematicBreak') {
       // Ignore or map to custom HR
@@ -69,7 +69,7 @@ function mdastToPortableText(nodes) {
       blocks.push({
         _type: 'footnoteDefinition',
         identifier: node.identifier,
-        children: mdastToPortableText(node.children)
+        children: mdastToPortableText(node.children),
       })
     } else if (node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') {
       const attributes = (node.attributes || []).reduce((acc, attr) => {
@@ -82,7 +82,7 @@ function mdastToPortableText(nodes) {
         _type: 'mdxComponent',
         name: node.name,
         attributes,
-        children: node.children ? mdastToPortableText(node.children) : []
+        children: node.children ? mdastToPortableText(node.children) : [],
       })
     } else {
       // fallback for raw text or inline elements that were parsed incorrectly
@@ -90,7 +90,7 @@ function mdastToPortableText(nodes) {
         _type: 'block',
         style: 'normal',
         children: [{ _type: 'span', marks: [], text: node.value || '' }],
-        markDefs: []
+        markDefs: [],
       })
     }
   }
@@ -105,7 +105,7 @@ function extractSpans(nodes, activeMarks = [], markDefs = []) {
         _type: 'span',
         marks: [...activeMarks],
         text: node.value,
-        _key: generateKey()
+        _key: generateKey(),
       })
     } else if (node.type === 'strong') {
       spans.push(...extractSpans(node.children, [...activeMarks, 'strong'], markDefs))
@@ -116,30 +116,30 @@ function extractSpans(nodes, activeMarks = [], markDefs = []) {
         _type: 'span',
         marks: [...activeMarks, 'code'],
         text: node.value,
-        _key: generateKey()
+        _key: generateKey(),
       })
     } else if (node.type === 'inlineMath') {
       spans.push({
         _type: 'span',
         marks: [...activeMarks],
         text: `$${node.value}$`,
-        _key: generateKey()
+        _key: generateKey(),
       })
     } else if (node.type === 'link') {
       const key = generateKey()
       markDefs.push({
         _type: 'link',
         _key: key,
-        href: node.url
+        href: node.url,
       })
       spans.push(...extractSpans(node.children, [...activeMarks, key], markDefs))
     } else if (node.type === 'image') {
-       // Inline image - portable text usually does not do inline images well, treat as text
-       spans.push({
+      // Inline image - portable text usually does not do inline images well, treat as text
+      spans.push({
         _type: 'span',
         marks: [...activeMarks],
         text: `[Image: ${node.alt}]`,
-        _key: generateKey()
+        _key: generateKey(),
       })
     } else if (node.type === 'mdxJsxTextElement') {
       // if it's a JSX tag inside text, we will just output its raw value or children
@@ -151,13 +151,13 @@ function extractSpans(nodes, activeMarks = [], markDefs = []) {
       markDefs.push({
         _type: 'link',
         _key: key,
-        href: `#fn-${node.identifier}`
+        href: `#fn-${node.identifier}`,
       })
       spans.push({
         _type: 'span',
         marks: [...activeMarks, key],
         text: `[${node.identifier}]`,
-        _key: generateKey()
+        _key: generateKey(),
       })
     }
   }
@@ -175,7 +175,7 @@ async function run() {
 
       const processor = unified().use(remarkParse).use(remarkMath).use(remarkMdx).use(remarkGfm)
       const mdast = processor.parse(markdownBody)
-      
+
       const portableText = mdastToPortableText(mdast.children)
 
       const jsonOutput = {

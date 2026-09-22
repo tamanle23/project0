@@ -47,9 +47,9 @@ public class JwtTokenHelperTest {
     AuthenticationToken token = jwtTokenHelper.generateToken(userDetails, "web");
 
     assertNotNull(token);
-    assertNotNull(token.getToken());
+    assertNotNull(token.getAccessToken());
     assertNotNull(token.getRefreshToken());
-    assertFalse(token.getToken().isEmpty());
+    assertFalse(token.getAccessToken().isEmpty());
     assertFalse(token.getRefreshToken().isEmpty());
   }
 

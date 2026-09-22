@@ -79,7 +79,7 @@ export function UserAuthForm({
   }
 
   // Sandbox bypass logic
-  const handleSandboxBypass = async (role: 'admin' | 'creator' | 'user') => {
+  const handleSandboxBypass = async (role: 'admin' | 'creator') => {
     setIsLoading(true);
     try {
       const response = await springApiClient.post('/auth/token', {
@@ -166,9 +166,6 @@ export function UserAuthForm({
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleSandboxBypass('creator')} className="cursor-pointer">
                 Creator Role (Content)
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleSandboxBypass('user')} className="cursor-pointer">
-                User Role (Read Only)
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -200,7 +200,7 @@ public class JwtTokenHelper implements Serializable {
     String refreshToken = this.generateRefreshToken(claims);
     Cookie cookie = this.getTokenCookie(token);
     return AuthenticationToken.builder()
-                              .token(token)
+                              .accessToken(token)
                               .refreshToken(refreshToken)
                               .tokenAge(exp.getTime())
                               .cookie(cookie)

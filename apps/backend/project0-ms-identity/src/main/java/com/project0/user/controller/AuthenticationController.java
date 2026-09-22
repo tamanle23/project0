@@ -45,9 +45,7 @@ public class AuthenticationController extends CommonController {
   public ResponseWrapper<ContextHeader, AuthenticationToken> token(@Validate(name = ValidatorConfiguration.TOKEN_CREATION) @RequestBody AuthenticationRequestBody authenticationRequestBody, HttpServletResponse response) {
     ResponseWrapper<ContextHeader, AuthenticationToken> authenticationTokenResponse = tokenService.getToken(this.extractRequest(authenticationRequestBody));
     AuthenticationToken token = authenticationTokenResponse.getBody();
-    response.addCookie(token.getCookie());
-    // TODO: logic to remove token, keep the value for timebeing as cordova not support cookie
-//    token.setToken(null);
+//    response.addCookie(token.getCookie());
     return authenticationTokenResponse;
   }
 

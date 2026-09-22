@@ -4,6 +4,6 @@ public enum UserType {
   ANONYMOUS,
   REGISTERED,
   SUPER,
-  ADMINISTRATOR,
+  ADMIN,
   AUTOLOGIN
 }

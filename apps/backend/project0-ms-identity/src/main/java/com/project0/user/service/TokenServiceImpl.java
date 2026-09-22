@@ -65,7 +65,7 @@ public class TokenServiceImpl extends CommonReponseBuilder implements TokenServi
   public ResponseWrapper<ContextHeader, AuthenticationToken> refreshToken(RequestWrapper<ContextHeader, AuthenticationToken> request) {
     String refreshTokenStr = request.getBody() != null ? request.getBody().getRefreshToken() : null;
     if (StringUtils.isBlank(refreshTokenStr) && request.getBody() != null) {
-      refreshTokenStr = request.getBody().getToken();
+      refreshTokenStr = request.getBody().getAccessToken();
     }
     if (StringUtils.isNotBlank(refreshTokenStr)) {
       Optional<Claims> claimsOpt = jwtHelper.getClaims(refreshTokenStr);

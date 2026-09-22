@@ -25,11 +25,13 @@ function getFilesRecursively(dir) {
 function loadBlogs() {
   const blogDir = path.join(process.cwd(), 'data', 'blog')
   const files = getFilesRecursively(blogDir)
-  
+
   return files.map((filePath) => {
     const raw = readFileSync(filePath, 'utf8')
     const doc = JSON.parse(raw)
-    const relativePath = path.relative(path.join(process.cwd(), 'data'), filePath).replace(/\\/g, '/')
+    const relativePath = path
+      .relative(path.join(process.cwd(), 'data'), filePath)
+      .replace(/\\/g, '/')
     const flattenedPath = relativePath.replace(/\.json$/, '')
     const postSlug = flattenedPath.replace(/^.+?(\/)/, '')
     return {
@@ -116,7 +118,7 @@ function createSearchIndex(allBlogs) {
     siteMetadata?.search?.provider === 'kbar' &&
     siteMetadata.search.kbarConfig.searchDocumentsPath
   ) {
-    const coreContents = allBlogs.map(blog => {
+    const coreContents = allBlogs.map((blog) => {
       const { portableTextBody, structuredData, ...core } = blog
       return core
     })

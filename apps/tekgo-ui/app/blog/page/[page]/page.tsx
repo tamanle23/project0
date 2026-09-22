@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prettier/prettier */
-/* eslint-disable jsx-a11y/media-has-caption */
+ 
 import ListLayout from '@/layouts/ListLayoutWithTags'
 import { allCoreContent, sortPosts } from '@/lib/content'
 import { allBlogs } from '@/lib/content'

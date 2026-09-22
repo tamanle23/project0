@@ -22,7 +22,7 @@ public class TokenRefreshValidator extends AbstractValidator<AuthenticationToken
       if (StringUtils.isNotBlank(token.getRefreshToken())) {
         return token.getRefreshToken();
       }
-      return token.getToken();
+      return token.getAccessToken();
     })
     .must(not(stringEmptyOrNull()))
       .withMessage("Refresh token or token must not be empty")

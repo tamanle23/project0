@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prettier/prettier */
-/* eslint-disable jsx-a11y/media-has-caption */
+ 
 import 'css/prism.css'
 import 'katex/dist/katex.css'
 

@@ -9,9 +9,9 @@
       SET DATABASE SQL SYNTAX MYS TRUE;
     </sql>
     <sql>
-      INSERT INTO ${table_prefix}role(uid,code) VALUES('a7d87556-a281-4965-829e-877beb3682d0','administrator');
+      INSERT INTO ${table_prefix}role(uid,code) VALUES('a7d87556-a281-4965-829e-877beb3682d0','admin');
       INSERT INTO ${table_prefix}role(uid,code) VALUES('b1822844-fbde-4462-ad8d-fd2739878e73','ANONYMOUS');
-      INSERT INTO ${table_prefix}role(uid,code) VALUES('0e751920-2716-4416-9042-a041c7137f8f','ShopOwner');
+      INSERT INTO ${table_prefix}role(uid,code) VALUES('0e751920-2716-4416-9042-a041c7137f8f','creator');
 
       INSERT INTO ${table_prefix}permission(uid,code, type, level, target, action) VALUES('bb779131-a5e9-4649-ae6f-084eb27d38cd','projects', 'MODULE', 'SYSTEM', null, null);
 
@@ -45,7 +45,7 @@
       INSERT INTO ${table_prefix}permission(uid,code, type, level, target, action) VALUES('bcc466d8-90de-4f1b-9cee-102a186ea47c','workflow_return', 'WORKFLOW', 'PROJECT', 'workflow', 'return');
 
 
-      INSERT INTO ${table_prefix}user(uid, id,userName,password,nonExpired,nonLocked,credentialsNonExpired,status,createddate,lastupdateddate,type, idType,version) VALUES('59111af4-b9a8-4f18-8124-b06c538702a0',2,'administrator','$2y$12$Qf49slkkZsOi4qIhzVvJ4upDtmLdsG4Ox7xDD6Dr7WBC/BEmM3GKW',true,true,true,0,'2016-01-01 00:00:00','2016-01-01 00:00:00','ADMINISTRATOR',0,0);
+      INSERT INTO ${table_prefix}user(uid, id,userName,password,nonExpired,nonLocked,credentialsNonExpired,status,createddate,lastupdateddate,type, idType,version) VALUES('59111af4-b9a8-4f18-8124-b06c538702a0',2,'admin','$2y$12$Qf49slkkZsOi4qIhzVvJ4upDtmLdsG4Ox7xDD6Dr7WBC/BEmM3GKW',true,true,true,0,'2016-01-01 00:00:00','2016-01-01 00:00:00','ADMIN',0,0);
       INSERT INTO ${table_prefix}user(uid, id,userName,password,nonExpired,nonLocked,credentialsNonExpired,status,createddate,lastupdateddate,type, idType,version) VALUES('95e939a8-89ec-4e0b-b888-4b7ca9ed7677',1,'anonymous','$2y$12$Qf49slkkZsOi4qIhzVvJ4upDtmLdsG4Ox7xDD6Dr7WBC/BEmM3GKW',true,true,true,0,'2016-01-01 00:00:00','2016-01-01 00:00:00','ANONYMOUS',0,0);
 
       INSERT INTO ${table_prefix}userRole(user_uid,role_uid) VALUES('59111af4-b9a8-4f18-8124-b06c538702a0','a7d87556-a281-4965-829e-877beb3682d0');

@@ -20,7 +20,6 @@ import {
   Command,
   GalleryVerticalEnd,
 } from 'lucide-react'
-import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
 import { useTranslation } from 'react-i18next'
 
@@ -86,24 +85,6 @@ export const useSidebarData = (): SidebarData => {
             title: t('sidebar.items.users', 'Users'),
             url: '/users',
             icon: Users,
-          },
-          {
-            title: t('sidebar.items.clerk', 'Secured by Clerk'),
-            icon: ClerkLogo,
-            items: [
-              {
-                title: t('sidebar.items.clerkSignIn', 'Sign In'),
-                url: '/clerk/sign-in',
-              },
-              {
-                title: t('sidebar.items.clerkSignUp', 'Sign Up'),
-                url: '/clerk/sign-up',
-              },
-              {
-                title: t('sidebar.items.clerkUserManagement', 'User Management'),
-                url: '/clerk/user-management',
-              },
-            ],
           },
         ],
       },

@@ -1,14 +1,4 @@
-# Project0 Console
-
 Admin Dashboard UI crafted with Shadcn and Vite. Built with responsiveness and accessibility in mind.
-
-![alt text](public/images/shadcn-admin.png)
-
-[![Sponsored by Clerk](https://img.shields.io/badge/Sponsored%20by-Clerk-5b6ee1?logo=clerk)](https://go.clerk.com/GttUAaK)
-
-I've been creating dashboard UIs at work and for my personal projects. I always wanted to make a reusable collection of dashboard UI for future projects; and here it is now. While I've created a few custom components, some of the code is directly adapted from ShadcnUI examples.
-
-> This is not a starter project (template) though. I'll probably make one in the future.
 
 ## Features
 

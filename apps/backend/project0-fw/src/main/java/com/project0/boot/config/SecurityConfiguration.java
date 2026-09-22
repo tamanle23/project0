@@ -63,8 +63,6 @@ public class SecurityConfiguration {
     if (!this.environment.acceptsProfiles(Profiles.of("nonsecured"))) {
       http
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-        .csrf(csrf -> csrf.disable())
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .httpBasic(hb -> {})
         .logout(logout -> logout.permitAll());
 
@@ -73,6 +71,11 @@ public class SecurityConfiguration {
           authz.requestMatchers(applicationProperties.getSecurity().getPermitAlls()).permitAll();
         }
         authz.anyRequest().authenticated();
+      });
+      http.csrf(csrf -> {
+        if (applicationProperties.getSecurity() != null && applicationProperties.getSecurity().getPermitAlls() != null) {
+          csrf.ignoringRequestMatchers(applicationProperties.getSecurity().getPermitAlls());
+        }
       });
 
       if (applicationProperties.getSecurity() != null && applicationProperties.getSecurity().getJwtTokenSecret() != null) {
@@ -86,12 +89,14 @@ public class SecurityConfiguration {
     return http.build();
   }
 
+  // The Golden Rule: The Wildcard ConflictFor security reasons, web browsers enforce a strict rule when credentials are involved:
+  // You cannot use wildcards (*) for allowed origins if credentials are allowed.setAllowCredentials(true)
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
     final CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(List.of("*"));
     configuration.setAllowedMethods(List.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-    configuration.setAllowCredentials(true);
+    configuration.setAllowCredentials(false); // with AllowedOrigins * and this true cannot bypass cors
     configuration.setAllowedHeaders(List.of("*"));
     configuration.setExposedHeaders(List.of("X-Auth-Token", "Authorization", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
