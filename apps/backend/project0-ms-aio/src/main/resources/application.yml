@@ -47,6 +47,16 @@ spring:
     redis:
       repositories:
         enabled: false
+  graphql:
+    schema:
+      # Directory locations — Spring for GraphQL appends file-extensions (.graphqls) automatically
+      locations:
+        - classpath:graphql/
+        - classpath*:graphql/
+      file-extensions: .graphqls
+    graphiql:
+      enabled: true
+      path: /graphiql
   batch:
     initialize-schema: NEVER
     job:
