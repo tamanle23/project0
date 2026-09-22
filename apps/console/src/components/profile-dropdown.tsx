@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Bell, HelpCircle, LogOut, Settings } from 'lucide-react'
+import { HelpCircle, LogOut, Settings } from 'lucide-react'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -45,12 +45,6 @@ export function ProfileDropdown() {
                 <Settings />
                 Settings
                 <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to='/settings/notifications'>
-                <Bell />
-                Notifications
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
