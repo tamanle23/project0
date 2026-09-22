@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { HelpCircle } from 'lucide-react'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -43,6 +44,12 @@ export function ProfileDropdown() {
               <Link to='/settings'>
                 Settings
                 <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to='/help-center'>
+                <HelpCircle className='mr-2 h-4 w-4' />
+                Help Center
               </Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
