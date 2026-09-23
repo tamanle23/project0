@@ -83,7 +83,7 @@ export function UserAuthForm({
     setIsLoading(true);
     try {
       const response = await springApiClient.post('/auth/token', {
-        username: `${role}_bypass`,
+        userName: `${role}_bypass`,
         password: 'bypass',
       }, {
         headers: {
@@ -91,7 +91,7 @@ export function UserAuthForm({
         }
       });
 
-      setTokens(response.data.accessToken, response.data.refreshToken);
+      setTokens(response.data.body.accessToken, response.data.body.refreshToken);
       toast.success(`Sandbox Login Successful (${role.toUpperCase()})`);
 
       const targetPath = redirectTo || '/';
