@@ -11,6 +11,7 @@ import com.project0.user.controller.request.RoleVm;
 import com.project0.user.controller.request.UserRoleVm;
 import com.project0.user.model.Role;
 import com.project0.user.service.RoleService;
+import com.project0.user.facade.RoleFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,9 @@ public class RoleCommandController extends CommandController<Role, RoleVm> {
   @Autowired
   RoleService roleService;
 
+  @Autowired
+  RoleFacade roleFacade;
+
   @Override
   public String getResourceName() {
     return ResourceConstants.ROLE;
@@ -32,13 +36,13 @@ public class RoleCommandController extends CommandController<Role, RoleVm> {
 
   @PostMapping(value="{uid}/permissions")
   public ResponseWrapper<ContextHeader, Void> updateRolePermissions(@PathVariable String uid, @RequestBody List<RolePermissionVm> rolePermissions){
-    roleService.updatePermissions(uid, rolePermissions);
+    roleFacade.updatePermissions(uid, rolePermissions);
     return ResponseWrapper.success(null);
   }
 
-  @PostMapping(value="{id}/users")
+  @PostMapping(value="{uid}/users")
   public ResponseWrapper<ContextHeader, Void> updateUserRoles(@PathVariable String uid, @RequestBody List<UserRoleVm> userRoles) {
-    roleService.updateUsers(uid, userRoles);
+    roleFacade.updateUsers(uid, userRoles);
     return ResponseWrapper.success(null);
   }
 

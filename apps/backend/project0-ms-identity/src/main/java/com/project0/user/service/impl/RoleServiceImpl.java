@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 
 import com.project0.core.io.Page;
 import com.project0.service.BaseModelService;
-import com.project0.user.controller.request.RolePermissionVm;
-import com.project0.user.controller.request.UserRoleVm;
+import com.project0.user.controller.request.CompositeRolePermission;
+import com.project0.user.controller.request.CompositeUserRole;
 import com.project0.user.controller.request.RoleSearchCondition;
 import com.project0.user.model.Permission;
 import com.project0.user.model.Role;
@@ -69,30 +69,21 @@ public class RoleServiceImpl extends BaseModelService<Role, RoleRepository> impl
   }
 
   @Override
-  public List<RolePermissionVm> findAllBelongingPermissions(String uid) {
+  public List<CompositeRolePermission> findAllBelongingPermissions(String uid) {
     return mRoleRepository.findAllRolePermissions(uid);
   }
 
   @Override
-  public List<UserRoleVm> findAllBelongingUsers(String uid) {
+  public List<CompositeUserRole> findAllBelongingUsers(String uid) {
     return mRoleRepository.findAllRoleUsers(uid);
   }
 
   @Override
-  public RoleVm getRoleDetail(String uid) {
-      Role role = this.repository.findOneByUid(uid);
-      RoleVm roleVm = this.roleMapper.roleToResponseModel(role);
-      roleVm.setRolePermissions(mRoleRepository.findAllRolePermissions(uid));
-      roleVm.setRoleUsers(mRoleRepository.findAllRoleUsers(uid));
-      return roleVm;
-  }
-
-  @Override
-  public void updatePermissions(String uid, List<RolePermissionVm> rolePermissions) {
+  public void updatePermissions(String uid, List<CompositeRolePermission> rolePermissions) {
     Role role = this.repository.findOneByUid(uid);
-    List<RolePermissionVm> newRolePermissions = new ArrayList<>();
-    List<RolePermissionVm> removingRolePermissions = new ArrayList<>();
-    for(RolePermissionVm cRolePermission:rolePermissions){
+    List<CompositeRolePermission> newRolePermissions = new ArrayList<>();
+    List<CompositeRolePermission> removingRolePermissions = new ArrayList<>();
+    for(CompositeRolePermission cRolePermission:rolePermissions){
       if(BooleanUtils.isTrue(cRolePermission.getEnabled())){
         newRolePermissions.add(cRolePermission);
       } else if (cRolePermission.getId() != null) {
@@ -102,7 +93,7 @@ public class RoleServiceImpl extends BaseModelService<Role, RoleRepository> impl
 
     if(CollectionUtils.isNotEmpty(removingRolePermissions)) {
       rolePermissionRepository.deleteByIdIn(removingRolePermissions.stream()
-                                                                   .map(RolePermissionVm::getId)
+                                                                   .map(CompositeRolePermission::getId)
                                                                    .collect(Collectors.toList()));
     }
     if(CollectionUtils.isNotEmpty(newRolePermissions)) {
@@ -122,11 +113,11 @@ public class RoleServiceImpl extends BaseModelService<Role, RoleRepository> impl
   }
 
   @Override
-  public void updateUsers(String uid, List<UserRoleVm> userRoles) {
+  public void updateUsers(String uid, List<CompositeUserRole> userRoles) {
     Role role = this.repository.findOneByUid(uid);
-    List<UserRoleVm> newUserRoles = new ArrayList<>();
-    List<UserRoleVm> removingUserRoles = new ArrayList<>();
-    for(UserRoleVm cUserRole:userRoles) {
+    List<CompositeUserRole> newUserRoles = new ArrayList<>();
+    List<CompositeUserRole> removingUserRoles = new ArrayList<>();
+    for(CompositeUserRole cUserRole:userRoles) {
       if(BooleanUtils.isTrue(cUserRole.getEnabled())){
         newUserRoles.add(cUserRole);
       } else {
@@ -138,7 +129,7 @@ public class RoleServiceImpl extends BaseModelService<Role, RoleRepository> impl
 
     if(CollectionUtils.isNotEmpty(removingUserRoles)) {
       accountRoleRepository.deleteByUidIn(removingUserRoles.stream()
-                                                                   .map(UserRoleVm::getUid)
+                                                                   .map(CompositeUserRole::getUid)
                                                                    .collect(Collectors.toSet()));
     }
     if(CollectionUtils.isNotEmpty(newUserRoles)) {

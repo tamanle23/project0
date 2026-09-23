@@ -17,6 +17,7 @@ import com.project0.user.controller.response.UserProfileVm;
 import com.project0.user.model.User;
 import com.project0.user.model.enums.UserType;
 import com.project0.user.service.UserService;
+import com.project0.user.facade.UserFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -38,6 +39,9 @@ public class UserGraphqlController extends CommonController {
 
   @Autowired
   UserMapper userMapper;
+
+  @Autowired
+  UserFacade userFacade;
 
   /**
    * Fetch a single user by their UID.
@@ -116,7 +120,7 @@ public class UserGraphqlController extends CommonController {
   @QueryMapping
   @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionActionConstants.LIST + "')")
   public UserVm userWithPermissions(@Argument("uid") String uid) {
-    return userService.findUserWithPermissions(uid);
+    return userFacade.findUserWithPermissions(uid);
   }
 
   // ─── Private helpers ────────────────────────────────────────────────────────

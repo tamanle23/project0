@@ -11,6 +11,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +53,9 @@ public class TokenServiceImpl extends CommonReponseBuilder implements TokenServi
   @Autowired
   protected GenerationHelper generationHelper;
 
+  @Autowired
+  UserDetailsService userDetailsService;
+
   @Override
   protected Context getContext() {
     return context;
@@ -58,7 +63,7 @@ public class TokenServiceImpl extends CommonReponseBuilder implements TokenServi
 
   public ResponseWrapper<ContextHeader, AuthenticationToken> getToken(RequestWrapper<ContextHeader,AuthenticationRequestBody> request) {
     this.authenticate(request.getBody().getUserName(), request.getBody().getPassword());
-    final UserDetailsImpl userDetails = userService.loadUserByUserName(request.getBody().getUserName());
+    final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getBody().getUserName());
     return success(jwtHelper.generateToken(userDetails, request.getHeader().getClientType()));
   }
 
@@ -74,7 +79,7 @@ public class TokenServiceImpl extends CommonReponseBuilder implements TokenServi
         String username = claims.getSubject();
         String clientType = request.getHeader() != null ? request.getHeader().getClientType() : null;
         if (StringUtils.isNotBlank(username) && jwtHelper.validate(claims, clientType)) {
-          final UserDetailsImpl userDetails = userService.loadUserByUserName(username);
+          final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
           return success(jwtHelper.generateToken(userDetails, clientType));
         }
       }

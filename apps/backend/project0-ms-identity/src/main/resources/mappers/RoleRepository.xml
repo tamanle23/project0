@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.project0.user.repository.mybatis.RoleRepository">
 
-  <resultMap id="RolePermissionVmMap" type="com.project0.user.controller.request.RolePermissionVm">
+  <resultMap id="CompositeRolePermissionMap" type="com.project0.user.controller.request.CompositeRolePermission">
     <id property="id" column="id"/>
     <result property="version" column="version"/>
     <result property="enabled" column="enabled"/>
@@ -17,7 +17,7 @@
     </association>
   </resultMap>
 
-  <resultMap id="RoleUserVmMap" type="com.project0.user.controller.request.UserRoleVm">
+  <resultMap id="CompositeRoleUserMap" type="com.project0.user.controller.request.CompositeUserRole">
     <id property="id" column="id"/>
     <result property="version" column="version"/>
     <result property="enabled" column="enabled"/>
@@ -60,7 +60,7 @@
       GROUP BY r.uid
   </select>
 
-  <select id="findAllRolePermissions" resultMap="RolePermissionVmMap">
+  <select id="findAllRolePermissions" resultMap="CompositeRolePermissionMap">
       SELECT
         rp.id AS id,
         rp.version AS version,
@@ -76,7 +76,7 @@
       WHERE rp.deletedDate IS NULL
   </select>
 
-  <select id="findAllRoleUsers" resultMap="RoleUserVmMap">
+  <select id="findAllRoleUsers" resultMap="CompositeRoleUserMap">
       SELECT
         ur.id AS id,
         ur.version AS version,

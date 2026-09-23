@@ -21,6 +21,7 @@ import com.project0.fw.QueryController;
 import com.project0.user.controller.mapping.UserMapper;
 import com.project0.user.model.Role;
 import com.project0.user.service.RoleService;
+import com.project0.user.facade.RoleFacade;
 
 @RestController
 @RequestMapping(value="api/role")
@@ -32,6 +33,9 @@ public class RoleQueryController extends QueryController<Role, RoleVm, RoleSearc
 
   @Autowired
   UserMapper userMapper;
+
+  @Autowired
+  RoleFacade roleFacade;
 
   @Override
   public String getResourceName() {
@@ -54,16 +58,16 @@ public class RoleQueryController extends QueryController<Role, RoleVm, RoleSearc
 
   @GetMapping(value="{uid}/permissions")
   public ResponseWrapper<ContextHeader, List<RolePermissionVm>> getAllRolePermissions(@PathVariable String uid, PageRequest pageRequest){
-    return success(roleService.findAllBelongingPermissions(uid));
+    return success(roleFacade.findAllBelongingPermissions(uid));
   }
 
   @GetMapping(value="{uid}/users")
   public ResponseWrapper<ContextHeader, List<UserRoleVm>> getBelongingUsers(@PathVariable String uid, PageRequest pageRequest){
-    return success(roleService.findAllBelongingUsers(uid));
+    return success(roleFacade.findAllBelongingUsers(uid));
   }
 
   @GetMapping(value="{uid}/_with_permissions")
   public ResponseWrapper<ContextHeader, RoleVm> getRoleDetail(@PathVariable String uid, PageRequest pageRequest){
-    return success(roleService.getRoleDetail(uid));
+    return success(roleFacade.getRoleDetail(uid));
   }
 }

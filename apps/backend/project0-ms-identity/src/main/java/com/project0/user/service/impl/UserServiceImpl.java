@@ -94,35 +94,26 @@ public class UserServiceImpl extends BaseModelService<User, UserRepository> impl
   GenerationHelper generationHelper;
 
   @Override
-  public UserVm findUserWithPermissions(String uid) {
-    User user = this.repository.findOneByUid(uid);
+  public List<CompositeUserPermission> findAllUserPermissions(String uid) {
+    return mUserRepository.findAllUserPermissions(uid);
+  }
 
-    if(user == null) {
-      throw BusinessException.create().add(ErrorCodes.ERROR_NOT_EXISTED);
+  @Override
+  public List<CompositeUserRole> findAllUserRoles(String uid) {
+    return mUserRepository.findAllUserRoles(uid);
+  }
+
+  @Override
+  public Map<String, Set<String>> findAllRoleGroupByPermission(Set<Long> roleIds) {
+    if (CollectionUtils.isEmpty(roleIds)) {
+      return Collections.emptyMap();
     }
-    UserVm qUser = this.userMapper.userToResponseModel(user);
-    qUser.setUserPermissions(mUserRepository.findAllUserPermissions(uid));
-    qUser.setUserRoles(mUserRepository.findAllUserRoles(uid));
-
-    if(CollectionUtils.isNotEmpty(qUser.getUserRoles())
-        && CollectionUtils.isNotEmpty(qUser.getUserPermissions())) {
-      Set<Long> roleIds = qUser.getUserRoles()
-                               .stream()
-                               .filter(UserRoleVm::getEnabled)
-                               .map(ar->ar.getRole().getId())
-                               .collect(Collectors.toSet());
-      Map<String, Set<String>> roleGroupByPermission = CollectionUtils.isEmpty(roleIds) ? Collections.emptyMap() :
-          mUserRepository.findAllRoleGroupByPermission(roleIds)
-                         .stream()
-                         .collect(Collectors.groupingBy(
-                             m -> (String) m.get("permissionUid"),
-                             Collectors.mapping(m -> (String) m.get("roleCode"), Collectors.toSet())
-                         ));
-      qUser.getUserPermissions()
+    return mUserRepository.findAllRoleGroupByPermission(roleIds)
         .stream()
-        .forEach(ap->ap.setInheritingRoles(roleGroupByPermission.get(ap.getPermission().getUid())));
-    }
-    return qUser;
+        .collect(Collectors.groupingBy(
+            m -> (String) m.get("permissionUid"),
+            Collectors.mapping(m -> (String) m.get("roleCode"), Collectors.toSet())
+        ));
   }
 
   @Override
@@ -252,7 +243,7 @@ public class UserServiceImpl extends BaseModelService<User, UserRepository> impl
 
   @Override
   public Page<PermissionVm> findUserPermissions(String uid, RequestWrapper<ContextHeader, UserPermissionSearchCondition> request) {
-//    Page<CompositePermission> page = Page.<CompositePermission>builder()
+//    Page<PermissionVm> page = Page.<PermissionVm>builder()
 //            .totalElements(roleMapper.count(searchRequest))
 //            .content(roleMapper.findWithUserCount(searchRequest))
 //            .build();
@@ -431,55 +422,6 @@ public class UserServiceImpl extends BaseModelService<User, UserRepository> impl
     }
   }
 
-  @Override
-  public UserDetailsImpl loadUserByUserName(String username) {
-    User user = userRepository.findByUserName(username);
-    return loadUser(user);
-  }
-
-  @Override
-  public UserDetailsImpl loadUserById(Long id) {
-    User userUser = userRepository.findOne(id);
-    return loadUser(userUser);
-  }
-
-  private UserDetailsImpl loadUser(User userUser) {
-    List<GrantedAuthority> authorities = new ArrayList<>();
-    UserDetailsImpl userDetails;
-    if (userUser == null) {
-      throw new UsernameNotFoundException(ErrorCodes.ERROR_LOGIN_INVALID_CREDENTIALS.getMessage());
-    }
-    Set<String> permissions = this.userPermissionRepository.findAllByUser(userUser)
-      .stream()
-      .map(UserPermission::getPermission)
-      .map(NamedModel::getCode)
-      .collect(Collectors.toSet());
-    List<UserRole> userRoles = this.userRoleRepository.findAllByUser(userUser);
-    if (userRoles != null) {
-      for (UserRole userRole : userRoles) {
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + userRole.getRole().getCode().toUpperCase()));
-        permissions.addAll(userRole.getRole().getPermissions().stream().map(NamedModel::getCode).collect(Collectors.toList()));
-      }
-    }
-    if (permissions != null) {
-      for (String permission : permissions) {
-        GrantedAuthority authority = new SimpleGrantedAuthority(permission.toUpperCase());
-        authorities.add(authority);
-      }
-    }
-    Map<String, Object> userMap = new HashMap<>();
-    userMap.put("uid", userUser.getUid());
-    userMap.put("userName", userUser.getUserName());
-    userMap.put("password", userUser.getPassword());
-    userMap.put("isNonLocked", userUser.isNonLocked());
-    userMap.put("isNonExpired", userUser.isNonExpired());
-    userMap.put("isCredentialsNonExpired", userUser.isCredentialsNonExpired());
-    userMap.put("isEnabled", userUser.getStatus() == UserStatus.ENABLED || userUser.getStatus() == UserStatus.APPROVED);
-    userMap.put("userType", userUser.getType().toString());
-    userDetails = new UserDetailsImpl(userMap, authorities);
-
-    return userDetails;
-  }
 
   protected void checkEmailModification(User user) {
     if(userRepository.countByIdNotAndEmail(user.getId(), user.getEmail())>0){

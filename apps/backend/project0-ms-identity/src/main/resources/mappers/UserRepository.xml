@@ -4,12 +4,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.project0.user.repository.mybatis.UserRepository">
 
-  <resultMap id="UserPermissionVmMap" type="com.project0.user.controller.response.UserPermissionVm">
+  <resultMap id="CompositeUserPermissionMap" type="com.project0.user.controller.request.CompositeUserPermission">
     <id property="id" column="id"/>
     <result property="version" column="version"/>
     <result property="lastUpdatedDate" column="lastUpdatedDate"/>
     <result property="status" column="status"/>
-    <association property="permission" javaType="com.project0.user.controller.request.PermissionVm">
+    <association property="permission" javaType="com.project0.user.model.Permission">
       <id property="id" column="perm_id"/>
       <result property="uid" column="perm_uid"/>
       <result property="code" column="perm_code"/>
@@ -20,11 +20,11 @@
     </association>
   </resultMap>
 
-  <resultMap id="UserRoleVmMap" type="com.project0.user.controller.request.UserRoleVm">
+  <resultMap id="CompositeUserRoleMap" type="com.project0.user.controller.request.CompositeUserRole">
     <id property="id" column="id"/>
     <result property="version" column="version"/>
     <result property="enabled" column="enabled"/>
-    <association property="role" javaType="com.project0.user.controller.request.RoleVm">
+    <association property="role" javaType="com.project0.user.model.Role">
       <id property="id" column="role_id"/>
       <result property="uid" column="role_uid"/>
       <result property="code" column="role_code"/>
@@ -46,7 +46,7 @@
       LIMIT #{pageRequest.size} OFFSET #{pageRequest.offset};
   </select>
 
-  <select id="findAllUserPermissions" resultMap="UserPermissionVmMap">
+  <select id="findAllUserPermissions" resultMap="CompositeUserPermissionMap">
       SELECT
         up.id AS id,
         up.version AS version,
@@ -66,7 +66,7 @@
       ORDER BY up.lastUpdatedDate DESC
   </select>
 
-  <select id="findAllUserRoles" resultMap="UserRoleVmMap">
+  <select id="findAllUserRoles" resultMap="CompositeUserRoleMap">
       SELECT
         ur.id AS id,
         ur.version AS version,

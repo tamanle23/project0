@@ -11,6 +11,7 @@ import com.project0.user.controller.response.UserProfileVm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,10 +25,10 @@ import com.project0.user.ValidatorConfiguration;
 import com.project0.user.controller.mapping.UserMapper;
 import com.project0.user.model.User;
 import com.project0.user.service.UserService;
+import com.project0.user.facade.UserFacade;
 
 @RestController
 @RequestMapping(value="api/user")
-//@Secured(PermissionConstants.ADMINSTRATION)
 @CacheConfig(cacheNames = {"UserQuery"})
 public class UserQueryController extends QueryController<User, UserVm, UserSearchCondition> {
 
@@ -36,6 +37,9 @@ public class UserQueryController extends QueryController<User, UserVm, UserSearc
 
   @Autowired
   UserMapper userMapper;
+
+  @Autowired
+  UserFacade userFacade;
 
   @Override
   public String getResourceName() {
@@ -100,6 +104,6 @@ public class UserQueryController extends QueryController<User, UserVm, UserSearc
   @GetMapping(value="{uid}/_with_permissions")
 //  @Cacheable
   public ResponseWrapper<ContextHeader, UserVm> getUserWithPermissions(@PathVariable String uid, PageRequest pageRequest){
-    return success(userService.findUserWithPermissions(uid));
+    return success(userFacade.findUserWithPermissions(uid));
   }
 }
