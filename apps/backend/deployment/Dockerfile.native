@@ -1,0 +1,33 @@
+FROM ghcr.io/graalvm/native-image-community:17-ol9 AS builder
+
+WORKDIR /workspace
+
+# Copy maven wrapper and pom files
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+COPY project0-core/pom.xml project0-core/
+COPY project0-resources/pom.xml project0-resources/
+COPY project0-fw/pom.xml project0-fw/
+COPY project0-db/pom.xml project0-db/
+COPY project0-ms-fs/pom.xml project0-ms-fs/
+COPY project0-ms-identity/pom.xml project0-ms-identity/
+COPY project0-report-engine/pom.xml project0-report-engine/
+COPY project0-ms-worker/pom.xml project0-ms-worker/
+COPY project0-ms-aio/pom.xml project0-ms-aio/
+
+# Download dependencies
+RUN ./mvnw dependency:go-offline -B
+
+# Copy source code
+COPY . .
+
+# Build native image
+RUN ./mvnw -pl project0-ms-aio -am clean package -Pnative -DskipTests
+
+FROM oraclelinux:9-micro
+WORKDIR /app
+COPY --from=builder /workspace/project0-ms-aio/target/project0-ms-aio /app/application
+
+EXPOSE 8080
+ENTRYPOINT ["/app/application"]

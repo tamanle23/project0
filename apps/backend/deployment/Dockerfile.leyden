@@ -1,0 +1,38 @@
+FROM eclipse-temurin:17-jdk-alpine AS builder
+
+WORKDIR /workspace
+
+# Copy maven wrapper and pom files
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+COPY project0-core/pom.xml project0-core/
+COPY project0-resources/pom.xml project0-resources/
+COPY project0-fw/pom.xml project0-fw/
+COPY project0-db/pom.xml project0-db/
+COPY project0-ms-fs/pom.xml project0-ms-fs/
+COPY project0-ms-identity/pom.xml project0-ms-identity/
+COPY project0-report-engine/pom.xml project0-report-engine/
+COPY project0-ms-worker/pom.xml project0-ms-worker/
+COPY project0-ms-aio/pom.xml project0-ms-aio/
+
+# Download dependencies
+RUN ./mvnw dependency:go-offline -B
+
+# Copy source code
+COPY . .
+
+# Build the jar
+RUN ./mvnw -pl project0-ms-aio -am clean package -DskipTests
+RUN cp project0-ms-aio/target/project0-ms-aio-*.jar /workspace/app.jar
+
+FROM eclipse-temurin:17-jre-alpine
+
+WORKDIR /app
+COPY --from=builder /workspace/app.jar app.jar
+
+# Create a CDS archive during the build phase by doing a training run
+RUN java -XX:ArchiveClassesAtExit=application.jsa -Dspring.context.exit=onRefresh -jar app.jar
+
+EXPOSE 8080
+ENTRYPOINT ["java", "-XX:SharedArchiveFile=application.jsa", "-jar", "app.jar"]
