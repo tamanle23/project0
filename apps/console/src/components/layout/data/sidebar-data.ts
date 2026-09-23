@@ -88,7 +88,7 @@ export const useSidebarData = (): SidebarData => {
             icon: Users,
           },
           {
-            title: t('sidebar.items.storage', 'Storage'),
+            title: t('sidebar.items.storage', 'Storage Providers'),
             url: '/storage',
             icon: Database,
           },
