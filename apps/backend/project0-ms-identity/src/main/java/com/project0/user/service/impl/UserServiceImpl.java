@@ -46,7 +46,6 @@ import com.project0.core.io.Page;
 import com.project0.core.io.RequestWrapper;
 import com.project0.user.model.enums.UserStatus;
 import com.project0.repository.jpa.ProjectRepository;
-import com.project0.user.repository.querydsl.QUserRepository;
 import com.project0.user.service.UserService;
 import org.springframework.validation.Errors;
 
@@ -64,7 +63,7 @@ public class UserServiceImpl extends BaseModelService<User, UserRepository> impl
   public static String APP_NAME = "vPos";
 
   @Autowired
-  QUserRepository qUserRepository;
+  com.project0.user.repository.mybatis.UserRepository mUserRepository;
   @Autowired
   Context contextHelper;
   @Autowired
@@ -102,16 +101,23 @@ public class UserServiceImpl extends BaseModelService<User, UserRepository> impl
       throw BusinessException.create().add(ErrorCodes.ERROR_NOT_EXISTED);
     }
     UserVm qUser = this.userMapper.userToResponseModel(user);
-    qUser.setUserPermissions(qUserRepository.findAllUserPermissions(uid));
-    qUser.setUserRoles(qUserRepository.findAllUserRoles(uid));
+    qUser.setUserPermissions(mUserRepository.findAllUserPermissions(uid));
+    qUser.setUserRoles(mUserRepository.findAllUserRoles(uid));
 
     if(CollectionUtils.isNotEmpty(qUser.getUserRoles())
         && CollectionUtils.isNotEmpty(qUser.getUserPermissions())) {
-      Map<String,Set<String>> roleGroupByPermission = qUserRepository.findAllRoleGroupByPermission(qUser.getUserRoles()
-                                                                    .stream()
-                                                                    .filter(UserRoleVm::getEnabled)
-                                                                    .map(ar->ar.getRole().getId())
-                                                                    .collect(Collectors.toSet()));
+      Set<Long> roleIds = qUser.getUserRoles()
+                               .stream()
+                               .filter(UserRoleVm::getEnabled)
+                               .map(ar->ar.getRole().getId())
+                               .collect(Collectors.toSet());
+      Map<String, Set<String>> roleGroupByPermission = CollectionUtils.isEmpty(roleIds) ? Collections.emptyMap() :
+          mUserRepository.findAllRoleGroupByPermission(roleIds)
+                         .stream()
+                         .collect(Collectors.groupingBy(
+                             m -> (String) m.get("permissionUid"),
+                             Collectors.mapping(m -> (String) m.get("roleCode"), Collectors.toSet())
+                         ));
       qUser.getUserPermissions()
         .stream()
         .forEach(ap->ap.setInheritingRoles(roleGroupByPermission.get(ap.getPermission().getUid())));
@@ -232,7 +238,11 @@ public class UserServiceImpl extends BaseModelService<User, UserRepository> impl
 
   @Override
   public Map<String, String> findUsersName(List<String> userUids) {
-    return this.qUserRepository.findUsersName(userUids);
+    if (CollectionUtils.isEmpty(userUids)) {
+      return Collections.emptyMap();
+    }
+    List<Map<String, String>> list = this.mUserRepository.findUsersName(userUids);
+    return list.stream().collect(Collectors.toMap(m -> m.get("uid"), m -> m.get("userName")));
   }
 
   @Override

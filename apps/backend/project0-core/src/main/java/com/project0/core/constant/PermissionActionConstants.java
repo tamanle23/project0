@@ -1,7 +1,7 @@
 package com.project0.core.constant;
 
-public class PermissionConstants {
-  private PermissionConstants() {
+public class PermissionActionConstants {
+  private PermissionActionConstants() {
   }
 
   public static final String LIST = "list";

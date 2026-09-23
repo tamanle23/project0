@@ -32,15 +32,11 @@ import com.project0.user.repository.jpa.RoleRepository;
 import com.project0.user.repository.jpa.UserRepository;
 import com.project0.user.repository.jpa.UserRoleRepository;
 import com.project0.user.repository.mybatis.model.RoleWithUserCount;
-import com.project0.user.repository.querydsl.QRoleRepository;
 import com.project0.user.service.RoleService;
 
 @Transactional
 @Service
 public class RoleServiceImpl extends BaseModelService<Role, RoleRepository> implements RoleService {
-
-  @Autowired
-  QRoleRepository qRoleRepository;
 
   @Autowired
   RolePermissionRepository rolePermissionRepository;
@@ -74,20 +70,20 @@ public class RoleServiceImpl extends BaseModelService<Role, RoleRepository> impl
 
   @Override
   public List<RolePermissionVm> findAllBelongingPermissions(String uid) {
-    return qRoleRepository.findAllRolePermissions(uid);
+    return mRoleRepository.findAllRolePermissions(uid);
   }
 
   @Override
   public List<UserRoleVm> findAllBelongingUsers(String uid) {
-    return qRoleRepository.findAllRoleUsers(uid);
+    return mRoleRepository.findAllRoleUsers(uid);
   }
 
   @Override
   public RoleVm getRoleDetail(String uid) {
       Role role = this.repository.findOneByUid(uid);
       RoleVm roleVm = this.roleMapper.roleToResponseModel(role);
-      roleVm.setRolePermissions(qRoleRepository.findAllRolePermissions(uid));
-      roleVm.setRoleUsers(qRoleRepository.findAllRoleUsers(uid));
+      roleVm.setRolePermissions(mRoleRepository.findAllRolePermissions(uid));
+      roleVm.setRoleUsers(mRoleRepository.findAllRoleUsers(uid));
       return roleVm;
   }
 

@@ -33,6 +33,7 @@ public class WebConfiguration implements WebMvcConfigurer {
 
   @Override
   public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+
     registry.addResourceHandler("/resources/img/**").addResourceLocations("classpath:resources/img/").setCachePeriod(60 * 60 * 24 * 365);
     registry.addResourceHandler("/resources/fonts/**").addResourceLocations("classpath:resources/fonts/").setCachePeriod(60 * 60 * 24 * 365);
     registry.addResourceHandler("/resources/qr/**").addResourceLocations("file:"+SystemConstant.PATH_QR_CODE+File.separator).setCachePeriod(60 * 60 * 24 * 365);

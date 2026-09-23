@@ -1,6 +1,6 @@
 package com.project0.user.controller.graphql;
 
-import com.project0.core.constant.PermissionConstants;
+import com.project0.core.constant.PermissionActionConstants;
 import com.project0.core.constant.ResourceConstants;
 import com.project0.core.io.ContextHeader;
 import com.project0.core.io.Page;
@@ -46,7 +46,7 @@ public class UserGraphqlController extends CommonController {
    * @return the mapped {@link UserVm} or {@code null} if not found
    */
   @QueryMapping
-  @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionConstants.LIST + "')")
+  @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionActionConstants.LIST + "')")
   public UserVm user(@Argument("uid") String uid) {
     return userMapper.userToResponseModel(userService.findByUid(uid));
   }
@@ -58,7 +58,7 @@ public class UserGraphqlController extends CommonController {
    * @return paginated list of {@link UserVm}
    */
   @QueryMapping
-  @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionConstants.LIST + "')")
+  @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionActionConstants.LIST + "')")
   public Page<UserVm> users(@Argument("request") UserSearchInput request) {
     UserSearchCondition condition = toSearchCondition(request);
     RequestWrapper<ContextHeader, UserSearchCondition> wrapped = extractRequest(condition);
@@ -73,7 +73,7 @@ public class UserGraphqlController extends CommonController {
    * @return paginated list of {@link PermissionVm}
    */
   @QueryMapping
-  @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionConstants.LIST + "')")
+  @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionActionConstants.LIST + "')")
   public Page<PermissionVm> userPermissions(@Argument("uid") String uid, @Argument("request") PageInput request) {
     UserPermissionSearchCondition condition = new UserPermissionSearchCondition();
     applyPagination(condition, request);
@@ -88,7 +88,7 @@ public class UserGraphqlController extends CommonController {
    * @return paginated list of {@link RoleVm}
    */
   @QueryMapping
-  @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionConstants.LIST + "')")
+  @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionActionConstants.LIST + "')")
   public Page<RoleVm> userRoles(@Argument("uid") String uid, @Argument("request") PageInput request) {
     UserRoleSearchCondition condition = new UserRoleSearchCondition();
     applyPagination(condition, request);
@@ -102,7 +102,7 @@ public class UserGraphqlController extends CommonController {
    * @return the {@link UserProfileVm}
    */
   @QueryMapping
-  @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionConstants.LIST + "')")
+  @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionActionConstants.LIST + "')")
   public UserProfileVm userProfile(@Argument("uid") String uid) {
     return userMapper.userProfileToResponseBody(userService.getUserProfile(uid));
   }
@@ -114,7 +114,7 @@ public class UserGraphqlController extends CommonController {
    * @return the {@link UserVm} with {@code userPermissions} populated
    */
   @QueryMapping
-  @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionConstants.LIST + "')")
+  @PreAuthorize("hasPermission('" + ResourceConstants.USER + "', '" + PermissionActionConstants.LIST + "')")
   public UserVm userWithPermissions(@Argument("uid") String uid) {
     return userService.findUserWithPermissions(uid);
   }

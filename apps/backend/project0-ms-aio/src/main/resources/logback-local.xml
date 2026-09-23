@@ -62,6 +62,9 @@
   <logger name="org.hibernate.hql" level="INFO" />
   <logger name="org.hibernate.SQL" level="DEBUG" />
   <logger name="org.hibernate.type" level="INFO" />
+<!--  <logger name="org.springframework.graphql" level="DEBUG" />-->
+<!--  <logger name="org.springframework.graphql.execute" level="DEBUG" />-->
+<!--  <logger name="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" level="TRACE" />-->
 <!--  <logger name="org.apache.http" level="ERROR" />-->
 
 <!--  <logger name="liquibase" level="DEBUG" />-->

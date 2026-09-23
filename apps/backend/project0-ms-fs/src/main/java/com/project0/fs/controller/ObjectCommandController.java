@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import com.project0.core.constant.PermissionConstants;
+import com.project0.core.constant.PermissionActionConstants;
 import com.project0.core.constant.ResourceConstants;
 import com.project0.core.exception.ErrorCodes;
 import com.project0.core.io.ContextHeader;
@@ -47,14 +47,14 @@ public class ObjectCommandController extends CommandController<FsObject, FileVm>
   }
 
   @PostMapping(value="/create_container")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.CREATION + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.CREATION + "')")
   public ResponseWrapper<ContextHeader, Object> createContainer(@Validate(name = ValidatorConfiguration.FILE_CREATION) @RequestBody ObjectCreationRequestBody requestBody){
     requestBody.getObject().setIsDirectory(true);
     return success(this.fileService.register(extractRequest(requestBody)));
   }
 
   @PostMapping("/upload/{uid}/{overwrite}")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.UPLOAD + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.UPLOAD + "')")
   public ResponseWrapper<ContextHeader, List<FileVm>> upload(HttpServletRequest request, @PathVariable(required = false) String uid, @PathVariable(required=false) String overwrite) {
     if(StringUtils.equalsIgnoreCase("root",uid)) {
       uid = null;
@@ -67,14 +67,14 @@ public class ObjectCommandController extends CommandController<FsObject, FileVm>
   }
 
   @PostMapping(value="/delete")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.DELETE + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.DELETE + "')")
   public ResponseWrapper<ContextHeader, Void> deleteFolder(@Validate(name = ValidatorConfiguration.FILE_DELETE) @RequestBody FileRemovalRequestBody requestBody){
     this.fileService.deleteByUids(extractRequest(requestBody));
     return success();
   }
 
   @PostMapping(value="/drop")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.CREATION + "') && hasPermission(this.getResourceName(), '"+ PermissionConstants.DELETE + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.CREATION + "') && hasPermission(this.getResourceName(), '"+ PermissionActionConstants.DELETE + "')")
   public ResponseWrapper<ContextHeader, Void> dropFiles(@Validate(name = ValidatorConfiguration.FILE_DROP) @RequestBody FileDropRequestBody requestBody){
     this.fileService.dropFiles(extractRequest(requestBody));
     return success();

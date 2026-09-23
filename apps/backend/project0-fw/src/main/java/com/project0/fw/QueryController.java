@@ -1,6 +1,6 @@
 package com.project0.fw;
 
-import com.project0.core.constant.PermissionConstants;
+import com.project0.core.constant.PermissionActionConstants;
 import com.project0.core.io.Page;
 import com.project0.core.io.SearchCondition;
 import com.project0.domain.BaseModel;
@@ -22,28 +22,28 @@ public abstract class QueryController<T extends BaseModel, V, S extends SearchCo
 
   @GetMapping(value = "/{id}")
   @ResponseBody
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.LIST + "')")
+  @PreAuthorize(value = "hasAuthority(this.getResourceName()_"+ PermissionActionConstants.LIST + "')")
   public ResponseWrapper<ContextHeader, V> get(@PathVariable Long id) { return null;}
 
   @GetMapping(value = "/{uid}/_uid")
   @ResponseBody
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.LIST + "')")
+  @PreAuthorize(value = "hasAuthority(this.getResourceName()_"+ PermissionActionConstants.LIST + "')")
   public ResponseWrapper<ContextHeader, V> getByUid(@PathVariable String uid) { return null;}
 
   @GetMapping(value="/_list")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.LIST + "')")
+  @PreAuthorize(value = "hasAuthority(this.getResourceName()_"+ PermissionActionConstants.LIST + "')")
   public ResponseWrapper<ContextHeader, Page<V>> getSearch(@JsonParam("request") S searchRequest) {
     return null;
   }
 
   @PostMapping(value="/_list")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.LIST + "')")
+  @PreAuthorize(value = "hasAuthority(this.getResourceName()_"+ PermissionActionConstants.LIST + "')")
   public ResponseWrapper<ContextHeader, Page<V>> postSearch(@RequestBody S searchRequest){
     return null;
   }
 
   @GetMapping(value="/_export")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.LIST + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.LIST + "')")
   public ResponseEntity<Resource> getExport(@JsonParam("request") S searchRequest) {
     return null;
   }

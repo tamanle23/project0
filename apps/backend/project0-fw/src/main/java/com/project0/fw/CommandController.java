@@ -1,6 +1,6 @@
 package com.project0.fw;
 
-import com.project0.core.constant.PermissionConstants;
+import com.project0.core.constant.PermissionActionConstants;
 import com.project0.core.exception.ErrorCodes;
 import com.project0.core.io.ContextHeader;
 import com.project0.domain.BaseModel;
@@ -21,7 +21,7 @@ public abstract class CommandController<T extends BaseModel, V> extends Applicat
   protected CrudService<T> dataService;
 
   @DeleteMapping(value = "/{id}")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.DELETE + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.DELETE + "')")
   public ResponseWrapper<ContextHeader, T> delete(@PathVariable("id") Long id){
     if(dataService.deleteById(id)) {
       return success();
@@ -30,7 +30,7 @@ public abstract class CommandController<T extends BaseModel, V> extends Applicat
   }
 
   @DeleteMapping(value = "/{uid}/_uid")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.DELETE + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.DELETE + "')")
   public ResponseWrapper<ContextHeader, V> deleteByUid(@PathVariable("uid") String uid) {
     if(dataService.deleteByUid(uid)) {
       return success();
@@ -39,30 +39,30 @@ public abstract class CommandController<T extends BaseModel, V> extends Applicat
   };
 
   @DeleteMapping(value = "/{uid}/_uids")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.DELETE + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.DELETE + "')")
   public ResponseWrapper<ContextHeader, V> deleteByUids(@PathVariable("uid") Set<String> uids) {
     dataService.deleteByUids(uids);
     return success();
   };
 
   @PostMapping
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.CREATION + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.CREATION + "')")
   public ResponseWrapper<ContextHeader, V> create(@RequestBody V viewModel) { return null;};
 
   @PostMapping(value="/_multi")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.CREATION + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.CREATION + "')")
   public ResponseWrapper<ContextHeader, List<V>> create(@RequestBody List<V> viewModel) { return null;};
 
   @PutMapping(value = "/{id}")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.MODIFY + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.MODIFY + "')")
   public ResponseWrapper<ContextHeader, V> update(@PathVariable("id") Long id, @RequestBody V viewModel) { return null;};
 
   @PutMapping(value = "/{uid}/_uid")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.MODIFY + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.MODIFY + "')")
   public ResponseWrapper<ContextHeader, V> updateByUid(@PathVariable("uid") String uid, @RequestBody V viewModel) { return null;};
 
   @PostMapping(value="/{uid}/_uid/copy")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.COPY + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.COPY + "')")
   public ResponseWrapper<ContextHeader, V> copy(@RequestBody V viewModel) { return null;};
 
 }

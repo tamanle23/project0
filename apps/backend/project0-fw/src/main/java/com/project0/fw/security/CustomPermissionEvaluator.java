@@ -1,9 +1,8 @@
 package com.project0.fw.security;
 
-import com.project0.core.constant.PermissionConstants;
+import com.project0.core.constant.PermissionActionConstants;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 
 import java.io.Serializable;
 
@@ -31,7 +30,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     if(auth != null) {
       return auth.getAuthorities()
                  .stream()
-                 .anyMatch(grant -> (grant.getAuthority().equals(combiPermission)) || (permission.equalsIgnoreCase(PermissionConstants.LIST) && grant.getAuthority().equalsIgnoreCase("ROLE_ADMINISTRATOR")));
+                 .anyMatch(grant -> (grant.getAuthority().equals(combiPermission)) || (permission.equalsIgnoreCase(PermissionActionConstants.LIST) && grant.getAuthority().equalsIgnoreCase("ROLE_ADMINISTRATOR")));
     }
     return false;
   }

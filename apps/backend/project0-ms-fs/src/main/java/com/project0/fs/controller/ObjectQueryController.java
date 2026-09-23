@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project0.core.constant.PermissionConstants;
+import com.project0.core.constant.PermissionActionConstants;
 import com.project0.core.constant.ResourceConstants;
 import com.project0.core.io.ContextHeader;
 import com.project0.core.io.SearchCondition;
@@ -75,7 +75,7 @@ public class ObjectQueryController extends QueryController<FsObject, FileVm, Sea
 
   @GetMapping("/{uid}/_uid/download")
   @ResponseBody
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.DOWNLOAD + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.DOWNLOAD + "')")
   public ResponseEntity<Resource> download(@PathVariable String uid) throws IOException {
     FsObject fsObject = fileService.findByUid(uid);
     StorageConnector storageConnector = storageServiceFactory.getConnector(fsObject.getConnector());
@@ -95,21 +95,21 @@ public class ObjectQueryController extends QueryController<FsObject, FileVm, Sea
   }
 
   @GetMapping(value="/{uid}/_parent_uid")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.LIST + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.LIST + "')")
   @ResponseBody
   public ResponseWrapper<ContextHeader, List<FileVm>> getAllInDirectory(@PathVariable String uid){
     return success(this.fileService.findAllByParentUid(uid).stream().map(fileMapper::fileToFileVM).collect(Collectors.toList()));
   }
 
   @GetMapping(value="/{uid}/_parent_uid/_directory")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.LIST + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.LIST + "')")
   @ResponseBody
   public ResponseWrapper<ContextHeader, List<FsObject>> getAllFileInDirectory(@PathVariable String uid){
     return success(this.fileService.findAllDirectories(uid));
   }
 
   @GetMapping(value="/{uid}/_parent_uid/_object")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.LIST + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.LIST + "')")
   @ResponseBody
   public ResponseWrapper<ContextHeader,?> getAllSubDirectory(@PathVariable(required = false) String uid, Pageable pageable){
     List<FileVm> files = this.fileService.findAllFilesByParentUid("null".equalsIgnoreCase(uid)? null : uid)
@@ -124,7 +124,7 @@ public class ObjectQueryController extends QueryController<FsObject, FileVm, Sea
   }
 
   @GetMapping(value="/link/{uid}")
-  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionConstants.DOWNLOAD + "')")
+  @PreAuthorize(value = "hasPermission(this.getResourceName(), '"+ PermissionActionConstants.DOWNLOAD + "')")
   @ResponseBody
   public ResponseWrapper<ContextHeader, Link> getLink(@PathVariable("uid") String uid){
     return success(linkService.getLink(uid));

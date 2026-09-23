@@ -1,0 +1,9 @@
+type Query {
+    # Anchor for modular query extensions
+    _empty: String
+}
+
+type Mutation {
+    # Anchor for modular mutation extensions
+    _empty: String
+}
