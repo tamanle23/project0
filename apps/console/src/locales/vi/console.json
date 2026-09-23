@@ -56,6 +56,10 @@
     "title": "Nhà cung cấp lưu trữ",
     "description": "Quản lý các dịch vụ lưu trữ đám mây cho tính năng tải lên tệp của @project0/backend!",
     "filterPlaceholder": "Lọc nhà cung cấp lưu trữ...",
+    "types": {
+      "system": "Hệ thống cung cấp",
+      "user": "Người dùng cung cấp"
+    },
     "modes": {
       "all": "Tất cả chế độ",
       "archive": "Lưu trữ (Archive)",

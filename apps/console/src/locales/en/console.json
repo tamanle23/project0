@@ -56,6 +56,10 @@
     "title": "Storage Providers",
     "description": "Manage your Cloud Storage services for @project0/backend file uploads!",
     "filterPlaceholder": "Filter storage providers...",
+    "types": {
+      "system": "System Internal",
+      "user": "User Provided"
+    },
     "modes": {
       "all": "All Modes",
       "archive": "Archive",

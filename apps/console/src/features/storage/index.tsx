@@ -1,6 +1,6 @@
 import { type ChangeEvent, useState } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
-import { SlidersHorizontal, ArrowUpAZ, ArrowDownAZ, Check } from 'lucide-react'
+import { SlidersHorizontal, ArrowUpAZ, ArrowDownAZ } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -182,54 +182,26 @@ export function StorageIntegration() {
                       {storage.logo}
                     </div>
                     <div className='flex items-center gap-2'>
-                      {storage.connected ? (
-                        <>
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            className='liquid-glass-interactive h-8 text-xs relative overflow-hidden bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md text-foreground shadow-sm transition-all duration-200 active:scale-95'
-                            onClick={() => {
-                              toast.info(
-                                t('storage.toasts.managing', 'Managing {{name}}', {
-                                  name: storage.name,
-                                })
-                              )
-                            }}
-                          >
-                            {t('storage.actions.manage', 'Manage')}
-                          </Button>
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            disabled
-                            className='h-8 border border-emerald-500/40 bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-xs font-medium shadow-xs disabled:opacity-100'
-                          >
-                            <Check className='me-1 size-3.5 stroke-[2.5]' />
-                            {t('storage.actions.connected', 'Connected')}
-                          </Button>
-                        </>
-                      ) : (
+                      {storage.providerType === 'User Provided' && (
                         <Button
                           variant='outline'
                           size='sm'
                           className='liquid-glass-interactive h-8 text-xs relative overflow-hidden bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md text-foreground shadow-sm transition-all duration-200 active:scale-95'
                           onClick={() => {
-                            toast.success(
-                              t(
-                                'storage.toasts.connecting',
-                                'Connecting to {{name}}',
-                                { name: storage.name }
-                              )
+                            toast.info(
+                              t('storage.toasts.managing', 'Managing {{name}}', {
+                                name: storage.name,
+                              })
                             )
                           }}
                         >
-                          {t('storage.actions.connect', 'Connect')}
+                          {t('storage.actions.manage', 'Manage')}
                         </Button>
                       )}
                     </div>
                   </div>
                   <div>
-                    <div className='mb-1 flex items-center gap-2'>
+                    <div className='mb-1 flex flex-wrap items-center gap-2'>
                       <h2 className='font-semibold tracking-tight text-card-foreground'>
                         {storage.name}
                       </h2>
@@ -241,6 +213,15 @@ export function StorageIntegration() {
                         }`}
                       >
                         {modeLabel}
+                      </span>
+                      <span
+                        className={`rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${
+                          storage.providerType === 'System Internal'
+                            ? 'border-gray-500/30 bg-gray-500/10 text-gray-700 dark:text-gray-300'
+                            : 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300'
+                        }`}
+                      >
+                        {storage.providerType === 'System Internal' ? t('storage.types.system', 'System Internal') : t('storage.types.user', 'User Provided')}
                       </span>
                     </div>
                     <p className='line-clamp-2 text-sm text-muted-foreground'>
