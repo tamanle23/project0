@@ -25,7 +25,12 @@ export function DataTable<TData>({
   const columnCount = table.getAllColumns().length
 
   return (
-    <div className={cn('overflow-hidden rounded-md border', containerClassName)}>
+    <div
+      className={cn(
+        'overflow-hidden rounded-xl border border-white/20 dark:border-white/10 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md shadow-lg shadow-black/5 dark:shadow-black/20',
+        containerClassName
+      )}
+    >
       <Table className={className}>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -35,7 +40,6 @@ export function DataTable<TData>({
                   key={header.id}
                   colSpan={header.colSpan}
                   className={cn(
-                    'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
                     header.column.columnDef.meta?.className,
                     header.column.columnDef.meta?.thClassName
                   )}
@@ -63,7 +67,6 @@ export function DataTable<TData>({
                   <TableCell
                     key={cell.id}
                     className={cn(
-                      'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
                       cell.column.columnDef.meta?.className,
                       cell.column.columnDef.meta?.tdClassName
                     )}
