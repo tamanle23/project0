@@ -39,7 +39,8 @@
       "appearance": "Appearance",
       "notifications": "Notifications",
       "display": "Display",
-      "helpCenter": "Help Center"
+      "helpCenter": "Help Center",
+      "storage": "Storage"
     }
   }
 }
