@@ -241,14 +241,16 @@ export function StorageIntegration() {
                       >
                         {t('storage.actions.manage', 'Manage')}
                       </Button>
-                      <Button
-                        variant='outline'
-                        size='sm'
-                        className='liquid-glass-interactive h-8 text-xs relative overflow-hidden bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md text-foreground shadow-sm transition-all duration-200 active:scale-95'
-                        onClick={() => setAssignmentsDialog({ open: true, provider: storage })}
-                      >
-                        {t('storage.actions.assignments', 'Assignments')}
-                      </Button>
+                      {storage.lifecycleStatus !== 'Draft' && (
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          className='liquid-glass-interactive h-8 text-xs relative overflow-hidden bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md text-foreground shadow-sm transition-all duration-200 active:scale-95'
+                          onClick={() => setAssignmentsDialog({ open: true, provider: storage })}
+                        >
+                          {t('storage.actions.assignments', 'Assignments')}
+                        </Button>
+                      )}
                     </div>
                   </div>
                   <div>
