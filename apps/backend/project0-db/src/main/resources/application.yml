@@ -4,6 +4,7 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/${schema}/changelog-master.xml
+    contexts: ${LIQUIBASE_CONTEXTS:dev,test,local}
   datasource:
     hikari:
       maximum-pool-size: 5

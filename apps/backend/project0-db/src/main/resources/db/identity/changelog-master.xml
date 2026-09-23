@@ -8,6 +8,9 @@
     <property name="table_prefix" value="PROJECT0_IDENTITY_"/>
 
     <include file="db/identity/changelog-000.000.00000.xml" />
-
+    <include file="db/identity/changelog-000.000.00001.xml" />
     <include file="db/identity/changelog-master_data.xml" />
+    
+    <include file="db/identity/changelog-mock_data.xml" context="dev, test, local, mock" />
 </databaseChangeLog>
+  
