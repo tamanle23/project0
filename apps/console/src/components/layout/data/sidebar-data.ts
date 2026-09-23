@@ -54,7 +54,7 @@ export const useSidebarData = (): SidebarData => {
     teams: sidebarTeams,
     navGroups: [
       {
-        title: t('sidebar.groups.general', 'General'),
+        title: t('sidebar.groups.workspace', 'Workspace'),
         items: [
           {
             title: t('sidebar.items.dashboard', 'Dashboard'),

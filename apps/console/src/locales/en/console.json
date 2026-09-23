@@ -10,6 +10,7 @@
   },
   "sidebar": {
     "groups": {
+      "workspace": "Workspace",
       "general": "General",
       "admin": "Admin",
       "pages": "Pages",

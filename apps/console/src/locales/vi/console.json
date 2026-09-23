@@ -10,6 +10,7 @@
   },
   "sidebar": {
     "groups": {
+      "workspace": "Không gian làm việc",
       "general": "Chung",
       "admin": "Quản trị",
       "pages": "Trang",
