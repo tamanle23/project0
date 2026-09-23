@@ -97,7 +97,8 @@
       "enabled": "Đã bật",
       "disabled": "Đã tắt",
       "enableAll": "Bật tất cả",
-      "disableAll": "Tắt tất cả"
+      "disableAll": "Tắt tất cả",
+      "assignAll": "Gán tất cả"
     },
     "manage": {
       "title": "Cấu hình lưu trữ",

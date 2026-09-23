@@ -97,7 +97,8 @@
       "enabled": "Enabled",
       "disabled": "Disabled",
       "enableAll": "Enable All",
-      "disableAll": "Disable All"
+      "disableAll": "Disable All",
+      "assignAll": "Assign All"
     },
     "manage": {
       "title": "Configure Storage",

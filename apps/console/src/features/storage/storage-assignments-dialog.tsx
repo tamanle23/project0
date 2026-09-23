@@ -66,6 +66,16 @@ export function StorageAssignmentsDialog({
     setAssignments((prev) => prev.map((a) => ({ ...a, enabled })))
   }
 
+  const handleAssignAll = () => {
+    setAssignments((prev) => [
+      ...prev,
+      ...unassignedProfiles.map((p) => ({
+        workspaceId: p.id ?? p.name,
+        enabled: true,
+      })),
+    ])
+  }
+
   const assignedSet = new Set(assignments.map((a) => a.workspaceId))
   const unassignedProfiles = profiles.filter(
     (p) => !assignedSet.has(p.id ?? p.name)
@@ -168,9 +178,19 @@ export function StorageAssignmentsDialog({
 
           {unassignedProfiles.length > 0 && provider.assignedWorkspaces !== 'all' && (
             <div className='space-y-3'>
-              <h4 className='text-sm font-medium text-foreground'>
-                {t('storage.assignments.unassigned', 'Unassigned Workspaces')}
-              </h4>
+              <div className='flex items-center justify-between'>
+                <h4 className='text-sm font-medium text-foreground'>
+                  {t('storage.assignments.unassigned', 'Unassigned Workspaces')}
+                </h4>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  className='h-7 text-xs text-muted-foreground'
+                  onClick={handleAssignAll}
+                >
+                  {t('storage.assignments.assignAll', 'Assign All')}
+                </Button>
+              </div>
               <ul className='space-y-2'>
                 {unassignedProfiles.map((profile) => (
                   <li
