@@ -22,6 +22,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { LanguageSwitch } from '@/components/language-switch'
 import { StorageManageDialog } from './storage-manage-dialog'
 import { StorageAssignmentsDialog } from './storage-assignments-dialog'
+import { AddStorageDialog } from './add-storage-dialog'
 import { storages, type StorageProvider } from './data/storages'
 
 const route = getRouteApi('/_authenticated/storage/')
@@ -42,6 +43,8 @@ export function StorageIntegration() {
   const [searchTerm, setSearchTerm] = useState(filter)
   const [manageDialog, setManageDialog] = useState<{ open: boolean; provider: StorageProvider | null }>({ open: false, provider: null })
   const [assignmentsDialog, setAssignmentsDialog] = useState<{ open: boolean; provider: StorageProvider | null }>({ open: false, provider: null })
+  const [addDialog, setAddDialog] = useState(false)
+  const [storageList, setStorageList] = useState<StorageProvider[]>(storages)
 
   const filterText: Record<FilterType, string> = {
     all: t('storage.modes.all', 'All Modes'),
@@ -49,7 +52,7 @@ export function StorageIntegration() {
     CDN: t('storage.modes.cdn', 'CDN'),
   }
 
-  const filteredStorages = storages
+  const filteredStorages = storageList
     .sort((a, b) =>
       sort === 'asc'
         ? a.name.localeCompare(b.name)
@@ -89,6 +92,16 @@ export function StorageIntegration() {
   const handleSortChange = (sort: 'asc' | 'desc') => {
     setSort(sort)
     navigate({ search: (prev) => ({ ...prev, sort }) })
+  }
+
+  const handleAddStorage = (newStorage: StorageProvider) => {
+    setStorageList((prev) => [newStorage, ...prev])
+  }
+
+  const handleUpdateStorage = (updatedStorage: StorageProvider) => {
+    setStorageList((prev) =>
+      prev.map((s) => (s.id === updatedStorage.id ? updatedStorage : s))
+    )
   }
 
   return (
@@ -142,6 +155,9 @@ export function StorageIntegration() {
                 </SelectItem>
               </SelectContent>
             </Select>
+            <Button onClick={() => setAddDialog(true)} className='h-9'>
+              {t('storage.actions.addProvider', 'Add Provider')}
+            </Button>
           </div>
 
           <Select value={sort} onValueChange={handleSortChange}>
@@ -185,26 +201,22 @@ export function StorageIntegration() {
                       {storage.logo}
                     </div>
                     <div className='flex items-center gap-2'>
-                      {storage.providerType === 'User Provided' && (
-                        <>
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            className='liquid-glass-interactive h-8 text-xs relative overflow-hidden bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md text-foreground shadow-sm transition-all duration-200 active:scale-95'
-                            onClick={() => setManageDialog({ open: true, provider: storage })}
-                          >
-                            {t('storage.actions.manage', 'Manage')}
-                          </Button>
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            className='liquid-glass-interactive h-8 text-xs relative overflow-hidden bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md text-foreground shadow-sm transition-all duration-200 active:scale-95'
-                            onClick={() => setAssignmentsDialog({ open: true, provider: storage })}
-                          >
-                            {t('storage.actions.assignments', 'Assignments')}
-                          </Button>
-                        </>
-                      )}
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        className='liquid-glass-interactive h-8 text-xs relative overflow-hidden bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md text-foreground shadow-sm transition-all duration-200 active:scale-95'
+                        onClick={() => setManageDialog({ open: true, provider: storage })}
+                      >
+                        {t('storage.actions.manage', 'Manage')}
+                      </Button>
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        className='liquid-glass-interactive h-8 text-xs relative overflow-hidden bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md text-foreground shadow-sm transition-all duration-200 active:scale-95'
+                        onClick={() => setAssignmentsDialog({ open: true, provider: storage })}
+                      >
+                        {t('storage.actions.assignments', 'Assignments')}
+                      </Button>
                     </div>
                   </div>
                   <div>
@@ -212,6 +224,15 @@ export function StorageIntegration() {
                       <h2 className='font-semibold tracking-tight text-card-foreground'>
                         {storage.name}
                       </h2>
+                      <span
+                        className={`rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${
+                          storage.lifecycleStatus === 'Live'
+                            ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+                            : 'border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-300'
+                        }`}
+                      >
+                        {storage.lifecycleStatus === 'Live' ? t('storage.lifecycle.live', 'Live') : t('storage.lifecycle.draft', 'Draft')}
+                      </span>
                       <span
                         className={`rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${
                           storage.storageMode === 'CDN'
@@ -244,11 +265,18 @@ export function StorageIntegration() {
           open={manageDialog.open}
           onOpenChange={(open) => setManageDialog((prev) => ({ ...prev, open }))}
           provider={manageDialog.provider}
+          onUpdateProvider={handleUpdateStorage}
         />
         <StorageAssignmentsDialog
           open={assignmentsDialog.open}
           onOpenChange={(open) => setAssignmentsDialog((prev) => ({ ...prev, open }))}
           provider={assignmentsDialog.provider}
+          onUpdateProvider={handleUpdateStorage}
+        />
+        <AddStorageDialog
+          open={addDialog}
+          onOpenChange={setAddDialog}
+          onAddProvider={handleAddStorage}
         />
       </Main>
     </>

@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Play } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -17,16 +19,30 @@ interface StorageManageDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   provider: StorageProvider | null
+  onUpdateProvider?: (provider: StorageProvider) => void
 }
 
 export function StorageManageDialog({
   open,
   onOpenChange,
   provider,
+  onUpdateProvider,
 }: StorageManageDialogProps) {
   const { t } = useTranslation('console')
+  const [isTesting, setIsTesting] = useState(false)
 
   if (!provider) return null
+
+  const handleTestConnection = () => {
+    setIsTesting(true)
+    setTimeout(() => {
+      setIsTesting(false)
+      toast.success(t('storage.toasts.connectionSuccess', 'Connection successful!'))
+      if (provider.lifecycleStatus === 'Draft' && onUpdateProvider) {
+        onUpdateProvider({ ...provider, lifecycleStatus: 'Live' })
+      }
+    }, 1000)
+  }
 
   const handleSave = () => {
     toast.success(t('storage.toasts.saved', 'Settings saved successfully'))
@@ -72,13 +88,30 @@ export function StorageManageDialog({
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant='outline' onClick={() => onOpenChange(false)}>
-            {t('storage.actions.cancel', 'Cancel')}
+        <DialogFooter className='flex-col sm:flex-row sm:justify-between items-center gap-2'>
+          <Button
+            variant='secondary'
+            onClick={handleTestConnection}
+            disabled={isTesting}
+            className='w-full sm:w-auto bg-blue-500/10 text-blue-700 hover:bg-blue-500/20 dark:text-blue-300 dark:hover:bg-blue-500/30'
+          >
+            {isTesting ? (
+              <span className='animate-pulse'>{t('storage.actions.testing', 'Testing...')}</span>
+            ) : (
+              <>
+                <Play className='mr-2 size-4' />
+                {t('storage.actions.testConnection', 'Test Connection')}
+              </>
+            )}
           </Button>
-          <Button onClick={handleSave}>
-            {t('storage.actions.save', 'Save Changes')}
-          </Button>
+          <div className='flex gap-2 w-full sm:w-auto'>
+            <Button variant='outline' onClick={() => onOpenChange(false)} className='w-full sm:w-auto'>
+              {t('storage.actions.cancel', 'Cancel')}
+            </Button>
+            <Button onClick={handleSave} className='w-full sm:w-auto'>
+              {t('storage.actions.save', 'Save Changes')}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

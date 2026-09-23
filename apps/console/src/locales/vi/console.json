@@ -76,7 +76,18 @@
       "connect": "Kết nối",
       "save": "Lưu thay đổi",
       "cancel": "Hủy",
-      "assign": "Chỉ định"
+      "assign": "Chỉ định",
+      "addProvider": "Thêm nhà cung cấp",
+      "testConnection": "Kiểm tra kết nối",
+      "testing": "Đang kiểm tra..."
+    },
+    "lifecycle": {
+      "live": "Hoạt động",
+      "draft": "Bản nháp"
+    },
+    "add": {
+      "title": "Thêm nhà cung cấp lưu trữ",
+      "description": "Chọn một mẫu nhà cung cấp để tạo mới một tài nguyên lưu trữ."
     },
     "assignments": {
       "title": "Phân công không gian làm việc",
@@ -84,7 +95,9 @@
       "unassigned": "Chưa phân công",
       "assigned": "Đã phân công",
       "enabled": "Đã bật",
-      "disabled": "Đã tắt"
+      "disabled": "Đã tắt",
+      "enableAll": "Bật tất cả",
+      "disableAll": "Tắt tất cả"
     },
     "manage": {
       "title": "Cấu hình lưu trữ",
@@ -93,7 +106,8 @@
     "toasts": {
       "managing": "Đang quản lý {{name}}",
       "connecting": "Đang kết nối tới {{name}}",
-      "saved": "Đã lưu cài đặt thành công"
+      "saved": "Đã lưu cài đặt thành công",
+      "connectionSuccess": "Kết nối thành công!"
     },
     "providers": {
       "googleDrive": {

@@ -19,12 +19,14 @@ interface StorageAssignmentsDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   provider: StorageProvider | null
+  onUpdateProvider?: (provider: StorageProvider) => void
 }
 
 export function StorageAssignmentsDialog({
   open,
   onOpenChange,
   provider,
+  onUpdateProvider,
 }: StorageAssignmentsDialogProps) {
   const { t } = useTranslation('console')
   const { profiles } = useProfile()
@@ -50,8 +52,18 @@ export function StorageAssignmentsDialog({
   }
 
   const handleSave = () => {
+    if (onUpdateProvider && provider) {
+      onUpdateProvider({
+        ...provider,
+        assignedWorkspaces: provider.assignedWorkspaces === 'all' ? 'all' : assignments,
+      })
+    }
     toast.success(t('storage.toasts.saved', 'Settings saved successfully'))
     onOpenChange(false)
+  }
+
+  const handleBulkToggle = (enabled: boolean) => {
+    setAssignments((prev) => prev.map((a) => ({ ...a, enabled })))
   }
 
   const assignedSet = new Set(assignments.map((a) => a.workspaceId))
@@ -78,17 +90,43 @@ export function StorageAssignmentsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className='py-4 space-y-6'>
+        <div className='py-4 space-y-6 max-h-[60vh] overflow-y-auto no-scrollbar'>
           {assignedProfiles.length > 0 && (
             <div className='space-y-3'>
-              <h4 className='text-sm font-medium text-foreground'>
-                {t('storage.assignments.assigned', 'Assigned Workspaces')}
-              </h4>
+              <div className='flex items-center justify-between'>
+                <h4 className='text-sm font-medium text-foreground'>
+                  {t('storage.assignments.assigned', 'Assigned Workspaces')}
+                </h4>
+                {provider.assignedWorkspaces !== 'all' && (
+                  <div className='flex items-center gap-2'>
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      className='h-7 text-xs text-muted-foreground'
+                      onClick={() => handleBulkToggle(true)}
+                    >
+                      {t('storage.assignments.enableAll', 'Enable All')}
+                    </Button>
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      className='h-7 text-xs text-muted-foreground'
+                      onClick={() => handleBulkToggle(false)}
+                    >
+                      {t('storage.assignments.disableAll', 'Disable All')}
+                    </Button>
+                  </div>
+                )}
+              </div>
               <ul className='space-y-2'>
                 {assignedProfiles.map((profile) => {
                   const assignment = assignments.find(
                     (a) => a.workspaceId === (profile.id ?? profile.name)
                   )
+                  // For 'System Internal' with 'all', they are effectively enabled globally unless overridden.
+                  // Since 'System Internal' uses 'all', we might just show them as enabled.
+                  const isEnabled = provider.assignedWorkspaces === 'all' ? true : (assignment?.enabled ?? false)
+
                   return (
                     <li
                       key={profile.id ?? profile.name}
@@ -106,12 +144,13 @@ export function StorageAssignmentsDialog({
                       </div>
                       <div className='flex items-center gap-3'>
                         <span className='text-xs text-muted-foreground'>
-                          {assignment?.enabled
+                          {isEnabled
                             ? t('storage.assignments.enabled', 'Enabled')
                             : t('storage.assignments.disabled', 'Disabled')}
                         </span>
                         <Switch
-                          checked={assignment?.enabled ?? false}
+                          checked={isEnabled}
+                          disabled={provider.assignedWorkspaces === 'all'}
                           onCheckedChange={(checked) =>
                             handleToggleEnable(
                               profile.id ?? profile.name,
@@ -127,7 +166,7 @@ export function StorageAssignmentsDialog({
             </div>
           )}
 
-          {unassignedProfiles.length > 0 && (
+          {unassignedProfiles.length > 0 && provider.assignedWorkspaces !== 'all' && (
             <div className='space-y-3'>
               <h4 className='text-sm font-medium text-foreground'>
                 {t('storage.assignments.unassigned', 'Unassigned Workspaces')}

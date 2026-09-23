@@ -76,7 +76,18 @@
       "connect": "Connect",
       "save": "Save Changes",
       "cancel": "Cancel",
-      "assign": "Assign"
+      "assign": "Assign",
+      "addProvider": "Add Provider",
+      "testConnection": "Test Connection",
+      "testing": "Testing..."
+    },
+    "lifecycle": {
+      "live": "Live",
+      "draft": "Draft"
+    },
+    "add": {
+      "title": "Add Storage Provider",
+      "description": "Select a provider template to instantiate a new storage resource."
     },
     "assignments": {
       "title": "Workspace Assignments",
@@ -84,7 +95,9 @@
       "unassigned": "Unassigned Workspaces",
       "assigned": "Assigned Workspaces",
       "enabled": "Enabled",
-      "disabled": "Disabled"
+      "disabled": "Disabled",
+      "enableAll": "Enable All",
+      "disableAll": "Disable All"
     },
     "manage": {
       "title": "Configure Storage",
@@ -93,7 +106,8 @@
     "toasts": {
       "managing": "Managing {{name}}",
       "connecting": "Connecting to {{name}}",
-      "saved": "Settings saved successfully"
+      "saved": "Settings saved successfully",
+      "connectionSuccess": "Connection successful!"
     },
     "providers": {
       "googleDrive": {
