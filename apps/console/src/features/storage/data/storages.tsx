@@ -4,12 +4,17 @@ import { Database, Cloud, HardDrive, Box, Server } from 'lucide-react';
 export type StorageMode = 'Archive' | 'CDN';
 export type ProviderType = 'System Internal' | 'User Provided';
 
+export type WorkspaceAssignment = {
+  workspaceId: string;
+  enabled: boolean;
+};
+
 export interface StorageProvider {
   id: string;
   name: string;
   logo: React.ReactNode;
   providerType: ProviderType;
-  assignedWorkspaces: string[] | 'all';
+  assignedWorkspaces: WorkspaceAssignment[] | 'all';
   status: 'enabled' | 'disabled';
   descKey: string;
   defaultDesc: string;
@@ -44,7 +49,7 @@ export const storages: StorageProvider[] = [
     name: 'Cloudflare R2',
     logo: <Server className='size-6 text-orange-500' />,
     providerType: 'User Provided',
-    assignedWorkspaces: ['workspace-1'],
+    assignedWorkspaces: [{ workspaceId: '1', enabled: false }],
     status: 'disabled',
     descKey: 'storage.providers.cloudflareR2.description',
     defaultDesc: 'Zero egress fee object storage distributed globally.',

@@ -71,12 +71,29 @@
     },
     "actions": {
       "manage": "Manage",
+      "assignments": "Assignments",
       "connected": "Connected",
-      "connect": "Connect"
+      "connect": "Connect",
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "assign": "Assign"
+    },
+    "assignments": {
+      "title": "Workspace Assignments",
+      "description": "Assign this storage provider to workspaces and manage its enabled state.",
+      "unassigned": "Unassigned Workspaces",
+      "assigned": "Assigned Workspaces",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "manage": {
+      "title": "Configure Storage",
+      "description": "Configure settings for this storage provider."
     },
     "toasts": {
       "managing": "Managing {{name}}",
-      "connecting": "Connecting to {{name}}"
+      "connecting": "Connecting to {{name}}",
+      "saved": "Settings saved successfully"
     },
     "providers": {
       "googleDrive": {

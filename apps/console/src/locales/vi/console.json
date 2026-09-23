@@ -71,12 +71,29 @@
     },
     "actions": {
       "manage": "Quản lý",
+      "assignments": "Phân công",
       "connected": "Đã kết nối",
-      "connect": "Kết nối"
+      "connect": "Kết nối",
+      "save": "Lưu thay đổi",
+      "cancel": "Hủy",
+      "assign": "Chỉ định"
+    },
+    "assignments": {
+      "title": "Phân công không gian làm việc",
+      "description": "Chỉ định nhà cung cấp lưu trữ này cho các không gian làm việc và quản lý trạng thái kích hoạt.",
+      "unassigned": "Chưa phân công",
+      "assigned": "Đã phân công",
+      "enabled": "Đã bật",
+      "disabled": "Đã tắt"
+    },
+    "manage": {
+      "title": "Cấu hình lưu trữ",
+      "description": "Cấu hình cài đặt cho nhà cung cấp lưu trữ này."
     },
     "toasts": {
       "managing": "Đang quản lý {{name}}",
-      "connecting": "Đang kết nối tới {{name}}"
+      "connecting": "Đang kết nối tới {{name}}",
+      "saved": "Đã lưu cài đặt thành công"
     },
     "providers": {
       "googleDrive": {

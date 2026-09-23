@@ -20,8 +20,9 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { LanguageSwitch } from '@/components/language-switch'
-import { toast } from 'sonner'
-import { storages } from './data/storages'
+import { StorageManageDialog } from './storage-manage-dialog'
+import { StorageAssignmentsDialog } from './storage-assignments-dialog'
+import { storages, type StorageProvider } from './data/storages'
 
 const route = getRouteApi('/_authenticated/storage/')
 
@@ -39,6 +40,8 @@ export function StorageIntegration() {
   const [sort, setSort] = useState(initSort)
   const [filterType, setFilterType] = useState<FilterType>(type as FilterType)
   const [searchTerm, setSearchTerm] = useState(filter)
+  const [manageDialog, setManageDialog] = useState<{ open: boolean; provider: StorageProvider | null }>({ open: false, provider: null })
+  const [assignmentsDialog, setAssignmentsDialog] = useState<{ open: boolean; provider: StorageProvider | null }>({ open: false, provider: null })
 
   const filterText: Record<FilterType, string> = {
     all: t('storage.modes.all', 'All Modes'),
@@ -183,20 +186,24 @@ export function StorageIntegration() {
                     </div>
                     <div className='flex items-center gap-2'>
                       {storage.providerType === 'User Provided' && (
-                        <Button
-                          variant='outline'
-                          size='sm'
-                          className='liquid-glass-interactive h-8 text-xs relative overflow-hidden bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md text-foreground shadow-sm transition-all duration-200 active:scale-95'
-                          onClick={() => {
-                            toast.info(
-                              t('storage.toasts.managing', 'Managing {{name}}', {
-                                name: storage.name,
-                              })
-                            )
-                          }}
-                        >
-                          {t('storage.actions.manage', 'Manage')}
-                        </Button>
+                        <>
+                          <Button
+                            variant='outline'
+                            size='sm'
+                            className='liquid-glass-interactive h-8 text-xs relative overflow-hidden bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md text-foreground shadow-sm transition-all duration-200 active:scale-95'
+                            onClick={() => setManageDialog({ open: true, provider: storage })}
+                          >
+                            {t('storage.actions.manage', 'Manage')}
+                          </Button>
+                          <Button
+                            variant='outline'
+                            size='sm'
+                            className='liquid-glass-interactive h-8 text-xs relative overflow-hidden bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md text-foreground shadow-sm transition-all duration-200 active:scale-95'
+                            onClick={() => setAssignmentsDialog({ open: true, provider: storage })}
+                          >
+                            {t('storage.actions.assignments', 'Assignments')}
+                          </Button>
+                        </>
                       )}
                     </div>
                   </div>
@@ -233,6 +240,16 @@ export function StorageIntegration() {
             )
           })}
         </ul>
+        <StorageManageDialog
+          open={manageDialog.open}
+          onOpenChange={(open) => setManageDialog((prev) => ({ ...prev, open }))}
+          provider={manageDialog.provider}
+        />
+        <StorageAssignmentsDialog
+          open={assignmentsDialog.open}
+          onOpenChange={(open) => setAssignmentsDialog((prev) => ({ ...prev, open }))}
+          provider={assignmentsDialog.provider}
+        />
       </Main>
     </>
   )
