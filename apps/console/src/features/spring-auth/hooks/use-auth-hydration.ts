@@ -17,7 +17,7 @@ export function useAuthHydration() {
       }
 
       try {
-        const { data } = await springApiClient.post('/api/auth/refresh', {
+        const { data } = await springApiClient.post('/auth/refresh', {
           refreshToken,
         });
         
