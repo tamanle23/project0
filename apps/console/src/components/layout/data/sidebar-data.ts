@@ -19,6 +19,7 @@ import {
   AudioWaveform,
   Command,
   GalleryVerticalEnd,
+  Database,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 import { useTranslation } from 'react-i18next'
@@ -69,6 +70,11 @@ export const useSidebarData = (): SidebarData => {
             title: t('sidebar.items.apps', 'Apps'),
             url: '/apps',
             icon: Package,
+          },
+          {
+            title: t('sidebar.items.storage', 'Storage'),
+            url: '/storage',
+            icon: Database,
           },
           {
             title: t('sidebar.items.chats', 'Chats'),
