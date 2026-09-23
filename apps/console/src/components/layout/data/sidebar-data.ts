@@ -72,11 +72,6 @@ export const useSidebarData = (): SidebarData => {
             icon: Package,
           },
           {
-            title: t('sidebar.items.storage', 'Storage'),
-            url: '/storage',
-            icon: Database,
-          },
-          {
             title: t('sidebar.items.chats', 'Chats'),
             url: '/chats',
             badge: '3',
@@ -91,6 +86,11 @@ export const useSidebarData = (): SidebarData => {
             title: t('sidebar.items.users', 'Users'),
             url: '/users',
             icon: Users,
+          },
+          {
+            title: t('sidebar.items.storage', 'Storage'),
+            url: '/storage',
+            icon: Database,
           },
         ],
       },
