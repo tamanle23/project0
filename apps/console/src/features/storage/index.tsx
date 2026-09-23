@@ -1,6 +1,7 @@
 import { type ChangeEvent, useState } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { SlidersHorizontal, ArrowUpAZ, ArrowDownAZ, Check } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -26,13 +27,8 @@ const route = getRouteApi('/_authenticated/storage/')
 
 type FilterType = 'all' | 'Archive' | 'CDN'
 
-const filterText = new Map<FilterType, string>([
-  ['all', 'All Modes'],
-  ['Archive', 'Archive'],
-  ['CDN', 'CDN'],
-])
-
 export function StorageIntegration() {
+  const { t } = useTranslation('console')
   const {
     filter = '',
     type = 'all',
@@ -44,6 +40,12 @@ export function StorageIntegration() {
   const [filterType, setFilterType] = useState<FilterType>(type as FilterType)
   const [searchTerm, setSearchTerm] = useState(filter)
 
+  const filterText: Record<FilterType, string> = {
+    all: t('storage.modes.all', 'All Modes'),
+    Archive: t('storage.modes.archive', 'Archive'),
+    CDN: t('storage.modes.cdn', 'CDN'),
+  }
+
   const filteredStorages = storages
     .sort((a, b) =>
       sort === 'asc'
@@ -53,7 +55,13 @@ export function StorageIntegration() {
     .filter((storage) =>
       filterType === 'all' ? true : storage.storageMode === filterType
     )
-    .filter((storage) => storage.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter((storage) => {
+      const localizedDesc = t(storage.descKey, storage.defaultDesc)
+      return (
+        storage.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        localizedDesc.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    })
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
@@ -95,28 +103,40 @@ export function StorageIntegration() {
       <Main fixed>
         <div>
           <h1 className='text-2xl font-bold tracking-tight'>
-            Storage Integrations
+            {t('storage.title', 'Storage Providers')}
           </h1>
           <p className='text-muted-foreground'>
-            Manage your Cloud Storage services for @project0/backend file uploads!
+            {t(
+              'storage.description',
+              'Manage your Cloud Storage services for @project0/backend file uploads!'
+            )}
           </p>
         </div>
         <div className='my-4 flex items-end justify-between sm:my-0 sm:items-center'>
           <div className='flex flex-col gap-4 sm:my-4 sm:flex-row'>
             <Input
-              placeholder='Filter storage...'
+              placeholder={t(
+                'storage.filterPlaceholder',
+                'Filter storage providers...'
+              )}
               className='h-9 w-40 lg:w-[250px]'
               value={searchTerm}
               onChange={handleSearch}
             />
             <Select value={filterType} onValueChange={handleTypeChange}>
-              <SelectTrigger className='w-36'>
-                <SelectValue>{filterText.get(filterType)}</SelectValue>
+              <SelectTrigger className='w-44'>
+                <SelectValue>{filterText[filterType]}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='all'>All Modes</SelectItem>
-                <SelectItem value='Archive'>Archive</SelectItem>
-                <SelectItem value='CDN'>CDN</SelectItem>
+                <SelectItem value='all'>
+                  {t('storage.modes.all', 'All Modes')}
+                </SelectItem>
+                <SelectItem value='Archive'>
+                  {t('storage.modes.archive', 'Archive')}
+                </SelectItem>
+                <SelectItem value='CDN'>
+                  {t('storage.modes.cdn', 'CDN')}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -131,13 +151,13 @@ export function StorageIntegration() {
               <SelectItem value='asc'>
                 <div className='flex items-center gap-4'>
                   <ArrowUpAZ size={16} />
-                  <span>Ascending</span>
+                  <span>{t('storage.sort.ascending', 'Ascending')}</span>
                 </div>
               </SelectItem>
               <SelectItem value='desc'>
                 <div className='flex items-center gap-4'>
                   <ArrowDownAZ size={16} />
-                  <span>Descending</span>
+                  <span>{t('storage.sort.descending', 'Descending')}</span>
                 </div>
               </SelectItem>
             </SelectContent>
@@ -145,64 +165,92 @@ export function StorageIntegration() {
         </div>
         <Separator className='shadow-sm' />
         <ul className='faded-bottom no-scrollbar grid gap-4 overflow-auto pt-4 pb-16 md:grid-cols-2 lg:grid-cols-3'>
-          {filteredStorages.map((storage) => (
-            <li key={storage.name} className='flex'>
-              <Card className='flex w-full flex-col justify-between gap-4 p-5 bg-white/65 dark:bg-slate-900/65 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/30 rounded-2xl'>
-                <div className='flex items-center justify-between'>
-                  <div
-                    className='flex size-11 items-center justify-center rounded-xl bg-white/40 dark:bg-white/10 border border-white/30 dark:border-white/10 backdrop-blur-md p-2 shadow-xs'
-                  >
-                    {storage.logo}
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    {storage.connected ? (
-                      <>
+          {filteredStorages.map((storage) => {
+            const modeLabel =
+              storage.storageMode === 'CDN'
+                ? t('storage.modes.cdn', 'CDN')
+                : t('storage.modes.archive', 'Archive')
+            const description = t(storage.descKey, storage.defaultDesc)
+
+            return (
+              <li key={storage.id} className='flex'>
+                <Card className='flex w-full flex-col justify-between gap-4 p-5 bg-white/65 dark:bg-slate-900/65 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/30 rounded-2xl'>
+                  <div className='flex items-center justify-between'>
+                    <div
+                      className='flex size-11 items-center justify-center rounded-xl bg-white/40 dark:bg-white/10 border border-white/30 dark:border-white/10 backdrop-blur-md p-2 shadow-xs'
+                    >
+                      {storage.logo}
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      {storage.connected ? (
+                        <>
+                          <Button
+                            variant='outline'
+                            size='sm'
+                            className='liquid-glass-interactive h-8 text-xs relative overflow-hidden bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md text-foreground shadow-sm transition-all duration-200 active:scale-95'
+                            onClick={() => {
+                              toast.info(
+                                t('storage.toasts.managing', 'Managing {{name}}', {
+                                  name: storage.name,
+                                })
+                              )
+                            }}
+                          >
+                            {t('storage.actions.manage', 'Manage')}
+                          </Button>
+                          <Button
+                            variant='outline'
+                            size='sm'
+                            disabled
+                            className='h-8 border border-emerald-500/40 bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-xs font-medium shadow-xs disabled:opacity-100'
+                          >
+                            <Check className='me-1 size-3.5 stroke-[2.5]' />
+                            {t('storage.actions.connected', 'Connected')}
+                          </Button>
+                        </>
+                      ) : (
                         <Button
                           variant='outline'
                           size='sm'
                           className='liquid-glass-interactive h-8 text-xs relative overflow-hidden bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md text-foreground shadow-sm transition-all duration-200 active:scale-95'
                           onClick={() => {
-                             toast.info(`Managing ${storage.name}`)
+                            toast.success(
+                              t(
+                                'storage.toasts.connecting',
+                                'Connecting to {{name}}',
+                                { name: storage.name }
+                              )
+                            )
                           }}
                         >
-                          Manage
+                          {t('storage.actions.connect', 'Connect')}
                         </Button>
-                        <Button
-                          variant='outline'
-                          size='sm'
-                          disabled
-                          className='h-8 border border-emerald-500/40 bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-xs font-medium shadow-xs disabled:opacity-100'
-                        >
-                          <Check className='me-1 size-3.5 stroke-[2.5]' />
-                          Connected
-                        </Button>
-                      </>
-                    ) : (
-                      <Button
-                        variant='outline'
-                        size='sm'
-                        className='liquid-glass-interactive h-8 text-xs relative overflow-hidden bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md text-foreground shadow-sm transition-all duration-200 active:scale-95'
-                        onClick={() => {
-                           toast.success(`Connecting to ${storage.name}`)
-                        }}
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <div className='mb-1 flex items-center gap-2'>
+                      <h2 className='font-semibold tracking-tight text-card-foreground'>
+                        {storage.name}
+                      </h2>
+                      <span
+                        className={`rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${
+                          storage.storageMode === 'CDN'
+                            ? 'border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-300'
+                            : 'border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300'
+                        }`}
                       >
-                        Connect
-                      </Button>
-                    )}
+                        {modeLabel}
+                      </span>
+                    </div>
+                    <p className='line-clamp-2 text-sm text-muted-foreground'>
+                      {description}
+                    </p>
                   </div>
-                </div>
-                <div>
-                  <div className='mb-1 flex items-center gap-2'>
-                    <h2 className='font-semibold tracking-tight text-card-foreground'>{storage.name}</h2>
-                    <span className={`rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${storage.storageMode === 'CDN' ? 'border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-300' : 'border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300'}`}>
-                      {storage.storageMode}
-                    </span>
-                  </div>
-                  <p className='line-clamp-2 text-sm text-muted-foreground'>{storage.desc}</p>
-                </div>
-              </Card>
-            </li>
-          ))}
+                </Card>
+              </li>
+            )
+          })}
         </ul>
       </Main>
     </>

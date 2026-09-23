@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Loader2, LogIn, ShieldAlert } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { IconFacebook, IconGithub } from '@project0/ui/icons'
 import { useSpringAuthStore, springApiClient } from '@/features/spring-auth'
 import { cn } from '@/lib/utils'
@@ -43,6 +44,7 @@ export function UserAuthForm({
   redirectTo,
   ...props
 }: UserAuthFormProps) {
+  const { t } = useTranslation('console')
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
 
@@ -94,12 +96,16 @@ export function UserAuthForm({
       });
 
       setTokens(response.data.accessToken, response.data.refreshToken);
-      toast.success(`Sandbox Login Successful (${role.toUpperCase()})`);
+      toast.success(
+        t('auth.sandbox.successToast', 'Sandbox Login Successful ({{role}})', {
+          role: role.toUpperCase(),
+        })
+      );
 
       const targetPath = redirectTo || '/';
       navigate({ to: targetPath, replace: true });
     } catch (_e) {
-      toast.error('Sandbox login failed');
+      toast.error(t('auth.sandbox.failedToast', 'Sandbox login failed'));
     } finally {
       setIsLoading(false);
     }
@@ -159,15 +165,15 @@ export function UserAuthForm({
                 disabled={isLoading}
               >
                 <ShieldAlert className='me-2 size-4' />
-                Bypass with Sandbox...
+                {t('auth.sandbox.bypass', 'Bypass with Sandbox...')}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="w-[var(--radix-dropdown-menu-trigger-width)]">
               <DropdownMenuItem onClick={() => handleSandboxBypass('admin')} className="cursor-pointer text-emerald-600 dark:text-emerald-400">
-                Admin Role (All Access)
+                {t('auth.sandbox.adminRole', 'Admin Role (All Access)')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleSandboxBypass('creator')} className="cursor-pointer">
-                Creator Role (Content)
+                {t('auth.sandbox.creatorRole', 'Creator Role (Content)')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

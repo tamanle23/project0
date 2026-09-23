@@ -42,5 +42,54 @@
       "helpCenter": "Help Center",
       "storage": "Storage Providers"
     }
+  },
+  "auth": {
+    "sandbox": {
+      "bypass": "Bypass with Sandbox...",
+      "adminRole": "Admin Role (All Access)",
+      "creatorRole": "Creator Role (Content)",
+      "successToast": "Sandbox Login Successful ({{role}})",
+      "failedToast": "Sandbox login failed"
+    }
+  },
+  "storage": {
+    "title": "Storage Providers",
+    "description": "Manage your Cloud Storage services for @project0/backend file uploads!",
+    "filterPlaceholder": "Filter storage providers...",
+    "modes": {
+      "all": "All Modes",
+      "archive": "Archive",
+      "cdn": "CDN"
+    },
+    "sort": {
+      "ascending": "Ascending",
+      "descending": "Descending"
+    },
+    "actions": {
+      "manage": "Manage",
+      "connected": "Connected",
+      "connect": "Connect"
+    },
+    "toasts": {
+      "managing": "Managing {{name}}",
+      "connecting": "Connecting to {{name}}"
+    },
+    "providers": {
+      "googleDrive": {
+        "description": "Connect with Google Drive to manage cloud files directly."
+      },
+      "googleCloudStorage": {
+        "description": "Enterprise-grade object storage for archive and serving."
+      },
+      "cloudflareR2": {
+        "description": "Zero egress fee object storage distributed globally."
+      },
+      "storj": {
+        "description": "Decentralized cloud storage network."
+      },
+      "amazonS3": {
+        "description": "Industry standard object storage service."
+      }
+    }
   }
 }

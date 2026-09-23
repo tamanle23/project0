@@ -42,5 +42,54 @@
       "helpCenter": "Trung tâm trợ giúp",
       "storage": "Nhà cung cấp lưu trữ"
     }
+  },
+  "auth": {
+    "sandbox": {
+      "bypass": "Bỏ qua bằng Sandbox...",
+      "adminRole": "Vai trò Admin (Toàn quyền)",
+      "creatorRole": "Vai trò Creator (Nội dung)",
+      "successToast": "Đăng nhập Sandbox thành công ({{role}})",
+      "failedToast": "Đăng nhập Sandbox thất bại"
+    }
+  },
+  "storage": {
+    "title": "Nhà cung cấp lưu trữ",
+    "description": "Quản lý các dịch vụ lưu trữ đám mây cho tính năng tải lên tệp của @project0/backend!",
+    "filterPlaceholder": "Lọc nhà cung cấp lưu trữ...",
+    "modes": {
+      "all": "Tất cả chế độ",
+      "archive": "Lưu trữ (Archive)",
+      "cdn": "Mạng phân phối (CDN)"
+    },
+    "sort": {
+      "ascending": "Tăng dần",
+      "descending": "Giảm dần"
+    },
+    "actions": {
+      "manage": "Quản lý",
+      "connected": "Đã kết nối",
+      "connect": "Kết nối"
+    },
+    "toasts": {
+      "managing": "Đang quản lý {{name}}",
+      "connecting": "Đang kết nối tới {{name}}"
+    },
+    "providers": {
+      "googleDrive": {
+        "description": "Kết nối với Google Drive để quản lý các tệp đám mây trực tiếp."
+      },
+      "googleCloudStorage": {
+        "description": "Lưu trữ đối tượng cấp doanh nghiệp cho lưu trữ và phân phối tệp."
+      },
+      "cloudflareR2": {
+        "description": "Lưu trữ đối tượng không tính phí truyền tải ra ngoài, phân phối toàn cầu."
+      },
+      "storj": {
+        "description": "Mạng lưới lưu trữ đám mây phi tập trung."
+      },
+      "amazonS3": {
+        "description": "Dịch vụ lưu trữ đối tượng tiêu chuẩn công nghiệp."
+      }
+    }
   }
 }
