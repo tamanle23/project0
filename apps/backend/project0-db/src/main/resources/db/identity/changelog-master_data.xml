@@ -4,7 +4,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
-  <changeSet id="changelog-${schema}-master_data" author="tamanle23" runInTransaction="true" onValidationFail="HALT" runOnChange="true" runAlways="true">
+  <changeSet id="changelog-${schema}-master_data" author="tamanle23" runInTransaction="true" onValidationFail="HALT">
     <sql dbms="hsqldb">
       SET DATABASE SQL SYNTAX MYS TRUE;
     </sql>
