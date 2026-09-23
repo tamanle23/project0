@@ -52,12 +52,26 @@ export function StorageIntegration() {
     CDN: t('storage.modes.cdn', 'CDN'),
   }
 
+  const getStorageWeight = (storage: StorageProvider) => {
+    if (storage.providerType === 'System Internal') return 0;
+    if (storage.lifecycleStatus === 'Draft') return 2;
+    return 1; // User Provided (Live)
+  }
+
   const filteredStorages = storageList
-    .sort((a, b) =>
-      sort === 'asc'
+    .sort((a, b) => {
+      const weightA = getStorageWeight(a);
+      const weightB = getStorageWeight(b);
+      
+      if (weightA !== weightB) {
+        return weightA - weightB;
+      }
+      
+      // Secondary sort: Provider Name
+      return sort === 'asc'
         ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name)
-    )
+        : b.name.localeCompare(a.name);
+    })
     .filter((storage) =>
       filterType === 'all' ? true : storage.storageMode === filterType
     )
@@ -195,10 +209,21 @@ export function StorageIntegration() {
               <li key={storage.id} className='flex'>
                 <Card className='flex w-full flex-col justify-between gap-4 p-5 bg-white/65 dark:bg-slate-900/65 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/30 rounded-2xl'>
                   <div className='flex items-center justify-between'>
-                    <div
-                      className='flex size-11 items-center justify-center rounded-xl bg-white/40 dark:bg-white/10 border border-white/30 dark:border-white/10 backdrop-blur-md p-2 shadow-xs'
-                    >
-                      {storage.logo}
+                    <div className='flex items-center gap-3'>
+                      <div
+                        className='flex size-11 items-center justify-center rounded-xl bg-white/40 dark:bg-white/10 border border-white/30 dark:border-white/10 backdrop-blur-md p-2 shadow-xs'
+                      >
+                        {storage.logo}
+                      </div>
+                      <span
+                        className={`rounded-md border px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase ${
+                          storage.lifecycleStatus === 'Live'
+                            ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)]'
+                            : 'border-orange-500/40 bg-orange-500/15 text-orange-700 dark:text-orange-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)]'
+                        }`}
+                      >
+                        {storage.lifecycleStatus === 'Live' ? t('storage.lifecycle.live', 'Live') : t('storage.lifecycle.draft', 'Draft')}
+                      </span>
                     </div>
                     <div className='flex items-center gap-2'>
                       <Button
@@ -224,15 +249,6 @@ export function StorageIntegration() {
                       <h2 className='font-semibold tracking-tight text-card-foreground'>
                         {storage.name}
                       </h2>
-                      <span
-                        className={`rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${
-                          storage.lifecycleStatus === 'Live'
-                            ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
-                            : 'border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-300'
-                        }`}
-                      >
-                        {storage.lifecycleStatus === 'Live' ? t('storage.lifecycle.live', 'Live') : t('storage.lifecycle.draft', 'Draft')}
-                      </span>
                       <span
                         className={`rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${
                           storage.storageMode === 'CDN'
