@@ -216,12 +216,19 @@ export function StorageIntegration() {
                         {storage.logo}
                       </div>
                       <span
-                        className={`rounded-md border px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase ${
+                        className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase ${
                           storage.lifecycleStatus === 'Live'
                             ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)]'
                             : 'border-orange-500/40 bg-orange-500/15 text-orange-700 dark:text-orange-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)]'
                         }`}
                       >
+                        <span
+                          className={`size-1.5 rounded-full animate-pulse ${
+                            storage.lifecycleStatus === 'Live'
+                              ? 'bg-emerald-500 dark:bg-emerald-400'
+                              : 'bg-orange-500 dark:bg-orange-400'
+                          }`}
+                        />
                         {storage.lifecycleStatus === 'Live' ? t('storage.lifecycle.live', 'Live') : t('storage.lifecycle.draft', 'Draft')}
                       </span>
                     </div>
