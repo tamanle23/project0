@@ -16,7 +16,7 @@ export function SandboxPanel() {
 
   const handleTestDashboard = async () => {
     try {
-      const { data } = await springApiClient.get('/api/admin/dashboard');
+      const { data } = await springApiClient.get('/admin/dashboard');
       setDashboardData(data);
       toast.success('Protected route access granted!');
     } catch (e: unknown) {
@@ -28,7 +28,7 @@ export function SandboxPanel() {
 
   const handleHardLogout = async () => {
     try {
-      await springApiClient.post('/api/auth/logout');
+      await springApiClient.post('/auth/logout');
     } catch (_e) {
       // Ignore
     } finally {

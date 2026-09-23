@@ -82,8 +82,10 @@ export function UserAuthForm({
   const handleSandboxBypass = async (role: 'admin' | 'creator') => {
     setIsLoading(true);
     try {
+      // The mock engine intercepts this request and checks for `username` + password === 'bypass'
+      // It returns { accessToken, refreshToken } at the top level (no `.body` wrapper)
       const response = await springApiClient.post('/auth/token', {
-        userName: `${role}_bypass`,
+        username: `${role}_bypass`,
         password: 'bypass',
       }, {
         headers: {
@@ -91,7 +93,7 @@ export function UserAuthForm({
         }
       });
 
-      setTokens(response.data.body.accessToken, response.data.body.refreshToken);
+      setTokens(response.data.accessToken, response.data.refreshToken);
       toast.success(`Sandbox Login Successful (${role.toUpperCase()})`);
 
       const targetPath = redirectTo || '/';
