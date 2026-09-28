@@ -1,4 +1,4 @@
-package com.project0.user.controller.request;
+package com.project0.user.dto;
 
 import com.project0.user.model.UserRole;
 

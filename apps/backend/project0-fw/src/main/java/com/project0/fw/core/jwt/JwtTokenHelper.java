@@ -29,6 +29,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.userdetails.UserDetails;
 
 
 public class JwtTokenHelper implements Serializable {
@@ -158,7 +159,7 @@ public class JwtTokenHelper implements Serializable {
     return Optional.ofNullable(claims).filter(audience -> AUDIENCE_TABLET.equals(audience) || AUDIENCE_MOBILE.equals(audience)).isPresent();
   }
 
-  public AuthenticationToken generateToken(UserDetailsImpl userDetails, String userAgent) {
+  public AuthenticationToken generateToken(UserDetails userDetails, String userAgent) {
     Map<String, Object> claims = new HashMap<>();
     claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
     claims.put(CLAIM_KEY_AUDIENCE, userAgent);

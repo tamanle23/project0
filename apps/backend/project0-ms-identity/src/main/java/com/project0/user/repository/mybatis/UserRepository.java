@@ -8,8 +8,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.project0.core.io.PageRequest;
-import com.project0.user.controller.request.CompositeUserRole;
-import com.project0.user.controller.request.CompositeUserPermission;
+import com.project0.user.dto.CompositeUserRole;
+import com.project0.user.dto.CompositeUserPermission;
 import com.project0.user.model.User;
 
 @Mapper

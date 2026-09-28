@@ -8,10 +8,12 @@ import com.project0.core.io.Page;
 import com.project0.core.io.RequestWrapper;
 import com.project0.user.controller.request.*;
 import com.project0.user.controller.response.UserPermissionVm;
+import com.project0.user.dto.CompositeUserPermission;
+import com.project0.user.dto.CompositeUserRole;
 import com.project0.user.model.enums.UserStatus;
 import com.project0.user.model.enums.UserType;
 import com.project0.service.CrudService;
-import com.project0.service.authentication.UserDetailsImpl;
+
 import java.util.Set;
 import com.project0.user.model.AuthenticationType;
 import com.project0.user.model.PasswordResetToken;

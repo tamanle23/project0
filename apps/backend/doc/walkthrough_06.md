@@ -11,8 +11,8 @@
 - Defined `extend type Query` with 6 operations mirroring all `UserQueryController` read endpoints
 - Two input types: `UserSearchInput` (userName, userTypes, page, size) and `PageInput` (page, size)
 - Two enums matching exact Java domain model values:
-  - `UserType`: ANONYMOUS, REGISTERED, SUPER, ADMIN, AUTOLOGIN
-  - `UserStatus`: APPROVED, DISAPPROVED, PENDING, ENABLED, DISABLED
+  - `UserType`: ANONYMOUS, REGISTERED, SUPER, ADMIN
+  - `UserStatus`: ENABLED, DISABLED
 - Output types: `UserVm`, `UserPage`, `UserProfileVm`, `PermissionVm`, `UserPermissionVm`, `RoleVm`, `UserRoleVm`, `RolePage`, `PermissionPage`
 
 ### 2. `UserGraphqlController.java` — Controller

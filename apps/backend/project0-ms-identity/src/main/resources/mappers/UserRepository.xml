@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.project0.user.repository.mybatis.UserRepository">
 
-  <resultMap id="CompositeUserPermissionMap" type="com.project0.user.controller.request.CompositeUserPermission">
+  <resultMap id="CompositeUserPermissionMap" type="com.project0.user.dto.CompositeUserPermission">
     <id property="id" column="id"/>
     <result property="version" column="version"/>
     <result property="lastUpdatedDate" column="lastUpdatedDate"/>
@@ -20,7 +20,7 @@
     </association>
   </resultMap>
 
-  <resultMap id="CompositeUserRoleMap" type="com.project0.user.controller.request.CompositeUserRole">
+  <resultMap id="CompositeUserRoleMap" type="com.project0.user.dto.CompositeUserRole">
     <id property="id" column="id"/>
     <result property="version" column="version"/>
     <result property="enabled" column="enabled"/>
@@ -34,14 +34,14 @@
   </resultMap>
 
   <select id="count" resultType="Long">
-      SELECT count(0) 
+      SELECT count(0)
       FROM ${table_prefix_identity}user
       <include refid="searchCondition"></include>
   </select>
 
   <select id="find" resultType="com.project0.user.model.User">
-      SELECT * 
-      FROM ${table_prefix_identity}user 
+      SELECT *
+      FROM ${table_prefix_identity}user
       <include refid="searchCondition"></include>
       LIMIT #{pageRequest.size} OFFSET #{pageRequest.offset};
   </select>
@@ -102,7 +102,7 @@
       </foreach>
   </select>
 
-  <sql id="searchCondition"> 
+  <sql id="searchCondition">
   </sql>
 </mapper>
 

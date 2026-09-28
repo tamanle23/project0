@@ -6,8 +6,8 @@ import com.project0.user.controller.mapping.UserMapper;
 import com.project0.user.controller.request.UserVm;
 import com.project0.user.controller.response.UserPermissionVm;
 import com.project0.user.controller.request.UserRoleVm;
-import com.project0.user.controller.request.CompositeUserPermission;
-import com.project0.user.controller.request.CompositeUserRole;
+import com.project0.user.dto.CompositeUserPermission;
+import com.project0.user.dto.CompositeUserRole;
 import com.project0.user.controller.request.PermissionVm;
 import com.project0.user.controller.request.RoleVm;
 import com.project0.user.model.User;
@@ -38,12 +38,12 @@ public class UserFacadeImpl implements UserFacade {
     if (user == null) {
       throw BusinessException.create().add(ErrorCodes.ERROR_NOT_EXISTED);
     }
-    
+
     UserVm qUser = this.userMapper.userToResponseModel(user);
-    
+
     List<CompositeUserPermission> permissions = userService.findAllUserPermissions(uid);
     List<CompositeUserRole> roles = userService.findAllUserRoles(uid);
-    
+
     List<UserPermissionVm> permissionVms = permissions.stream().map(p -> {
         UserPermissionVm vm = new UserPermissionVm();
         vm.setId(p.getId());
@@ -63,7 +63,7 @@ public class UserFacadeImpl implements UserFacade {
         }
         return vm;
     }).collect(Collectors.toList());
-    
+
     List<UserRoleVm> roleVms = roles.stream().map(r -> {
         UserRoleVm vm = new UserRoleVm();
         vm.setId(r.getId());
@@ -80,7 +80,7 @@ public class UserFacadeImpl implements UserFacade {
         }
         return vm;
     }).collect(Collectors.toList());
-    
+
     qUser.setUserPermissions(permissionVms);
     qUser.setUserRoles(roleVms);
 
@@ -91,10 +91,10 @@ public class UserFacadeImpl implements UserFacade {
           .filter(UserRoleVm::getEnabled)
           .map(ar -> ar.getRole().getId())
           .collect(Collectors.toSet());
-          
+
       Map<String, Set<String>> roleGroupByPermission = CollectionUtils.isEmpty(roleIds) ? Collections.emptyMap() :
           userService.findAllRoleGroupByPermission(roleIds);
-          
+
       qUser.getUserPermissions()
           .stream()
           .forEach(ap -> {

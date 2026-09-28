@@ -8,15 +8,15 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import com.project0.user.dto.CompositeUserPermission;
+import com.project0.user.dto.CompositeUserRole;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import com.google.common.base.Objects;
 import com.project0.core.helper.GenerationHelper;
 import com.project0.core.io.ContextHeader;
-import com.project0.domain.NamedModel;
 import com.project0.service.BaseModelService;
-import com.project0.service.authentication.UserDetailsImpl;
 import com.project0.user.controller.mapping.UserMapper;
 import com.project0.user.controller.request.*;
 import com.project0.user.controller.response.UserPermissionVm;
@@ -32,10 +32,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

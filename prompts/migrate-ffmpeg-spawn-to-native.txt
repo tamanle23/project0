@@ -1,0 +1,32 @@
+I need to refactor my current TypeScript application to completely eliminate `child_process.spawn("ffmpeg", ...)` and replace it with a hyper-performance native SDK implementation using **`bun:ffi`**.
+
+We will adopt **Option A (Bundled Architecture Prebuilds)**, meaning we will bundle pre-compiled FFmpeg dynamic libraries (.so, .dylib, .dll) directly within our application directory structure so the app runs natively without requiring a globally installed FFmpeg binary.
+
+### Objective
+Migrate the codebase from shell execution to direct memory/pointer interactions with FFmpeg’s C APIs (`libavformat`, `libavcodec`, `libavutil`, etc.) via Bun's fast FFI layer.
+
+### Directory Structure to Adopt
+Assume or create this target structure for our dependencies:
+```text
+root/
+├── deps/
+│   ├── include/          # FFmpeg C Header files (for reference/mapping)
+│   └── lib/
+│       ├── linux-x64/    # libavformat.so, libavcodec.so, libavutil.so
+│       ├── darwin-arm64/ # libavformat.dylib, libavcodec.dylib, libavutil.dylib
+│       └── win32-x64/    # avformat.dll, avcodec.dll, avutil.dll
+```
+
+### Steps to Execute
+Please review the codebase and generate the necessary files by following these stages:
+
+1. **Platform Architecture Detection Script**: Write a utility module that reads `process.platform` and `process.arch` to dynamically return the strict file paths to the correct bundled library binaries inside the `deps/lib/` directory at runtime.
+2. **`bun:ffi` Low-Level Bridge Binding**: Define the FFI schema utilizing `dlopen` from `bun:ffi`. Map the core memory pointers (`ptr`), functions, and `FFIType` bindings required to duplicate our processing capabilities. Be sure to safely define typed wrappers for string signatures and structural function returns (like memory allocation handles or initialization contexts).
+3. **Refactored Module Layer**: Completely rewrite our processing file. Instead of building an array of CLI arguments and feeding them into `child_process.spawn()`, write high-level TypeScript wrapper functions that handle the underlying step-by-step FFI calls, error codes, buffer handoffs, and resource disposal.
+
+### Constraints & Edge Cases
+* Do not leave any hanging pointers or manual memory allocations. Implement strict garbage collection safety hooks or clean up patterns when freeing native structures.
+* Ensure all code is typed in pure TypeScript.
+* Write highly descriptive inline comments for the FFI mappings explaining what the corresponding raw FFmpeg C function expects.
+
+Please first ask me to share the file or lines containing my current `spawn` implementation, and once provided, deliver the complete TypeScript architecture files to execute this migration step-by-step.

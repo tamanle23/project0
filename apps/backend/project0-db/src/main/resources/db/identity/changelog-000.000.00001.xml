@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+  <changeSet author="tamanle23" id="changelog-${schema}-000.000.00000">
+    <createTable tableName="${table_prefix}PASSWORDRESETTOKEN">
+      <column autoIncrement="true" name="ID" type="BIGINT">
+        <constraints primaryKey="true" primaryKeyName="PK_PASSWORDRESETTOKEN"/>
+      </column>
+      <column name="TOKEN" type="VARCHAR(255)"/>
+      <column name="USER_ID" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="EXPIRYDATE" type="TIMESTAMP"/>
+    </createTable>
+    <createTable tableName="${table_prefix}REGISTRATIONTOKEN">
+      <column autoIncrement="true" name="ID" type="BIGINT">
+        <constraints primaryKey="true" primaryKeyName="PK_REGISTRATIONTOKEN"/>
+      </column>
+      <column name="TOKEN" type="VARCHAR(255)"/>
+      <column name="USER_ID" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="EXPIRYDATE" type="TIMESTAMP"/>
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="USER_ID" baseTableName="${table_prefix}PASSWORDRESETTOKEN"
+                             constraintName="FK_PASSWORDRESETTOKEN_USERID_USER" deferrable="false" initiallyDeferred="false"
+                             onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID"
+                             referencedTableName="${table_prefix}USER" validate="true"/>
+    <addForeignKeyConstraint baseColumnNames="USER_ID" baseTableName="${table_prefix}REGISTRATIONTOKEN"
+                             constraintName="FK_REGISTRATIONTOKEN_USERID_USER" deferrable="false" initiallyDeferred="false"
+                             onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID"
+                             referencedTableName="${table_prefix}USER" validate="true"/>
+  </changeSet>
+</databaseChangeLog>

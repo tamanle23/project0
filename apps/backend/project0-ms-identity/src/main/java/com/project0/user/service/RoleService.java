@@ -4,9 +4,8 @@ import java.util.List;
 
 import com.project0.core.io.Page;
 import com.project0.service.CrudService;
-import com.project0.user.controller.request.CompositeRolePermission;
-import com.project0.user.controller.request.CompositeUserRole;
-import com.project0.user.controller.request.RoleVm;
+import com.project0.user.dto.CompositeRolePermission;
+import com.project0.user.dto.CompositeUserRole;
 import com.project0.user.controller.request.RoleSearchCondition;
 import com.project0.user.model.Role;
 import com.project0.user.repository.mybatis.model.RoleWithUserCount;

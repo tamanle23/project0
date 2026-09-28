@@ -86,7 +86,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     userMap.put("isNonLocked", userUser.isNonLocked());
     userMap.put("isNonExpired", userUser.isNonExpired());
     userMap.put("isCredentialsNonExpired", userUser.isCredentialsNonExpired());
-    userMap.put("isEnabled", userUser.getStatus() == UserStatus.ENABLED || userUser.getStatus() == UserStatus.APPROVED);
+    userMap.put("isEnabled", userUser.getStatus() == UserStatus.ENABLED);
     userMap.put("userType", userUser.getType().toString());
     userDetails = new UserDetailsImpl(userMap, authorities);
 

@@ -10,7 +10,6 @@ import jakarta.transaction.Transactional;
 
 import com.project0.domain.BaseModel;
 import com.project0.user.controller.mapping.RoleMapper;
-import com.project0.user.controller.request.RoleVm;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +17,8 @@ import org.springframework.stereotype.Service;
 
 import com.project0.core.io.Page;
 import com.project0.service.BaseModelService;
-import com.project0.user.controller.request.CompositeRolePermission;
-import com.project0.user.controller.request.CompositeUserRole;
+import com.project0.user.dto.CompositeRolePermission;
+import com.project0.user.dto.CompositeUserRole;
 import com.project0.user.controller.request.RoleSearchCondition;
 import com.project0.user.model.Permission;
 import com.project0.user.model.Role;

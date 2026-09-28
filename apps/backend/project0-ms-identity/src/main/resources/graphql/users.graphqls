@@ -39,7 +39,6 @@ enum UserType {
     REGISTERED
     SUPER
     ADMIN
-    AUTOLOGIN
 }
 
 enum UserStatus {

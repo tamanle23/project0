@@ -1,0 +1,31 @@
+Please perform a complete token-optimization and system refactoring of all files currently located in the `.agents/rules/` directory AND the main `AGENTS.md` file.
+
+Task 1: Create the "Master Document" (Source of Truth)
+1. Read `AGENTS.md`, `story-config.md`, and `history-archival.md`. Extract all detailed explanations, lore, examples, world-building context, and verbose reasoning.
+2. Compile this comprehensive information into a new file named `docs/master_rules_reference.md` (create the `docs` folder at the root if it doesn't exist).
+
+Task 2: Modularize and Compact Active Rules (Token Optimization)
+1. Evaluate the complexity of the extracted rules and decouple them into two distinct categories:
+   - Generic Common Rules: Broad constraints reusable across ANY project (e.g., AI persona limits, formatting, safety guardrails). Create `.agents/rules/00-generic-common.md` for these.
+   - Project-Specific Rules: Constraints bound to this visual story-telling generator (e.g., story config, history archival). Create `.agents/rules/01-story-specific.md` for these.
+2. Refactor `AGENTS.md` (the root file): It must now act ONLY as a hyper-compact entry point. It should define the core Agent Persona in 1-2 sentences and explicitly state that the agent MUST strictly follow the constraints located in `00-generic-common.md` and `01-story-specific.md`. Strip EVERYTHING else out of it.
+3. Rewrite all active rules to be extremely token-efficient. Strip all transitional phrases and redundant context. Use imperative commands ("NEVER do X", "MUST output Y") and minimal YAML or bullet points. You MUST retain 100% of the core logical constraints.
+
+Task 3: Establish New Standard Operating Procedure (SOP)
+From this point forward, adhere strictly to this workflow whenever I ask you to add, update, or modify a rule:
+Step A: Write the detailed explanation and reasoning into `docs/master_rules_reference.md`.
+Step B: Determine if the new rule is "Generic" or "Project-Specific".
+Step C: Distill the update into a highly compacted, token-optimized constraint and append ONLY that minimal version to the appropriate categorized file (`00-` or `01-`).
+
+Acknowledge this prompt by confirming the refactoring and modularization is complete, and report the new estimated token count for `AGENTS.md` and the `.agents/rules/` directory combined.
+
+
+Add this rule to head of 00-generic-common.md
+```
+# RULE MANAGEMENT SOP (CRITICAL CONSTRAINT)
+Constraint: YOU MUST NEVER write long, detailed rules directly into the `.agents/rules/` directory.
+Workflow:
+  Step_1: Whenever the user asks to add or update a rule, FIRST write the full, verbose explanation and logic into `docs/master_rules_reference.md`.
+  Step_2: SECOND, strictly distill the rule into a highly compact, imperative constraint (using YAML or bullet points).
+  Step_3: THIRD, append ONLY the compacted version to either `00-generic-common.md` (if broad) or `01-workspace-specific.md` (if domain-specific).
+```

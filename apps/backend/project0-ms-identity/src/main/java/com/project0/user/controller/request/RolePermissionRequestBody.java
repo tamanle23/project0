@@ -2,6 +2,7 @@ package com.project0.user.controller.request;
 
 import java.util.List;
 
+import com.project0.user.dto.CompositeRolePermission;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

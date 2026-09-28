@@ -5,10 +5,10 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.project0.user.controller.request.CompositeRolePermission;
+import com.project0.user.dto.CompositeRolePermission;
 import com.project0.user.controller.request.RoleSearchCondition;
 import com.project0.user.controller.request.RoleVm;
-import com.project0.user.controller.request.CompositeUserRole;
+import com.project0.user.dto.CompositeUserRole;
 import com.project0.user.repository.mybatis.model.RoleWithUserCount;
 
 @Mapper
