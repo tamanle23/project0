@@ -1,60 +1,17 @@
-# Implementation Plan - Application-Level Profile Context & ProfileSwitcher Refactoring
+# Architecture Blueprint: Frontend Architecture Standards
 
-Refactor [`profile-switcher.tsx`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/components/layout/profile-switcher.tsx) from isolated local component state (`useState`) to a global application-level context and state store (`ProfileProvider` / `useProfile`). This enables any screen, component, or layout across the console application to reference the active profile state and reactively reload/filter data when the profile changes.
+## 1. Design Strategy
+**Goal:** Guarantee strict architectural separation of concerns on the client side while establishing the mandatory 'Liquid Glass' UI visual identity.
 
-## User Review Required
+**Chosen Patterns & Rationale:**
+- **Facade Pattern:** Extracted network API calls and state management interactions (e.g., TanStack Query) into isolated, domain-specific hooks (`useRegisterUserFacade`). This ensures React view components remain pure and unaware of underlying transport mechanisms or caching strategies.
+- **Mediator Pattern:** By using TanStack's `useQueryClient` to invalidate queries automatically on mutation success, we avoid having the UI directly coordinate state updates across disparate components.
+- **Atomic Design (Liquid Glass):** Implemented foundational Liquid Glass components (`GlassCard`) in the shared `@project0/ui` workspace. Centralizing these tokens ensures multi-platform consistency and DRY compliance.
 
-> [!NOTE]
-> Currently, [`profile-switcher.tsx`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/components/layout/profile-switcher.tsx) holds `activeProfile` in local `React.useState`.
-> We will introduce a global `ProfileProvider` (persisted via cookie/localStorage for tab and refresh persistence) and a `useProfile()` hook. The active profile will be accessible throughout the component tree.
-> We will also wire an active profile badge/indicator into the [`Dashboard`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/features/dashboard/index.tsx) to verify and demonstrate screen-level reactivity.
+## 2. Architecture Structure
+- `packages/ui/src/components/glass/glass-card.tsx`: Shared UI library containing strict atomic elements adhering to the Liquid Glass design standards (multi-layer blurs, frosted scrims, specular borders).
+- `apps/console/src/features/users/api/useRegisterUserFacade.ts`: Domain-scoped facade hooking into the backend CQRS API via REST.
+- `apps/console/src/features/users/components/RegisterUserForm.tsx`: React UI component executing the facade hook, integrating the `GlassCard` and displaying the decoupled logic.
 
-## Proposed Changes
-
-### Console Application (`apps/console`)
-
-#### [NEW] [profile-provider.tsx](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/context/profile-provider.tsx)
-- Create `ProfileContext` and `ProfileProvider` following the pattern of `layout-provider.tsx` and `theme-provider.tsx`.
-- Define type `Profile` (`id`, `name`, `logo`, `plan`, extensible metadata).
-- Provide state:
-  - `currentProfile`: the currently active profile.
-  - `setCurrentProfile(profile)`: updates the active profile globally and persists selection to cookies/storage (`console_active_profile`).
-  - `profiles`: list of available profiles, initialized from `sidebarData.teams` or configurable props.
-  - `setProfiles(profiles)`: allows dynamic profile updates.
-- Export `useProfile()` hook with type-safety and context verification.
-
-#### [NEW] [profile-store.ts](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/stores/profile-store.ts)
-- Expose a companion Zustand store `useProfileStore` synchronized with `ProfileProvider` for non-React access (interceptor, utility, or router context access if required).
-
-#### [MODIFY] [profile-switcher.tsx](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/components/layout/profile-switcher.tsx)
-- Refactor `ProfileSwitcher` to consume `useProfile()`.
-- Use `currentProfile` and `setCurrentProfile` from context instead of local `useState`.
-- Retain optional `profiles` prop as an override or fallback to context `profiles`.
-- Maintain Liquid Glass styling on dropdown trigger and popover items.
-
-#### [MODIFY] [main.tsx](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/main.tsx)
-- Wrap `<ProfileProvider>` around `<RouterProvider>` in the root application provider tree alongside `ThemeProvider`, `FontProvider`, and `DirectionProvider`.
-
-#### [MODIFY] [dashboard/index.tsx](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/features/dashboard/index.tsx)
-- Connect `useProfile()` to display the active profile name and plan in the dashboard heading, verifying that switching profiles updates the screen view reactively.
-
----
-
-### App Documentation & Artifact History
-
-#### [NEW] [apps/console/doc/implementation_plan_06.md](file:///c:/Users/Admin/workspace/git/project0/apps/console/doc/implementation_plan_06.md)
-- Mirror of this implementation plan per monorepo artifact history rules.
-
-## Verification Plan
-
-### Automated Tests
-1. **TypeScript Typecheck**:
-   - Run `pnpm --filter @project0/console build:web` or `tsc -b` to verify types across all consumers.
-2. **ESLint Validation**:
-   - Run `pnpm --filter @project0/console lint` to ensure no linting regressions.
-
-### Manual / Visual Verification
-1. Open the console application.
-2. Switch between profiles (*Shadcn Admin*, *Acme Inc*, *Acme Corp.*) using `ProfileSwitcher` in the sidebar.
-3. Verify that the active profile updates in `ProfileSwitcher` and simultaneously reflects in the `Dashboard` screen.
-4. Refresh the page to verify that the selected profile persists across page reloads.
+## 3. Extensibility (OCP)
+The Facade approach strictly enforces the Open/Closed Principle. If the underlying data transport changes (e.g., moving from REST to GraphQL or WebSockets), only the Facade hook changes. The hundreds of view components consuming the hook require zero modification.

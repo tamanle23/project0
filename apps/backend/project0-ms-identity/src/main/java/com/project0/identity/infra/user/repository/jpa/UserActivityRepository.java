@@ -1,4 +1,4 @@
-package com.project0.user.repository.jpa;
+package com.project0.identity.infra.user.repository.jpa;
 
 import com.project0.user.model.UserActivity;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,4 +1,4 @@
-package com.project0.user.repository.jpa;
+package com.project0.identity.infra.user.repository.jpa;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;

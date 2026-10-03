@@ -10,9 +10,9 @@ import java.util.Optional;
 @Repository("domainUserRepositoryImpl")
 public class UserRepositoryImpl implements UserRepository {
 
-    private final com.project0.user.repository.jpa.UserRepository jpaRepository;
+    private final com.project0.identity.infra.user.repository.jpa.UserRepository jpaRepository;
 
-    public UserRepositoryImpl(com.project0.user.repository.jpa.UserRepository jpaRepository) {
+    public UserRepositoryImpl(com.project0.identity.infra.user.repository.jpa.UserRepository jpaRepository) {
         this.jpaRepository = jpaRepository;
     }
 

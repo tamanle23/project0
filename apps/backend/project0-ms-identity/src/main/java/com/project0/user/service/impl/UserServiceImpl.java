@@ -22,7 +22,7 @@ import com.project0.user.controller.request.*;
 import com.project0.user.controller.response.UserPermissionVm;
 import com.project0.user.model.*;
 import com.project0.user.model.enums.UserType;
-import com.project0.user.repository.jpa.*;
+import com.project0.identity.infra.user.repository.jpa.*;
 import com.project0.user.repository.mybatis.UserSearchRepository;
 import com.project0.workflow.RecordState;
 import org.apache.commons.collections.CollectionUtils;
@@ -79,7 +79,7 @@ public class UserServiceImpl extends BaseModelService<User, UserRepository> impl
   @Autowired
   UserMapper userMapper;
   @Inject
-  protected com.project0.user.repository.jpa.UserRepository userRepository;
+  protected com.project0.identity.infra.user.repository.jpa.UserRepository userRepository;
   @Inject
   protected RoleRepository roleRepository;
   @Inject
