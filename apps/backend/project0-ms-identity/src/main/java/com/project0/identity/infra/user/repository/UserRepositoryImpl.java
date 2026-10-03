@@ -2,6 +2,7 @@ package com.project0.identity.infra.user.repository;
 
 import com.project0.identity.domain.user.repository.UserRepository;
 import com.project0.user.model.User;
+import com.project0.user.model.enums.UserStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -27,9 +28,12 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findByEmail(String email) {
-        // Since there's no findByEmail in the original interface, we will skip it for this PoC
-        // or return empty if unsupported, but we will return empty here to compile.
-        return Optional.empty();
+        return Optional.empty(); // Still omitted from underlying JPA impl for now
+    }
+
+    @Override
+    public Optional<User> findByUserName(String userName) {
+        return Optional.ofNullable(jpaRepository.findByUserName(userName));
     }
 
     @Override
@@ -40,5 +44,14 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public boolean existsByUserName(String userName) {
         return jpaRepository.countByUserNameIgnoreCase(userName) > 0;
+    }
+
+    @Override
+    public void updateStatus(String userName, UserStatus status) {
+        if (status == UserStatus.ENABLED) {
+            jpaRepository.enableUser(userName);
+        } else if (status == UserStatus.DISABLED) {
+            jpaRepository.disableUser(userName);
+        }
     }
 }
