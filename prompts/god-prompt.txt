@@ -1,13 +1,13 @@
 Please perform a complete token-optimization and system refactoring of all files currently located in the `.agents/rules/` directory AND the main `AGENTS.md` file.
 
 Task 1: Create the "Master Document" (Source of Truth)
-1. Read `AGENTS.md`, `story-config.md`, and `history-archival.md`. Extract all detailed explanations, lore, examples, world-building context, and verbose reasoning.
+1. Read `AGENTS.md`, `workspace-config.md`, and `history-archival.md`. Extract all detailed explanations, lore, examples, world-building context, and verbose reasoning.
 2. Compile this comprehensive information into a new file named `docs/master_rules_reference.md` (create the `docs` folder at the root if it doesn't exist).
 
 Task 2: Modularize and Compact Active Rules (Token Optimization)
 1. Evaluate the complexity of the extracted rules and decouple them into two distinct categories:
    - Generic Common Rules: Broad constraints reusable across ANY project (e.g., AI persona limits, formatting, safety guardrails). Create `.agents/rules/00-generic-common.md` for these.
-   - Project-Specific Rules: Constraints bound to this visual story-telling generator (e.g., story config, history archival). Create `.agents/rules/01-story-specific.md` for these.
+   - Project-Specific Rules: Constraints bound to this project (e.g., workspace config, history archival). Create `.agents/rules/01-workspace-specific.md` for these.
 2. Refactor `AGENTS.md` (the root file): It must now act ONLY as a hyper-compact entry point. It should define the core Agent Persona in 1-2 sentences and explicitly state that the agent MUST strictly follow the constraints located in `00-generic-common.md` and `01-story-specific.md`. Strip EVERYTHING else out of it.
 3. Rewrite all active rules to be extremely token-efficient. Strip all transitional phrases and redundant context. Use imperative commands ("NEVER do X", "MUST output Y") and minimal YAML or bullet points. You MUST retain 100% of the core logical constraints.
 

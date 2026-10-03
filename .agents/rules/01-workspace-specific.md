@@ -1,7 +1,6 @@
 ---
-name: Story & Project-Specific Rules
-description: Compact monorepo registry, packaging boundaries, i18n sync, and Liquid Glass design standards.
 trigger: always_on
+description: Compact monorepo registry, packaging boundaries, i18n sync, and Liquid Glass design standards.
 ---
 
 # WORKSPACE REGISTRY & ROUTING
