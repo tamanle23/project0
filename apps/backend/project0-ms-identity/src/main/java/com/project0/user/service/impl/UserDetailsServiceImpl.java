@@ -6,8 +6,8 @@ import com.project0.service.authentication.UserDetailsImpl;
 import com.project0.user.model.UserPermission;
 import com.project0.user.model.UserRole;
 import com.project0.user.model.enums.UserStatus;
-import com.project0.user.repository.jpa.UserPermissionRepository;
-import com.project0.user.repository.jpa.UserRoleRepository;
+import com.project0.identity.infra.user.repository.jpa.UserPermissionRepository;
+import com.project0.identity.infra.user.repository.jpa.UserRoleRepository;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
   @Inject
-  protected com.project0.user.repository.jpa.UserRepository userRepository;
+  protected com.project0.identity.infra.user.repository.jpa.UserRepository userRepository;
 
   @Autowired
   UserPermissionRepository userPermissionRepository;

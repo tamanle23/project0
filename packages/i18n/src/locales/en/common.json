@@ -1,8 +1,8 @@
 {
   "save": "Save",
   "cancel": "Cancel",
-  "loading": "Loading...",
   "submit": "Submit",
-  "error": "An error occurred",
-  "update": "Update"
+  "loading": "Loading...",
+  "register": "Register",
+  "error": "An error occurred"
 }

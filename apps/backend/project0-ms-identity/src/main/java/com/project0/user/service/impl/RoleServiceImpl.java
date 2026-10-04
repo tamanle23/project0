@@ -25,11 +25,11 @@ import com.project0.user.model.Role;
 import com.project0.user.model.RolePermission;
 import com.project0.user.model.User;
 import com.project0.user.model.UserRole;
-import com.project0.user.repository.jpa.PermissionRepository;
-import com.project0.user.repository.jpa.RolePermissionRepository;
-import com.project0.user.repository.jpa.RoleRepository;
-import com.project0.user.repository.jpa.UserRepository;
-import com.project0.user.repository.jpa.UserRoleRepository;
+import com.project0.identity.infra.user.repository.jpa.PermissionRepository;
+import com.project0.identity.infra.user.repository.jpa.RolePermissionRepository;
+import com.project0.identity.infra.user.repository.jpa.RoleRepository;
+import com.project0.identity.infra.user.repository.jpa.UserRepository;
+import com.project0.identity.infra.user.repository.jpa.UserRoleRepository;
 import com.project0.user.repository.mybatis.model.RoleWithUserCount;
 import com.project0.user.service.RoleService;
 
