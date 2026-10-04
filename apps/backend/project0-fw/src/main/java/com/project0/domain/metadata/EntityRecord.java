@@ -1,0 +1,30 @@
+package com.project0.domain.metadata;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+import com.project0.domain.BaseModel;
+import jakarta.persistence.Convert;
+import java.util.Map;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "PROJECT0_ENTITIES")
+public class EntityRecord extends BaseModel {
+
+    @ManyToOne
+    @JoinColumn(name = "entity_type_id", nullable = false)
+    private EntityType entityType;
+
+    @Column(name = "tenant_id")
+    private String tenantId;
+
+    @Column(columnDefinition = "jsonb")
+    @Convert(converter = MapJsonConverter.class)
+    private Map<String, Object> attributes;
+}

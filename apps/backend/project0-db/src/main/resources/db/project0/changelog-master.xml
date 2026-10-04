@@ -9,5 +9,6 @@
   <property name="table_prefix" value="PROJECT0_"/>
 
   <include file="db/project0/changelog-000.000.00000.xml"/>
+  <include file="db/project0/changelog-000.000.00001.xml"/>
 
 </databaseChangeLog>
