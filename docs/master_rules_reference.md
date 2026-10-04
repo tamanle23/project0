@@ -164,3 +164,24 @@ Liquid Glass is the mandatory design standard for all UI clients across web, mob
   - `LinearGradient` from `expo-linear-gradient` for specular top sheen borders.
 - **Desktop (Electrobun)**:
   - Window transparency/vibrancy with CSS `backdrop-filter: blur(...)` across translucent titlebars and floating toolbars.
+
+---
+
+## 8. App UI/UX Design & Route Specification Foundation (Google Stitch Integration)
+
+### Core Directives
+To ensure visual consistency, architectural predictability, and seamless collaboration with generative design engines like **Google Stitch**, every frontend and mobile application in the monorepo (`apps/console`, `apps/mobile-ui`, `apps/tekgo-ui`, `apps/desktop-console`) maintains two living foundation files in its root directory:
+1. **`DESIGN.md` (Portable Design System & Google Stitch Context)**:
+   - Contains complete design tokens (colors, OKLCH scales, light/dark themes, Liquid Glass blur/specular values, typography hierarchy, radii, elevation).
+   - Specifies core component contracts (`GlassCard`, `GlassButton`, frosted headers, floating bars).
+   - Provides ready-to-use "Zoom-Out-Zoom-In" prompting blueprints specifically formatted for Google Stitch AI screen generation.
+2. **`ROUTE.md` (Screen Architecture & Navigation Matrix)**:
+   - Documents the routing engine (TanStack Router, React Navigation, Next.js App Router).
+   - Maps out the complete route matrix (path, file location, layout shell, auth guards, parameters).
+   - Provides detailed screen blueprints (components, state/store dependencies, interactive behaviors).
+   - Visualizes user journeys with Mermaid flowcharts.
+
+### Living Document Maintenance SOP
+- **Synchronous Updates**: Whenever an agent or engineer adds, modifies, or deletes a route, screen, or core visual component, they MUST update the corresponding `DESIGN.md` and `ROUTE.md` files in the app's directory.
+- **Design Token Synchronization**: Any token adjustments in CSS or TypeScript must be mirrored in `DESIGN.md` so that Google Stitch generations remain in lockstep with the running codebase.
+- **Google Stitch Workflow**: When requesting new screens or layouts from Google Stitch or AI coding assistants, feed `DESIGN.md` and `ROUTE.md` as contextual constraints to ensure pixel-perfect fidelity with the monorepo's Liquid Glass standard.

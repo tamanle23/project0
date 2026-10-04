@@ -39,3 +39,9 @@ description: Compact monorepo registry, packaging boundaries, i18n sync, and Liq
   - Web: Tailwind v4 glass cards (`backdrop-blur-xl bg-white/65 border border-white/30`), frosted sticky headers.
   - Mobile: Expo `BlurView` (`tint="systemMaterial"`, intensity 50-85) + `LinearGradient` specular sheens.
   - Desktop: Electrobun window vibrancy + CSS `backdrop-filter: blur(...)`.
+
+# UI/UX LIVING DESIGN & ROUTE SPECIFICATIONS (GOOGLE STITCH)
+- Files: Every frontend/mobile app (`console`, `mobile-ui`, `tekgo-ui`, `desktop-console`) MUST maintain `DESIGN.md` and `ROUTE.md` in its root folder.
+- DESIGN.md: Acts as portable Google Stitch design system context. MUST define OKLCH/hex color tokens, Liquid Glass blur/specular metrics, typography scale, component specs, and Stitch prompt templates.
+- ROUTE.md: MUST define routing engine, complete screen registry table, screen blueprints with state/store bindings, and user flow diagrams.
+- Synchronization: When routes, screens, or UI tokens are added/edited, MUST synchronously update `DESIGN.md` and `ROUTE.md`. NEVER leave them out of sync.
