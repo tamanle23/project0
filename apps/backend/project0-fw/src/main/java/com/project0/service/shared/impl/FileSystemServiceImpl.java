@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public class FileSystemServiceImpl implements FileSystemService {
@@ -35,7 +36,7 @@ public class FileSystemServiceImpl implements FileSystemService {
   String fileUploadPath;
 
   @Override
-  public ResponseWrapper<ContextHeader, List<Map>> upload(String uid, InputStream fileStream, String name, String fieldName, String contentType) throws JsonProcessingException {
+  public CompletableFuture<ResponseWrapper<ContextHeader, List<Map>>> upload(String uid, InputStream fileStream, String name, String fieldName, String contentType) throws JsonProcessingException {
     HttpHeaders requestHeaders = new HttpHeaders();
     requestHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
     requestHeaders.add("Accept", MediaType.APPLICATION_JSON.toString());
@@ -55,7 +56,14 @@ public class FileSystemServiceImpl implements FileSystemService {
     Map<String, String> uriVariables = new HashMap<>();
     uriVariables.put("uid", "null");
     uriVariables.put("overwrite", "overwrite");
-    String responseBodyStr = restTemplate.exchange(fileUploadPath, HttpMethod.POST, requestEntity, String.class, uriVariables).getBody();
-    return this.objectMapper.readValue(responseBodyStr, new TypeReference<ResponseWrapper<ContextHeader, List<Map>>>() {});
+
+    return CompletableFuture.supplyAsync(() -> {
+      String responseBodyStr = restTemplate.exchange(fileUploadPath, HttpMethod.POST, requestEntity, String.class, uriVariables).getBody();
+      try {
+        return this.objectMapper.readValue(responseBodyStr, new TypeReference<ResponseWrapper<ContextHeader, List<Map>>>() {});
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException("Failed to parse JSON response", e);
+      }
+    });
   }
 }
