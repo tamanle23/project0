@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="20261004-metadata-tables" author="jules">
+        <createTable tableName="PROJECT0_ENTITY_TYPES">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uid" type="VARCHAR(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="createdBy_uid" type="VARCHAR(255)"/>
+            <column name="createdDate" type="TIMESTAMP"/>
+            <column name="lastUpdatedBy_uid" type="VARCHAR(255)"/>
+            <column name="lastUpdatedDate" type="TIMESTAMP"/>
+            <column name="version" type="BIGINT"/>
+            <column name="deletedDate" type="TIMESTAMP"/>
+            <column name="mode" type="VARCHAR(50)"/>
+            <column name="state" type="VARCHAR(20)"/>
+
+            <column name="name" type="VARCHAR(100)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+        </createTable>
+
+        <createTable tableName="PROJECT0_ATTRIBUTE_DEFINITIONS">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uid" type="VARCHAR(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="createdBy_uid" type="VARCHAR(255)"/>
+            <column name="createdDate" type="TIMESTAMP"/>
+            <column name="lastUpdatedBy_uid" type="VARCHAR(255)"/>
+            <column name="lastUpdatedDate" type="TIMESTAMP"/>
+            <column name="version" type="BIGINT"/>
+            <column name="deletedDate" type="TIMESTAMP"/>
+            <column name="mode" type="VARCHAR(50)"/>
+            <column name="state" type="VARCHAR(20)"/>
+
+            <column name="entity_type_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_attr_def_entity_type" referencedTableName="PROJECT0_ENTITY_TYPES" referencedColumnNames="id"/>
+            </column>
+            <column name="field_key" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ui_component" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_type" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_required" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="options" type="TEXT"/>
+        </createTable>
+
+        <addUniqueConstraint tableName="PROJECT0_ATTRIBUTE_DEFINITIONS" columnNames="entity_type_id, field_key" constraintName="uc_attr_def_entity_field"/>
+
+        <createTable tableName="PROJECT0_ENTITIES">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uid" type="VARCHAR(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="createdBy_uid" type="VARCHAR(255)"/>
+            <column name="createdDate" type="TIMESTAMP"/>
+            <column name="lastUpdatedBy_uid" type="VARCHAR(255)"/>
+            <column name="lastUpdatedDate" type="TIMESTAMP"/>
+            <column name="version" type="BIGINT"/>
+            <column name="deletedDate" type="TIMESTAMP"/>
+            <column name="mode" type="VARCHAR(50)"/>
+            <column name="state" type="VARCHAR(20)"/>
+
+            <column name="entity_type_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_entity_entity_type" referencedTableName="PROJECT0_ENTITY_TYPES" referencedColumnNames="id"/>
+            </column>
+            <column name="attributes" type="TEXT"/>
+        </createTable>
+
+        <createTable tableName="PROJECT0_RELATIONSHIP_TYPES">
+            <column name="id" type="VARCHAR(50)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+        </createTable>
+
+        <createTable tableName="PROJECT0_ENTITY_RELATIONSHIPS">
+            <column name="source_entity_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_edge_source_entity" referencedTableName="PROJECT0_ENTITIES" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="target_entity_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_edge_target_entity" referencedTableName="PROJECT0_ENTITIES" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="relationship_type_id" type="VARCHAR(50)">
+                <constraints nullable="false" foreignKeyName="fk_edge_rel_type" referencedTableName="PROJECT0_RELATIONSHIP_TYPES" referencedColumnNames="id"/>
+            </column>
+            <column name="edge_metadata" type="TEXT"/>
+        </createTable>
+
+        <addPrimaryKey tableName="PROJECT0_ENTITY_RELATIONSHIPS" columnNames="source_entity_id, target_entity_id, relationship_type_id" constraintName="pk_entity_relationships"/>
+
+    </changeSet>
+
+</databaseChangeLog>
