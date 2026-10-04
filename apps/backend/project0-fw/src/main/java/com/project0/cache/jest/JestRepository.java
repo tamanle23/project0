@@ -426,22 +426,20 @@ public abstract class JestRepository<T, ID> implements EsRepository<T, ID> {
     if (batchSize <= 0) {
       throw new IllegalArgumentException("batchSize = " + batchSize);
     }
-    int i = 0;
-    List<Update> updateActions = new ArrayList<>();
+    List<Update> updateActions = new ArrayList<>(Math.min(objectsMap.size(), batchSize));
     for (Map.Entry<ID, T> keyValue : objectsMap.entrySet()) {
-      i++;
       updateActions.add(
           new Update.Builder(this.wrapPartialUpdate(keyValue.getValue()))
               .index(this.indexName)
               .type(this.typeName)
               .id(String.valueOf(keyValue.getKey()))
               .build());
-      if (i % batchSize == 0) {
+      if (updateActions.size() == batchSize) {
         flag = flag && executeUpdate(updateActions);
         updateActions.clear();
       }
     }
-    if (updateActions.size() > 0) {
+    if (!updateActions.isEmpty()) {
       flag = flag && executeUpdate(updateActions);
     }
     return flag;
