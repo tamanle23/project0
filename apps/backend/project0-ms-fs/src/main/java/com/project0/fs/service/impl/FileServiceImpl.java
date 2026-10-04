@@ -305,7 +305,7 @@ public class FileServiceImpl extends BaseModelService<FsObject, FsObjectReposito
       List<FsObject> fsObjects = this.fileRepository.findAllByUidIn(copyUids);
       StorageConnector storageConnector = storageServiceFactory.getConnector(FileConnector.DEFAULT_CONNECTOR);
       jpaHelpers.detach(fsObjects);
-      fsObjects.forEach(file -> {
+      fsObjects.parallelStream().forEach(file -> {
         file.setId(null);
         file.setParent(null);
         file.setChildren(null);
