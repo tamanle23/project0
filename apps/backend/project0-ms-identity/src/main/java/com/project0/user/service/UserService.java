@@ -21,6 +21,7 @@ import com.project0.user.model.RegistrationToken;
 import com.project0.user.model.User;
 import com.project0.user.model.UserProfile;
 
+@Deprecated
 public interface UserService<T extends User> extends CrudService<T>{
 
   public T findByIdAndUserType(Long accountId, UserType accountType);

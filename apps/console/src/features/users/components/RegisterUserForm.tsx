@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { GlassCard } from '@project0/ui'
-import { useRegisterUserFacade } from '../api/use-register-user-facade'
+import { useRegisterUserFacade } from '../api/useRegisterUserFacade'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
