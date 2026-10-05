@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
-import { useEntityTypes } from '../hooks/useMetadataApi';
-import { SchemaBuilder } from '../components/SchemaBuilder';
-import { EntityDataGrid } from '../components/EntityDataGrid';
+import { useEntityTypes } from '../../../hooks/useMetadataApi';
+import { SchemaBuilder } from '../../../components/SchemaBuilder';
+import { EntityDataGrid } from '../../../components/EntityDataGrid';
 
-export const Route = createFileRoute('/metadata')({
+export const Route = createFileRoute('/_authenticated/metadata/')({
   component: MetadataManagementPage,
 });
 
@@ -21,7 +21,7 @@ function MetadataManagementPage() {
       <div className="w-64 border-r bg-white p-4">
         <h2 className="text-lg font-bold mb-4">Entity Types</h2>
         <ul className="space-y-2">
-          {entityTypes?.map(type => (
+          {entityTypes?.map((type: any) => (
             <li
               key={type.id}
               onClick={() => setSelectedTypeId(type.id)}
