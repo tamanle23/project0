@@ -1,5 +1,7 @@
 package com.project0.presentation;
 
+import com.project0.core.io.Page;
+import com.project0.core.io.PageRequest;
 import com.project0.domain.metadata.EntityType;
 import com.project0.domain.metadata.AttributeDefinition;
 import com.project0.domain.metadata.EntityRecord;
@@ -8,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/metadata")
 @RequiredArgsConstructor
@@ -17,9 +17,16 @@ public class MetadataController {
 
     private final MetadataService metadataService;
 
+    private PageRequest populateDefaults(PageRequest pageRequest) {
+        if (pageRequest == null) pageRequest = new PageRequest();
+        if (pageRequest.getNumber() == null) pageRequest.setNumber(1);
+        if (pageRequest.getSize() <= 0) pageRequest.setSize(10);
+        return pageRequest;
+    }
+
     @GetMapping("/entity-types")
-    public ResponseEntity<List<EntityType>> getEntityTypes() {
-        return ResponseEntity.ok(metadataService.getEntityTypes());
+    public ResponseEntity<Page<EntityType>> getEntityTypes(@ModelAttribute PageRequest pageRequest) {
+        return ResponseEntity.ok(metadataService.getEntityTypes(populateDefaults(pageRequest)));
     }
 
     @PostMapping("/entity-types")
@@ -28,8 +35,8 @@ public class MetadataController {
     }
 
     @GetMapping("/entity-types/{id}/attributes")
-    public ResponseEntity<List<AttributeDefinition>> getAttributeDefinitions(@PathVariable Long id) {
-        return ResponseEntity.ok(metadataService.getAttributeDefinitions(id));
+    public ResponseEntity<Page<AttributeDefinition>> getAttributeDefinitions(@PathVariable Long id, @ModelAttribute PageRequest pageRequest) {
+        return ResponseEntity.ok(metadataService.getAttributeDefinitions(id, populateDefaults(pageRequest)));
     }
 
     @PostMapping("/entity-types/{id}/attributes")
@@ -38,8 +45,8 @@ public class MetadataController {
     }
 
     @GetMapping("/entity-types/{id}/records")
-    public ResponseEntity<List<EntityRecord>> getEntityRecords(@PathVariable Long id) {
-        return ResponseEntity.ok(metadataService.getEntityRecords(id));
+    public ResponseEntity<Page<EntityRecord>> getEntityRecords(@PathVariable Long id, @ModelAttribute PageRequest pageRequest) {
+        return ResponseEntity.ok(metadataService.getEntityRecords(id, populateDefaults(pageRequest)));
     }
 
     @PostMapping("/entity-types/{id}/records")

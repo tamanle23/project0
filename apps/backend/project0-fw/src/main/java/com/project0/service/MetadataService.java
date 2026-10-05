@@ -1,5 +1,7 @@
 package com.project0.service;
 
+import com.project0.core.io.Page;
+import com.project0.core.io.PageRequest;
 import com.project0.domain.metadata.AttributeDefinition;
 import com.project0.domain.metadata.AttributeDefinitionUpdatedEvent;
 import com.project0.domain.metadata.EntityRecord;
@@ -12,8 +14,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -24,9 +24,17 @@ public class MetadataService {
     private final EntityRecordRepository entityRecordRepository;
     private final SchemaValidationService schemaValidationService;
     private final ApplicationEventPublisher eventPublisher;
+    private final PageBuilder pageBuilder;
 
-    public List<EntityType> getEntityTypes() {
-        return entityTypeRepository.findAll();
+    private org.springframework.data.domain.PageRequest toSpringPageRequest(PageRequest request) {
+        int page = request.getNumber() != null ? request.getNumber() - 1 : 0;
+        int size = request.getSize() > 0 ? request.getSize() : 10;
+        return org.springframework.data.domain.PageRequest.of(page, size);
+    }
+
+    public Page<EntityType> getEntityTypes(PageRequest pageRequest) {
+        org.springframework.data.domain.Page<EntityType> springPage = entityTypeRepository.findAll(toSpringPageRequest(pageRequest));
+        return pageBuilder.build(pageRequest, springPage::getTotalElements, springPage::getContent);
     }
 
     @Transactional
@@ -34,8 +42,9 @@ public class MetadataService {
         return entityTypeRepository.save(entityType);
     }
 
-    public List<AttributeDefinition> getAttributeDefinitions(Long entityTypeId) {
-        return attributeDefinitionRepository.findByEntityTypeId(entityTypeId);
+    public Page<AttributeDefinition> getAttributeDefinitions(Long entityTypeId, PageRequest pageRequest) {
+        org.springframework.data.domain.Page<AttributeDefinition> springPage = attributeDefinitionRepository.findByEntityTypeId(entityTypeId, toSpringPageRequest(pageRequest));
+        return pageBuilder.build(pageRequest, springPage::getTotalElements, springPage::getContent);
     }
 
     @Transactional
@@ -50,8 +59,9 @@ public class MetadataService {
         return saved;
     }
 
-    public List<EntityRecord> getEntityRecords(Long entityTypeId) {
-        return entityRecordRepository.findByEntityTypeId(entityTypeId);
+    public Page<EntityRecord> getEntityRecords(Long entityTypeId, PageRequest pageRequest) {
+        org.springframework.data.domain.Page<EntityRecord> springPage = entityRecordRepository.findByEntityTypeId(entityTypeId, toSpringPageRequest(pageRequest));
+        return pageBuilder.build(pageRequest, springPage::getTotalElements, springPage::getContent);
     }
 
     @Transactional

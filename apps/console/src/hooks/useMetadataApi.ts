@@ -10,7 +10,7 @@ export const useEntityTypes = () => {
     queryKey: ['entity-types'],
     queryFn: async () => {
       const res = await api.get('/entity-types');
-      return res.data;
+      return res.data.content || [];
     },
   });
 };
@@ -20,7 +20,7 @@ export const useAttributeDefinitions = (entityTypeId: string) => {
     queryKey: ['attributes', entityTypeId],
     queryFn: async () => {
         const res = await api.get(`/entity-types/${entityTypeId}/attributes`);
-        return res.data;
+        return res.data.content || [];
     },
     enabled: !!entityTypeId,
   });
@@ -31,7 +31,7 @@ export const useEntityRecords = (entityTypeId: string) => {
     queryKey: ['entity-records', entityTypeId],
     queryFn: async () => {
         const res = await api.get(`/entity-types/${entityTypeId}/records`);
-        return res.data;
+        return res.data.content || [];
     },
     enabled: !!entityTypeId,
   });
