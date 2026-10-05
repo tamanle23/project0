@@ -12,6 +12,7 @@ import com.project0.repository.jpa.EntityTypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import com.project0.service.PageBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
