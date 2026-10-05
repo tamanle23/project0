@@ -3,4 +3,7 @@ export * from './api/metadata-api';
 export * from './store/use-metadata-ui-store';
 export * from './data/mock-metadata';
 export * from './data/field-types';
+export * from './data/schema-generator';
 export * from './components/schema-builder';
+export * from './components/dynamic-fields';
+export * from './components/data-explorer/record-editor-dialog';
