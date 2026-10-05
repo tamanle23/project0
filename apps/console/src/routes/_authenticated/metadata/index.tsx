@@ -4,6 +4,8 @@ import { useEntityTypes } from '../../../hooks/useMetadataApi';
 import { SchemaBuilder } from '../../../components/SchemaBuilder';
 import { EntityDataGrid } from '../../../components/EntityDataGrid';
 
+import type { EntityType } from '@/features/metadata';
+
 export const Route = createFileRoute('/_authenticated/metadata/')({
   component: MetadataManagementPage,
 });
@@ -21,11 +23,11 @@ function MetadataManagementPage() {
       <div className="w-64 border-r bg-white p-4">
         <h2 className="text-lg font-bold mb-4">Entity Types</h2>
         <ul className="space-y-2">
-          {entityTypes?.map((type: any) => (
+          {entityTypes?.map((type: EntityType) => (
             <li
               key={type.id}
-              onClick={() => setSelectedTypeId(type.id)}
-              className={`p-2 rounded cursor-pointer ${selectedTypeId === type.id ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100'}`}
+              onClick={() => setSelectedTypeId(String(type.id))}
+              className={`p-2 rounded cursor-pointer ${selectedTypeId === String(type.id) ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100'}`}
             >
               {type.name}
             </li>

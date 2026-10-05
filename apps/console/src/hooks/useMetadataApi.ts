@@ -1,38 +1,35 @@
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import {
+  useEntityTypes as useEntityTypesPage,
+  useAttributeDefinitions as useAttributeDefinitionsPage,
+  useEntityRecords as useEntityRecordsPage,
+} from '@/features/metadata';
 
-const api = axios.create({
-  baseURL: '/api/v1/metadata',
-});
+// Re-export modern metadata types and hooks
+export * from '@/features/metadata';
 
+/**
+ * Backward compatibility wrapper returning raw arrays for legacy components
+ */
 export const useEntityTypes = () => {
-  return useQuery({
-    queryKey: ['entity-types'],
-    queryFn: async () => {
-      const res = await api.get('/entity-types');
-      return res.data.content || [];
-    },
-  });
+  const query = useEntityTypesPage();
+  return {
+    ...query,
+    data: query.data?.content || [],
+  };
 };
 
-export const useAttributeDefinitions = (entityTypeId: string) => {
-  return useQuery({
-    queryKey: ['attributes', entityTypeId],
-    queryFn: async () => {
-        const res = await api.get(`/entity-types/${entityTypeId}/attributes`);
-        return res.data.content || [];
-    },
-    enabled: !!entityTypeId,
-  });
+export const useAttributeDefinitions = (entityTypeId: string | number) => {
+  const query = useAttributeDefinitionsPage(entityTypeId);
+  return {
+    ...query,
+    data: query.data?.content || [],
+  };
 };
 
-export const useEntityRecords = (entityTypeId: string) => {
-  return useQuery({
-    queryKey: ['entity-records', entityTypeId],
-    queryFn: async () => {
-        const res = await api.get(`/entity-types/${entityTypeId}/records`);
-        return res.data.content || [];
-    },
-    enabled: !!entityTypeId,
-  });
+export const useEntityRecords = (entityTypeId: string | number) => {
+  const query = useEntityRecordsPage(entityTypeId);
+  return {
+    ...query,
+    data: query.data?.content || [],
+  };
 };

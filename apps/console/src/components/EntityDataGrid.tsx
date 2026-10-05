@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useEntityRecords, useAttributeDefinitions } from '../hooks/useMetadataApi';
+import type { AttributeDefinition, EntityRecord } from '../features/metadata';
 import {
   createColumnHelper,
   flexRender,
@@ -11,25 +12,38 @@ interface Props {
   entityTypeId: string;
 }
 
+const columnHelper = createColumnHelper<EntityRecord>();
+
 export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
   const { data: records, isLoading: recordsLoading } = useEntityRecords(entityTypeId);
   const { data: schema, isLoading: schemaLoading } = useAttributeDefinitions(entityTypeId);
 
-  const columnHelper = createColumnHelper<any>();
-
   const columns = useMemo(() => {
     if (!schema) return [];
 
-    const dynamicCols = schema.map((attr: any) =>
-      columnHelper.accessor(`attributes.${attr.systemName}`, {
-        header: attr.name,
-        cell: info => info.getValue() || '-',
-      })
+    const dynamicCols = schema.map((attr: AttributeDefinition) =>
+      columnHelper.accessor(
+        (row) => (row.attributes?.[attr.systemName] as string | number | boolean | null | undefined),
+        {
+          id: attr.systemName,
+          header: attr.name,
+          cell: (info) => {
+            const val = info.getValue();
+            if (val === null || val === undefined || val === '') return '-';
+            if (typeof val === 'boolean') return val ? 'Yes' : 'No';
+            if (typeof val === 'object') return JSON.stringify(val);
+            return String(val);
+          },
+        }
+      )
     );
 
     return [
-      columnHelper.accessor('id', { header: 'ID', cell: info => info.getValue() }),
-      ...dynamicCols
+      columnHelper.accessor('id', {
+        header: 'ID',
+        cell: (info) => String(info.getValue()),
+      }),
+      ...dynamicCols,
     ];
   }, [schema]);
 
@@ -46,9 +60,9 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            {table.getHeaderGroups().map(headerGroup => (
+            {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="bg-white/50 border-b">
-                {headerGroup.headers.map(header => (
+                {headerGroup.headers.map((header) => (
                   <th key={header.id} className="p-3 font-semibold text-sm">
                     {header.isPlaceholder
                       ? null
@@ -62,9 +76,9 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map(row => (
+            {table.getRowModel().rows.map((row) => (
               <tr key={row.id} className="border-b hover:bg-white/40">
-                {row.getVisibleCells().map(cell => (
+                {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="p-3 text-sm">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>

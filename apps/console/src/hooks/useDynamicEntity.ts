@@ -1,21 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEntityRecords } from '@/features/metadata';
 
-// Mocked fetcher for demonstration.
-const fetchEntity = async (entityId: string) => {
+export const useDynamicEntity = (entityId: string, entityTypeId?: string) => {
+  const query = useEntityRecords(entityTypeId || '1');
+  const record = query.data?.content.find((r) => String(r.id) === String(entityId));
+
   return {
-    id: entityId,
-    entityTypeId: '123',
-    attributes: {
-      title: 'Sample Entity',
-      status: 'active'
-    }
+    ...query,
+    data: record,
   };
-};
-
-export const useDynamicEntity = (entityId: string) => {
-  return useQuery({
-    queryKey: ['entity', entityId],
-    queryFn: () => fetchEntity(entityId),
-    enabled: !!entityId,
-  });
 };

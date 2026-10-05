@@ -2,6 +2,8 @@ import React from 'react';
 import { useAttributeDefinitions } from '../hooks/useMetadataApi';
 import { Plus, Trash2 } from 'lucide-react';
 
+import type { AttributeDefinition } from '../features/metadata';
+
 interface Props {
   entityTypeId: string;
 }
@@ -25,7 +27,7 @@ export const SchemaBuilder: React.FC<Props> = ({ entityTypeId }) => {
           <div className="text-center text-gray-500 py-8">No fields defined yet.</div>
         ) : (
           <div className="space-y-2">
-            {attributes?.map((attr: any) => (
+            {attributes?.map((attr: AttributeDefinition) => (
               <div key={attr.id} className="flex items-center justify-between p-3 bg-white/50 rounded border">
                 <div>
                   <span className="font-medium">{attr.name}</span>

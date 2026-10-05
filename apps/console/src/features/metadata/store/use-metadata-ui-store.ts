@@ -1,0 +1,122 @@
+import { create } from 'zustand';
+import type {
+  AttributeDefinition,
+  EntityRecord,
+  EntityType,
+} from '../api/types';
+
+interface MetadataUiState {
+  // Navigation & selection
+  selectedEntityTypeId: string | null;
+  setSelectedEntityTypeId: (id: string | null) => void;
+  activeTab: 'schema' | 'data';
+  setActiveTab: (tab: 'schema' | 'data') => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+
+  // Entity Type Dialogs
+  isEntityTypeDialogOpen: boolean;
+  editingEntityType: EntityType | null;
+  openCreateEntityTypeDialog: () => void;
+  openEditEntityTypeDialog: (entityType: EntityType) => void;
+  closeEntityTypeDialog: () => void;
+
+  isEntityTypeDeleteDialogOpen: boolean;
+  deletingEntityType: EntityType | null;
+  openDeleteEntityTypeDialog: (entityType: EntityType) => void;
+  closeDeleteEntityTypeDialog: () => void;
+
+  // Attribute Definition Dialogs
+  isAttributeDialogOpen: boolean;
+  editingAttribute: AttributeDefinition | null;
+  openCreateAttributeDialog: () => void;
+  openEditAttributeDialog: (attribute: AttributeDefinition) => void;
+  closeAttributeDialog: () => void;
+
+  isAttributeDeleteDialogOpen: boolean;
+  deletingAttribute: AttributeDefinition | null;
+  openDeleteAttributeDialog: (attribute: AttributeDefinition) => void;
+  closeDeleteAttributeDialog: () => void;
+
+  // Record Editor Dialogs
+  isRecordEditorDialogOpen: boolean;
+  editingRecord: EntityRecord | null;
+  openCreateRecordDialog: () => void;
+  openEditRecordDialog: (record: EntityRecord) => void;
+  closeRecordEditorDialog: () => void;
+
+  isRecordDeleteDialogOpen: boolean;
+  deletingRecord: EntityRecord | null;
+  openDeleteRecordDialog: (record: EntityRecord) => void;
+  closeDeleteRecordDialog: () => void;
+
+  // Schema JSON Preview
+  isJsonSchemaPreviewOpen: boolean;
+  openJsonSchemaPreview: () => void;
+  closeJsonSchemaPreview: () => void;
+}
+
+export const useMetadataUiStore = create<MetadataUiState>((set) => ({
+  selectedEntityTypeId: '1',
+  setSelectedEntityTypeId: (id) => set({ selectedEntityTypeId: id }),
+  activeTab: 'schema',
+  setActiveTab: (tab) => set({ activeTab: tab }),
+  searchQuery: '',
+  setSearchQuery: (query) => set({ searchQuery: query }),
+
+  // Entity Type
+  isEntityTypeDialogOpen: false,
+  editingEntityType: null,
+  openCreateEntityTypeDialog: () =>
+    set({ isEntityTypeDialogOpen: true, editingEntityType: null }),
+  openEditEntityTypeDialog: (entityType) =>
+    set({ isEntityTypeDialogOpen: true, editingEntityType: entityType }),
+  closeEntityTypeDialog: () =>
+    set({ isEntityTypeDialogOpen: false, editingEntityType: null }),
+
+  isEntityTypeDeleteDialogOpen: false,
+  deletingEntityType: null,
+  openDeleteEntityTypeDialog: (entityType) =>
+    set({ isEntityTypeDeleteDialogOpen: true, deletingEntityType: entityType }),
+  closeDeleteEntityTypeDialog: () =>
+    set({ isEntityTypeDeleteDialogOpen: false, deletingEntityType: null }),
+
+  // Attribute
+  isAttributeDialogOpen: false,
+  editingAttribute: null,
+  openCreateAttributeDialog: () =>
+    set({ isAttributeDialogOpen: true, editingAttribute: null }),
+  openEditAttributeDialog: (attribute) =>
+    set({ isAttributeDialogOpen: true, editingAttribute: attribute }),
+  closeAttributeDialog: () =>
+    set({ isAttributeDialogOpen: false, editingAttribute: null }),
+
+  isAttributeDeleteDialogOpen: false,
+  deletingAttribute: null,
+  openDeleteAttributeDialog: (attribute) =>
+    set({ isAttributeDeleteDialogOpen: true, deletingAttribute: attribute }),
+  closeDeleteAttributeDialog: () =>
+    set({ isAttributeDeleteDialogOpen: false, deletingAttribute: null }),
+
+  // Record
+  isRecordEditorDialogOpen: false,
+  editingRecord: null,
+  openCreateRecordDialog: () =>
+    set({ isRecordEditorDialogOpen: true, editingRecord: null }),
+  openEditRecordDialog: (record) =>
+    set({ isRecordEditorDialogOpen: true, editingRecord: record }),
+  closeRecordEditorDialog: () =>
+    set({ isRecordEditorDialogOpen: false, editingRecord: null }),
+
+  isRecordDeleteDialogOpen: false,
+  deletingRecord: null,
+  openDeleteRecordDialog: (record) =>
+    set({ isRecordDeleteDialogOpen: true, deletingRecord: record }),
+  closeDeleteRecordDialog: () =>
+    set({ isRecordDeleteDialogOpen: false, deletingRecord: null }),
+
+  // JSON Schema Preview
+  isJsonSchemaPreviewOpen: false,
+  openJsonSchemaPreview: () => set({ isJsonSchemaPreviewOpen: true }),
+  closeJsonSchemaPreview: () => set({ isJsonSchemaPreviewOpen: false }),
+}));
