@@ -1,11 +1,11 @@
-# Walkthrough 52: Phase 1 - Metadata Foundation, Domain Types & Authenticated API Layer
+# Walkthrough 52: Metadata Modernization - Phases 1 & 2
 
 ## 1. Overview
-In Phase 1 of the Metadata Management modernization plan, we established the domain models, authenticated React Query API hooks with `springApiClient`, offline dev sandbox fallback, and a centralized Zustand state machine for the metadata module in `@project0/console`.
+This walkthrough records the implementations completed for Phase 1 (Metadata Foundation, Domain Types & Authenticated API Layer) and Phase 2 (Liquid Glass SchemaBuilder Redesign & Field Configurator) in `@project0/console`.
 
 ---
 
-## 2. Changes Made
+## 2. Phase 1 Summary: Foundation, Types & API Client
 
 ### 2.1 Metadata Domain Types & DTOs
 - Created [`apps/console/src/features/metadata/api/types.ts`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/features/metadata/api/types.ts):
@@ -32,15 +32,44 @@ In Phase 1 of the Metadata Management modernization plan, we established the dom
     - Entity Records: `useEntityRecords`, `useCreateEntityRecord`, `useUpdateEntityRecord`, `useDeleteEntityRecord`
   - Integrated graceful fallback to `mockMetadataStore` when the backend is unreachable.
 
-### 2.5 Modernized Barrel & Backward Compatibility
-- Created [`apps/console/src/features/metadata/index.ts`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/features/metadata/index.ts) exporting all domain contracts, hooks, and stores.
-- Updated [`apps/console/src/hooks/useMetadataApi.ts`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/hooks/useMetadataApi.ts) with backward-compatible adapters.
-- Connected [`apps/console/src/hooks/useDynamicSchema.ts`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/hooks/useDynamicSchema.ts) and [`apps/console/src/hooks/useDynamicEntity.ts`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/hooks/useDynamicEntity.ts) to the new API hooks.
-- Refactored legacy components ([`SchemaBuilder.tsx`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/components/SchemaBuilder.tsx), [`EntityDataGrid.tsx`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/components/EntityDataGrid.tsx), [`DynamicFieldRenderer.tsx`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/components/DynamicFieldRenderer.tsx), and [`routes/_authenticated/metadata/index.tsx`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/routes/_authenticated/metadata/index.tsx)) to eliminate `any` types.
+---
+
+## 3. Phase 2 Summary: Liquid Glass SchemaBuilder Redesign & Field Configurator
+
+### 3.1 Field Catalog & Metadata Registry
+- Created [`apps/console/src/features/metadata/data/field-types.ts`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/features/metadata/data/field-types.ts):
+  - Registered 9 rich UI component types (`text`, `textarea`, `number`, `switch`, `select`, `multiselect`, `datepicker`, `json_editor`, `relation_picker`).
+  - Specified compatible storage types, icon mappings, and option capabilities (`hasChoices`, `hasMinMax`, `hasPattern`, etc.).
+
+### 3.2 Liquid Glass Attribute Cards
+- Created [`apps/console/src/features/metadata/components/schema-builder/attribute-card.tsx`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/features/metadata/components/schema-builder/attribute-card.tsx):
+  - Optical translucency (`bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30`).
+  - Displays field icon, name, monospace systemName tag, `Required`/`Optional`/`Archived` status badges, data type pill, and options count.
+  - Quick action buttons: Edit, Duplicate, and Delete.
+
+### 3.3 Attribute Definition Dialog
+- Created [`apps/console/src/features/metadata/components/schema-builder/attribute-dialog.tsx`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/features/metadata/components/schema-builder/attribute-dialog.tsx):
+  - Multi-tab configuration modal (General & Types, Validation & Options).
+  - Auto-slugs display names into `system_name` convention.
+  - Dynamic option builders: choice tags for select/multiselect, min/max guards for numbers, placeholder, and regex pattern tester.
+  - Supports both create and edit flows with instant query invalidation.
+
+### 3.4 Attribute Deletion Guard
+- Created [`apps/console/src/features/metadata/components/schema-builder/attribute-delete-dialog.tsx`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/features/metadata/components/schema-builder/attribute-delete-dialog.tsx):
+  - Confirmation alert modal with warning on downstream entity record validation impacts.
+
+### 3.5 Live Draft-07 JSON Schema Inspector
+- Created [`apps/console/src/features/metadata/components/schema-builder/schema-json-preview.tsx`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/features/metadata/components/schema-builder/schema-json-preview.tsx):
+  - Compiles active attribute definitions into standard JSON Schema Draft-07 matching Spring Modulith's `SchemaValidationService.java`.
+  - Syntax highlighted container with one-click clipboard copy.
+
+### 3.6 Upgraded SchemaBuilder View & Legacy Forwarding
+- Created [`apps/console/src/features/metadata/components/schema-builder/schema-builder.tsx`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/features/metadata/components/schema-builder/schema-builder.tsx) with search filtering, empty states, and action bars.
+- Updated [`apps/console/src/components/SchemaBuilder.tsx`](file:///c:/Users/Admin/workspace/git/project0/apps/console/src/components/SchemaBuilder.tsx) to forward to the modern component.
 
 ---
 
-## 3. Verification Results
+## 4. Verification Results
 - **Typecheck & Web Build:**
   - Ran `pnpm --filter @project0/console build:web` (`tsc -b && vite build --mode web`).
-  - Result: Built successfully with exit code 0 in ~640ms.
+  - Result: Built successfully with exit code 0 in ~600ms with zero errors.
