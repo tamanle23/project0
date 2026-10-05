@@ -20,7 +20,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
   const columns = useMemo(() => {
     if (!schema) return [];
 
-    const dynamicCols = schema.map(attr =>
+    const dynamicCols = schema.map((attr: any) =>
       columnHelper.accessor(`attributes.${attr.systemName}`, {
         header: attr.name,
         cell: info => info.getValue() || '-',

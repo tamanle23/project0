@@ -1,27 +1,27 @@
 import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 
-// Simulated API calls for demonstration
-const mockApi = {
-  getEntityTypes: async () => [{ id: '1', name: 'Product', systemName: 'product' }],
-  getAttributes: async (_entityTypeId: string) => [
-    { id: '1', name: 'Title', systemName: 'title', uiComponent: 'text', isRequired: true }
-  ],
-  getRecords: async (_entityTypeId: string) => [
-    { id: '1', attributes: { title: 'Smartphone' } }
-  ]
-};
+const api = axios.create({
+  baseURL: '/api/v1/metadata',
+});
 
 export const useEntityTypes = () => {
   return useQuery({
     queryKey: ['entity-types'],
-    queryFn: mockApi.getEntityTypes,
+    queryFn: async () => {
+      const res = await api.get('/entity-types');
+      return res.data;
+    },
   });
 };
 
 export const useAttributeDefinitions = (entityTypeId: string) => {
   return useQuery({
     queryKey: ['attributes', entityTypeId],
-    queryFn: () => mockApi.getAttributes(entityTypeId),
+    queryFn: async () => {
+        const res = await api.get(`/entity-types/${entityTypeId}/attributes`);
+        return res.data;
+    },
     enabled: !!entityTypeId,
   });
 };
@@ -29,7 +29,10 @@ export const useAttributeDefinitions = (entityTypeId: string) => {
 export const useEntityRecords = (entityTypeId: string) => {
   return useQuery({
     queryKey: ['entity-records', entityTypeId],
-    queryFn: () => mockApi.getRecords(entityTypeId),
+    queryFn: async () => {
+        const res = await api.get(`/entity-types/${entityTypeId}/records`);
+        return res.data;
+    },
     enabled: !!entityTypeId,
   });
 };

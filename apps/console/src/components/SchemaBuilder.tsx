@@ -25,7 +25,7 @@ export const SchemaBuilder: React.FC<Props> = ({ entityTypeId }) => {
           <div className="text-center text-gray-500 py-8">No fields defined yet.</div>
         ) : (
           <div className="space-y-2">
-            {attributes?.map((attr) => (
+            {attributes?.map((attr: any) => (
               <div key={attr.id} className="flex items-center justify-between p-3 bg-white/50 rounded border">
                 <div>
                   <span className="font-medium">{attr.name}</span>
