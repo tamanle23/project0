@@ -41,7 +41,8 @@
       "notifications": "Thông báo",
       "display": "Hiển thị",
       "helpCenter": "Trung tâm trợ giúp",
-      "storage": "Nhà cung cấp lưu trữ"
+      "storage": "Nhà cung cấp lưu trữ",
+      "metadata": "Siêu dữ liệu"
     }
   },
   "auth": {
@@ -127,6 +128,14 @@
       "amazonS3": {
         "description": "Dịch vụ lưu trữ đối tượng tiêu chuẩn công nghiệp."
       }
+    }
+  },
+  "metadata": {
+    "title": "Quản lý Siêu dữ liệu",
+    "description": "Thiết kế lược đồ dữ liệu linh hoạt, thực thi quy tắc kiểm thực và quản lý bản ghi.",
+    "tabs": {
+      "schema": "Trình tạo Lược đồ",
+      "data": "Trình khám phá Dữ liệu"
     }
   }
 }

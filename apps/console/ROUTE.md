@@ -55,6 +55,7 @@ src/routes/
 | `/chats` | `_authenticated/chats/index.tsx` | Yes | Authenticated Shell | Direct and channel messaging with team members |
 | `/users` | `_authenticated/users/index.tsx` | Yes (Admin) | Authenticated Shell | User directory CRUD, role assignments, invite links |
 | `/storage` | `_authenticated/storage/index.tsx` | Yes (Admin) | Authenticated Shell | Configure S3/MinIO buckets, test connectivity, view usage |
+| `/metadata` | `_authenticated/metadata/index.tsx` | Yes (Admin) | Authenticated Shell | Enterprise schema builder, dynamic attribute configurator, data records explorer |
 | `/settings` | `_authenticated/settings/index.tsx` | Yes | Settings Layout | Manage account name, email, avatar, bio |
 | `/settings/appearance` | `_authenticated/settings/appearance.tsx`| Yes | Settings Layout | Switch theme (light/dark/system), adjust glass intensity |
 | `/settings/notifications`| `_authenticated/settings/notifications.tsx`| Yes | Settings Layout | Configure email, push, and webhook alerts |
@@ -110,6 +111,14 @@ src/routes/
   - `/settings/appearance`: Theme switcher (Light, Dark, System) and **Liquid Glass Intensity Slider** (`0.0` - `1.0`).
   - `/settings/notifications`: Toggle switches for email digests, incident webhooks, real-time sounds.
 
+### 3.8 Metadata Management (`/metadata`)
+- **Route:** `src/routes/_authenticated/metadata/index.tsx`
+- **Component Stack:** `MetadataFeature`, `EntityTypeSidebar`, `SchemaBuilder`, `EntityDataGrid`, `AttributeDialog`, `RecordEditorDialog`, `SchemaJsonPreview`.
+- **Layout:** Liquid Glass split-view (`lg:w-72` frosted entity model rail + flex-1 active model workspace).
+- **Glass Spec:** Multi-layer frosted translucent cards (`backdrop-blur-xl bg-white/45 dark:bg-slate-900/45 border border-white/30 dark:border-white/10 shadow-lg`), frosted tab triggers, and monospace key tags.
+- **State & Stores:** `useMetadataUiStore` tracks active entity selection, view tab (`schema` | `data`), search filter, and dialogs. TanStack Query caching backed by `springApiClient` with sandbox fallback.
+- **Features:** 9 UI component types, auto-slugging system keys, live Draft-07 JSON Schema compiler, dynamic Zod validation, record pagination and JSON export.
+
 ---
 
 ## 4. User Navigation Flow
@@ -129,10 +138,11 @@ flowchart TD
     F --> J["/chats (Team Messaging)"]
     F --> K["/users (Admin Directory)"]
     F --> L["/storage (Storage Config)"]
-    F --> M["/settings (Profile / Appearance / Alerts)"]
-    F --> N["/help-center (Support & Docs)"]
+    F --> M["/metadata (Metadata & Schemas)"]
+    F --> N["/settings (Profile / Appearance / Alerts)"]
+    F --> O["/help-center (Support & Docs)"]
 
-    M -->|Appearance| O["Tune Glass Translucency Slider"]
+    N -->|Appearance| P["Tune Glass Translucency Slider"]
 ```
 
 ---

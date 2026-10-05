@@ -41,7 +41,8 @@
       "notifications": "Notifications",
       "display": "Display",
       "helpCenter": "Help Center",
-      "storage": "Storage Providers"
+      "storage": "Storage Providers",
+      "metadata": "Metadata"
     }
   },
   "auth": {
@@ -127,6 +128,14 @@
       "amazonS3": {
         "description": "Industry standard object storage service."
       }
+    }
+  },
+  "metadata": {
+    "title": "Metadata Management",
+    "description": "Architect flexible data schemas, enforce dynamic validation rules, and manage records.",
+    "tabs": {
+      "schema": "Schema Builder",
+      "data": "Data Explorer"
     }
   }
 }

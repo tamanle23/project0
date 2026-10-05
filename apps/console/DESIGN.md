@@ -115,6 +115,12 @@ Google Stitch ingests these design tokens as prompt-level constraints when rende
 - **Glass Variant:** `bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/15 border border-white/30 dark:border-white/15 backdrop-blur-md shadow-sm active:scale-95`
 - **Destructive:** `bg-destructive/15 text-destructive hover:bg-destructive/25 border border-destructive/30`
 
+### 3.5 Metadata SchemaBuilder & Dynamic Data Explorer
+- **Entity Model Sidebar:** `w-full lg:w-72 bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-2xl shadow-lg` with active selection item `bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20`.
+- **Attribute Card:** `bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-white/50 transition-all` with monospace system key badges and icon container `bg-primary/10 text-primary border border-primary/20`.
+- **Dynamic Field Inputs:** `bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-white/20 focus:border-primary` with WCAG AA compliant contrast.
+- **Data Table Canvas:** Translucent table container `backdrop-blur-xl bg-white/45 dark:bg-slate-900/45 border border-white/30 dark:border-white/10 rounded-2xl shadow-lg` with sticky header `bg-white/60 dark:bg-slate-800/60` and hover rows `hover:bg-white/40 dark:hover:bg-white/5`.
+
 ---
 
 ## 4. Google Stitch Prompting Blueprint (Zoom-Out-Zoom-In)
