@@ -1,4 +1,5 @@
 import {
+  Settings2,
   Construction,
   LayoutDashboard,
   Bug,
@@ -92,6 +93,11 @@ export const useSidebarData = (): SidebarData => {
             title: t('sidebar.items.storage', 'Storage Providers'),
             url: '/storage',
             icon: Database,
+          },
+          {
+            title: t('sidebar.items.metadata', 'Metadata'),
+            url: '/metadata',
+            icon: Settings2,
           },
         ],
       },

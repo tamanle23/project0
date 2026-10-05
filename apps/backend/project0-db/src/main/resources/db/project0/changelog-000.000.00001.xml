@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="hybrid-metadata-schema-init" author="jules">
+        <!-- 1. Entity Types -->
+        <createTable tableName="PROJECT0_ENTITY_TYPES">
+            <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="uid" type="VARCHAR(255)"><constraints unique="true" nullable="false"/></column>
+            <column name="name" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="system_name" type="VARCHAR(255)"><constraints unique="true" nullable="false"/></column>
+            <column name="description" type="TEXT"/>
+
+            <column name="createdBy_uid" type="VARCHAR(255)"/>
+            <column name="createdDate" type="TIMESTAMP"/>
+            <column name="lastUpdatedBy_uid" type="VARCHAR(255)"/>
+            <column name="lastUpdatedDate" type="TIMESTAMP"/>
+            <column name="version" type="BIGINT"/>
+            <column name="deletedDate" type="TIMESTAMP"/>
+            <column name="mode" type="VARCHAR(50)"/>
+            <column name="state" type="VARCHAR(20)"/>
+        </createTable>
+
+        <!-- 2. Attribute Definitions -->
+        <createTable tableName="PROJECT0_ATTRIBUTE_DEFINITIONS">
+            <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="uid" type="VARCHAR(255)"><constraints unique="true" nullable="false"/></column>
+            <column name="entity_type_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_attr_def_entity_type" referencedTableName="PROJECT0_ENTITY_TYPES" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="system_name" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="data_type" type="VARCHAR(50)"><constraints nullable="false"/></column>
+            <column name="ui_component" type="VARCHAR(50)"><constraints nullable="false"/></column>
+            <column name="is_required" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="is_archived" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="options" type="JSONB"/>
+            <column name="default_value" type="VARCHAR(255)"/>
+
+            <column name="createdBy_uid" type="VARCHAR(255)"/>
+            <column name="createdDate" type="TIMESTAMP"/>
+            <column name="lastUpdatedBy_uid" type="VARCHAR(255)"/>
+            <column name="lastUpdatedDate" type="TIMESTAMP"/>
+            <column name="version" type="BIGINT"/>
+            <column name="deletedDate" type="TIMESTAMP"/>
+            <column name="mode" type="VARCHAR(50)"/>
+            <column name="state" type="VARCHAR(20)"/>
+        </createTable>
+
+        <!-- Add unique constraint on entity_type + system_name -->
+        <addUniqueConstraint tableName="PROJECT0_ATTRIBUTE_DEFINITIONS" columnNames="entity_type_id, system_name" constraintName="uk_attr_def_type_sysname"/>
+
+        <!-- 3. Entities (Records) -->
+        <createTable tableName="PROJECT0_ENTITIES">
+            <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="uid" type="VARCHAR(255)"><constraints unique="true" nullable="false"/></column>
+            <column name="entity_type_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_entity_entity_type" referencedTableName="PROJECT0_ENTITY_TYPES" referencedColumnNames="id"/>
+            </column>
+            <!-- Pattern A: Hard Foreign Key for Tenancy (Optional Example) -->
+            <column name="tenant_id" type="VARCHAR(255)"/>
+
+            <!-- Hybrid Payload -->
+            <column name="attributes" type="JSONB" defaultValue="{}"/>
+
+            <column name="createdBy_uid" type="VARCHAR(255)"/>
+            <column name="createdDate" type="TIMESTAMP"/>
+            <column name="lastUpdatedBy_uid" type="VARCHAR(255)"/>
+            <column name="lastUpdatedDate" type="TIMESTAMP"/>
+            <column name="version" type="BIGINT"/>
+            <column name="deletedDate" type="TIMESTAMP"/>
+            <column name="mode" type="VARCHAR(50)"/>
+            <column name="state" type="VARCHAR(20)"/>
+        </createTable>
+
+        <!-- 4. Relationship Types -->
+        <createTable tableName="PROJECT0_RELATIONSHIP_TYPES">
+            <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="uid" type="VARCHAR(255)"><constraints unique="true" nullable="false"/></column>
+            <column name="system_name" type="VARCHAR(255)"><constraints unique="true" nullable="false"/></column>
+            <column name="description" type="TEXT"/>
+
+            <column name="createdBy_uid" type="VARCHAR(255)"/>
+            <column name="createdDate" type="TIMESTAMP"/>
+            <column name="lastUpdatedBy_uid" type="VARCHAR(255)"/>
+            <column name="lastUpdatedDate" type="TIMESTAMP"/>
+            <column name="version" type="BIGINT"/>
+            <column name="deletedDate" type="TIMESTAMP"/>
+            <column name="mode" type="VARCHAR(50)"/>
+            <column name="state" type="VARCHAR(20)"/>
+        </createTable>
+
+        <!-- 5. Entity Relationships (Pattern C - Edge Table) -->
+        <createTable tableName="PROJECT0_ENTITY_RELATIONSHIPS">
+            <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="uid" type="VARCHAR(255)"><constraints unique="true" nullable="false"/></column>
+            <column name="source_entity_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_rel_source_entity" referencedTableName="PROJECT0_ENTITIES" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="target_entity_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_rel_target_entity" referencedTableName="PROJECT0_ENTITIES" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="relationship_type_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_rel_type" referencedTableName="PROJECT0_RELATIONSHIP_TYPES" referencedColumnNames="id"/>
+            </column>
+
+            <!-- Hybrid Edge Metadata Payload -->
+            <column name="edge_metadata" type="JSONB" defaultValue="{}"/>
+
+            <column name="createdBy_uid" type="VARCHAR(255)"/>
+            <column name="createdDate" type="TIMESTAMP"/>
+            <column name="lastUpdatedBy_uid" type="VARCHAR(255)"/>
+            <column name="lastUpdatedDate" type="TIMESTAMP"/>
+            <column name="version" type="BIGINT"/>
+            <column name="deletedDate" type="TIMESTAMP"/>
+            <column name="mode" type="VARCHAR(50)"/>
+            <column name="state" type="VARCHAR(20)"/>
+        </createTable>
+
+        <addUniqueConstraint tableName="PROJECT0_ENTITY_RELATIONSHIPS" columnNames="source_entity_id, target_entity_id, relationship_type_id" constraintName="uk_entity_rel_triplet"/>
+
+    </changeSet>
+
+</databaseChangeLog>
