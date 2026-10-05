@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 import { useTranslation } from 'react-i18next'
+import { useMemo } from 'react'
 
 export const sidebarTeams = [
   {
@@ -45,7 +46,7 @@ export const sidebarTeams = [
 export const useSidebarData = (): SidebarData => {
   const { t } = useTranslation('console');
 
-  return {
+  return useMemo(() => ({
     user: {
       name: 'satnaing',
       email: 'satnaingdev@gmail.com',
@@ -189,5 +190,5 @@ export const useSidebarData = (): SidebarData => {
         ],
       },
     ],
-  }
+  }), [t])
 }

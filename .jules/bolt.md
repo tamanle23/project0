@@ -1,0 +1,3 @@
+## 2024-05-18 - Prevent Unnecessary Re-Renders in `useSidebarData`
+**Learning:** `useSidebarData` in `apps/console` returned a completely new object containing deeply nested navigation arrays on every single render. Since this hook is called by primary layout components like `AppSidebar` and `CommandMenu`, it caused significant unnecessary re-renders across the main layout tree.
+**Action:** When creating custom hooks that return large configuration objects or arrays of UI items, always wrap the return value in `useMemo` (e.g., `useMemo(() => ({ ... }), [deps])`) to maintain referential equality across renders unless the dependencies change.
