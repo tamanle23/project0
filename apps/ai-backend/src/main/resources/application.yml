@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: ai-backend
+
+ai:
+  model:
+    qwen:
+      path: ${QWEN_MODEL_PATH:/models/qwen-2.5-coder-1.5b.gguf}
+    llama:
+      path: ${LLAMA_MODEL_PATH:/models/llama-3.2-1b-instruct.gguf}
+
+conductor:
+  server:
+    url: ${CONDUCTOR_SERVER_URL:http://localhost:8080/api}
+
+logging:
+  level:
+    root: INFO
+    com.acc.aibackend: DEBUG
