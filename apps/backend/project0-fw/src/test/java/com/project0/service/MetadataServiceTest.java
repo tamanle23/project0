@@ -22,6 +22,7 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -171,6 +172,103 @@ class MetadataServiceTest {
         assertEquals("tenant-1", result.tenantId());
         verify(schemaValidationService).validatePayload(typeId, attributes);
         verify(entityRecordRepository).save(any(EntityRecord.class));
+    }
+
+    @Test
+    void testCreateEntityRecord_AppliesAttributeDefaults() {
+        Long typeId = 1L;
+        EntityType type = new EntityType();
+        type.setId(typeId);
+
+        AttributeDefinition defStatus = new AttributeDefinition();
+        defStatus.setSystemName("status");
+        defStatus.setDataType("string");
+        defStatus.setDefaultValue("DRAFT");
+        defStatus.setIsArchived(false);
+
+        AttributeDefinition defCount = new AttributeDefinition();
+        defCount.setSystemName("count");
+        defCount.setDataType("integer");
+        defCount.setDefaultValue("10");
+        defCount.setIsArchived(false);
+
+        AttributeDefinition defArchived = new AttributeDefinition();
+        defArchived.setSystemName("old_prop");
+        defArchived.setDataType("string");
+        defArchived.setDefaultValue("OLD");
+        defArchived.setIsArchived(true);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(typeId)).thenReturn(Optional.of(type));
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(typeId))
+                .thenReturn(List.of(defStatus, defCount, defArchived));
+
+        Map<String, Object> inputAttributes = new HashMap<>();
+        inputAttributes.put("name", "Item");
+        CreateRecordRequest request = new CreateRecordRequest(inputAttributes, "tenant-1");
+
+        when(entityRecordRepository.save(any(EntityRecord.class))).thenAnswer(i -> {
+            EntityRecord r = i.getArgument(0);
+            r.setId(101L);
+            return r;
+        });
+
+        EntityRecordResponse response = metadataService.createEntityRecord(typeId, request);
+
+        assertNotNull(response);
+        assertEquals("DRAFT", response.attributes().get("status"));
+        assertEquals(10L, response.attributes().get("count"));
+        assertNull(response.attributes().get("old_prop"));
+        assertEquals("Item", response.attributes().get("name"));
+    }
+
+    @Test
+    void testGetEntityRecords_WithFiltersAndTenant() {
+        Long typeId = 1L;
+        EntityType type = new EntityType();
+        type.setId(typeId);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(typeId)).thenReturn(Optional.of(type));
+
+        AttributeDefinition defEmail = new AttributeDefinition();
+        defEmail.setSystemName("email");
+        defEmail.setDataType("string");
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(typeId))
+                .thenReturn(List.of(defEmail));
+
+        EntityRecord record = new EntityRecord();
+        record.setId(100L);
+        record.setEntityType(type);
+        record.setAttributes(Map.of("email", "john@example.com"));
+
+        org.springframework.data.domain.Page<EntityRecord> springPage = new org.springframework.data.domain.PageImpl<>(
+                List.of(record),
+                org.springframework.data.domain.PageRequest.of(0, 10),
+                1
+        );
+        when(entityRecordRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(springPage);
+
+        PageRequest pageRequest = new PageRequest();
+        pageRequest.setNumber(1);
+        pageRequest.setSize(10);
+
+        when(pageBuilder.build(eq(pageRequest), any(), any())).thenReturn(customPageMock);
+
+        Map<String, Map<String, String>> filterParams = Map.of("email", Map.of("contains", "john"));
+
+        Page<EntityRecordResponse> result = metadataService.getEntityRecords(
+                typeId,
+                pageRequest,
+                filterParams,
+                "createdDate",
+                "desc",
+                "tenant-1"
+        );
+
+        assertNotNull(result);
+        assertSame(customPageMock, result);
+        verify(entityRecordRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
+        verify(pageBuilder).build(eq(pageRequest), any(), any());
     }
 
     @Test

@@ -317,16 +317,78 @@ public class MetadataService {
     // 3. Entity Record Lifecycle
     // ==========================================
 
-    public Page<EntityRecordResponse> getEntityRecords(Long entityTypeId, PageRequest pageRequest) {
+    private Map<String, Object> applyAttributeDefaults(Long entityTypeId, Map<String, Object> attributes) {
+        Map<String, Object> result = new HashMap<>();
+        List<AttributeDefinition> definitions = attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId);
+        
+        for (AttributeDefinition def : definitions) {
+            if (Boolean.TRUE.equals(def.getIsArchived())) continue;
+            if (def.getDefaultValue() != null && !def.getDefaultValue().isBlank()) {
+                String type = def.getDataType() != null ? def.getDataType().trim().toLowerCase() : "string";
+                try {
+                    switch (type) {
+                        case "boolean" -> result.put(def.getSystemName(), Boolean.parseBoolean(def.getDefaultValue()));
+                        case "integer" -> result.put(def.getSystemName(), Long.parseLong(def.getDefaultValue().trim()));
+                        case "number" -> result.put(def.getSystemName(), Double.parseDouble(def.getDefaultValue().trim()));
+                        default -> result.put(def.getSystemName(), def.getDefaultValue());
+                    }
+                } catch (Exception ignored) {
+                    result.put(def.getSystemName(), def.getDefaultValue());
+                }
+            }
+        }
+        
+        if (attributes != null) {
+            result.putAll(attributes);
+        }
+        return result;
+    }
+
+    public Page<EntityRecordResponse> getEntityRecords(
+            Long entityTypeId,
+            PageRequest pageRequest,
+            Map<String, Map<String, String>> filterParams,
+            String sortProperty,
+            String sortDirection,
+            String tenantId) {
         if (!entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId).isPresent()) {
             throw new MetadataNotFoundException("EntityType not found with id: " + entityTypeId);
         }
-        org.springframework.data.domain.Page<EntityRecord> springPage = entityRecordRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId, toSpringPageRequest(pageRequest));
+
+        List<AttributeDefinition> definitions = attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId);
+        Map<String, AttributeDefinition> activeAttributes = definitions.stream()
+                .filter(d -> !Boolean.TRUE.equals(d.getIsArchived()))
+                .collect(Collectors.toMap(AttributeDefinition::getSystemName, d -> d, (a, b) -> a));
+
+        org.springframework.data.domain.Pageable pageable = toSpringPageRequest(pageRequest);
+        if (sortProperty != null && !sortProperty.isBlank()) {
+            org.springframework.data.domain.Sort.Direction direction = "desc".equalsIgnoreCase(sortDirection) 
+                    ? org.springframework.data.domain.Sort.Direction.DESC 
+                    : org.springframework.data.domain.Sort.Direction.ASC;
+
+            // Whitelist sort fields
+            if ("id".equalsIgnoreCase(sortProperty) || "createdDate".equalsIgnoreCase(sortProperty) || "lastUpdatedDate".equalsIgnoreCase(sortProperty)) {
+                pageable = org.springframework.data.domain.PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), org.springframework.data.domain.Sort.by(direction, sortProperty));
+            }
+        }
+
+        org.springframework.data.jpa.domain.Specification<EntityRecord> spec = EntityRecordSpecifications.withFilters(
+                entityTypeId,
+                tenantId,
+                filterParams,
+                activeAttributes
+        );
+
+        org.springframework.data.domain.Page<EntityRecord> springPage = entityRecordRepository.findAll(spec, pageable);
         return pageBuilder.build(
                 pageRequest,
                 springPage::getTotalElements,
                 () -> springPage.getContent().stream().map(MetadataDtoMapper::toResponse).collect(Collectors.toList())
         );
+    }
+
+    public Page<EntityRecordResponse> getEntityRecords(Long entityTypeId, PageRequest pageRequest) {
+        return getEntityRecords(entityTypeId, pageRequest, null, null, null, null);
     }
 
     public EntityRecordResponse getEntityRecord(Long entityTypeId, Long recordId) {
@@ -343,11 +405,11 @@ public class MetadataService {
         EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId)
                 .orElseThrow(() -> new MetadataNotFoundException("EntityType not found with id: " + entityTypeId));
 
-        if (request.attributes() != null) {
-            schemaValidationService.validatePayload(entityTypeId, request.attributes());
-        }
+        Map<String, Object> finalAttributes = applyAttributeDefaults(entityTypeId, request.attributes());
+        schemaValidationService.validatePayload(entityTypeId, finalAttributes);
 
-        EntityRecord record = MetadataDtoMapper.toEntity(request, entityType);
+        CreateRecordRequest finalRequest = new CreateRecordRequest(finalAttributes, request.tenantId());
+        EntityRecord record = MetadataDtoMapper.toEntity(finalRequest, entityType);
         record.setSchemaVersion(entityType.getSchemaVersion() != null ? entityType.getSchemaVersion() : 1L);
         EntityRecord saved = entityRecordRepository.save(record);
         return MetadataDtoMapper.toResponse(saved);
@@ -367,11 +429,10 @@ public class MetadataService {
                     + record.getVersion() + ", actual: " + request.version() + ")");
         }
 
-        if (request.attributes() != null) {
-            schemaValidationService.validatePayload(entityTypeId, request.attributes());
-        }
+        Map<String, Object> finalAttributes = applyAttributeDefaults(entityTypeId, request.attributes());
+        schemaValidationService.validatePayload(entityTypeId, finalAttributes);
 
-        record.setAttributes(request.attributes());
+        record.setAttributes(finalAttributes);
         record.setSchemaVersion(entityType.getSchemaVersion() != null ? entityType.getSchemaVersion() : 1L);
         EntityRecord saved = entityRecordRepository.save(record);
         return MetadataDtoMapper.toResponse(saved);

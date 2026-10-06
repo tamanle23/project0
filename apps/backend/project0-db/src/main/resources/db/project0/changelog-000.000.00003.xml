@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="hybrid-metadata-performance-indexes-03" author="antigravity">
+        <!-- 1. Filter performance index on PROJECT0_ENTITIES (entity_type_id, tenant_id) where deletedDate is null -->
+        <sql dbms="postgresql">
+            CREATE INDEX IF NOT EXISTS idx_entities_type_tenant_active 
+            ON PROJECT0_ENTITIES (entity_type_id, tenant_id) 
+            WHERE "deletedDate" IS NULL;
+        </sql>
+
+        <!-- 2. GIN jsonb_path_ops index on attributes JSONB column for high performance JSON path queries -->
+        <sql dbms="postgresql">
+            CREATE INDEX IF NOT EXISTS idx_entities_attributes_gin 
+            ON PROJECT0_ENTITIES USING GIN (attributes jsonb_path_ops);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

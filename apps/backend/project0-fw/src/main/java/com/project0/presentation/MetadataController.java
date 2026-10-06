@@ -8,6 +8,7 @@ import com.project0.fw.ResponseEntityBuilder;
 import com.project0.presentation.dto.metadata.*;
 import com.project0.service.MetadataService;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -150,8 +151,48 @@ public class MetadataController {
     @PreAuthorize("hasAuthority('METADATA_RECORD_READ') or hasAuthority('METADATA_RECORD_WRITE') or hasRole('ADMIN')")
     public ResponseEntity<ResponseWrapper<ContextHeader, Page<EntityRecordResponse>>> getEntityRecords(
             @PathVariable Long id,
-            @ModelAttribute PageRequest pageRequest) {
-        Page<EntityRecordResponse> page = metadataService.getEntityRecords(id, populateDefaults(pageRequest));
+            @ModelAttribute PageRequest pageRequest,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) String tenantId,
+            @RequestParam Map<String, String> allParams) {
+
+        // Parse filter[attr][op]=val or filter[attr]=val
+        java.util.Map<String, java.util.Map<String, String>> filterParams = new java.util.HashMap<>();
+        for (java.util.Map.Entry<String, String> entry : allParams.entrySet()) {
+            String key = entry.getKey();
+            if (key.startsWith("filter[") && key.endsWith("]")) {
+                String inner = key.substring(7, key.length() - 1);
+                if (inner.contains("][")) {
+                    String[] parts = inner.split("\\]\\[");
+                    String attr = parts[0];
+                    String op = parts[1];
+                    filterParams.computeIfAbsent(attr, k -> new java.util.HashMap<>()).put(op, entry.getValue());
+                } else {
+                    filterParams.computeIfAbsent(inner, k -> new java.util.HashMap<>()).put("eq", entry.getValue());
+                }
+            }
+        }
+
+        String sortProperty = null;
+        String sortDirection = "asc";
+        if (sort != null && !sort.isBlank()) {
+            if (sort.contains(",")) {
+                String[] parts = sort.split(",");
+                sortProperty = parts[0].trim();
+                sortDirection = parts[1].trim();
+            } else {
+                sortProperty = sort.trim();
+            }
+        }
+
+        Page<EntityRecordResponse> page = metadataService.getEntityRecords(
+                id,
+                populateDefaults(pageRequest),
+                filterParams,
+                sortProperty,
+                sortDirection,
+                tenantId
+        );
         return responseBuilder.success(page);
     }
 

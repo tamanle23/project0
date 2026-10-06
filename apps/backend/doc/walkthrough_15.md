@@ -69,6 +69,20 @@ In Phase 0, 1, 2, and 3, we investigated and resolved core security, data contra
 - [`MetadataService.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/service/MetadataService.java): Added `getCompiledSchema(id)` method.
 - [`MetadataController.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/presentation/MetadataController.java): Exposed `GET /api/v1/metadata/entity-types/{id}/schema`.
 
+### Query, Filtering & Server-Side Defaults (`project0-fw` & `project0-db`)
+- [`changelog-000.000.00003.xml`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-db/src/main/resources/db/project0/changelog-000.000.00003.xml):
+  - Added partial index `idx_entities_type_tenant_active` ON `PROJECT0_ENTITIES (entity_type_id, tenant_id) WHERE "deletedDate" IS NULL`.
+  - Added GIN index `idx_entities_attributes_gin` ON `PROJECT0_ENTITIES USING GIN (attributes jsonb_path_ops)`.
+- [`EntityRecordSpecifications.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/service/EntityRecordSpecifications.java):
+  - Dynamic JPA Criteria Specification using `cb.function("jsonb_extract_path_text", ...)` for whitelisted active attributes.
+  - Supports operators: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `contains`, `in` (with numeric cast for number/integer types).
+  - Handles soft-delete condition and multi-tenancy filtering (`tenantId`).
+- [`MetadataService.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/service/MetadataService.java):
+  - `applyAttributeDefaults`: Automatically populates missing attribute values with active attribute defaults on record creation and updates.
+  - `getEntityRecords(...)`: Overload accepting `filterParams`, `sortProperty`, `sortDirection`, and `tenantId` running via Spring Data `JpaSpecificationExecutor`.
+- [`MetadataController.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/presentation/MetadataController.java):
+  - `GET /api/v1/metadata/entity-types/{id}/records`: Parses `filter[<attr>][<op>]=<val>`, `filter[<attr>]=<val>`, `sort=<prop>,<dir>`, and `tenantId`.
+
 ---
 
 ## 3. Verification & Tests
@@ -79,9 +93,10 @@ In Phase 0, 1, 2, and 3, we investigated and resolved core security, data contra
   - `SchemaCompilerTest`: Verified all 9 UI components, constraints, format, enum choices, defaults, and archived exclusion.
   - `SchemaValidationServiceTest`: Verified L1 memory cache, L2 Redis versioned caching, validation failure extraction, boolean switch, and `additionalProperties: false`.
   - `MetadataCacheListenerTest`: Verified L1 and L2 cache eviction.
-  - `MetadataServiceTest`: 20 unit tests verifying EntityType CRUD, `getCompiledSchema`, AttributeDefinition lifecycle, EntityRecord CRUD, delete guards, and versioning.
-  - `MetadataControllerTest`: 17 controller slice tests verifying routing and envelope wrapping.
+  - `MetadataServiceTest`: 22 unit tests verifying EntityType CRUD, `getCompiledSchema`, AttributeDefinition lifecycle, EntityRecord CRUD, delete guards, versioning, default value injection, and specification filtering.
+  - `MetadataControllerTest`: 18 controller slice tests verifying routing, envelope wrapping, and filter/sort query parameters.
 - **Maven Reactor Execution**:
-  - `node mvnw.cjs test -pl :project0-fw`: 57 tests passed (0 failures, 0 errors).
+  - `node mvnw.cjs test -pl :project0-fw`: 60 tests passed (0 failures, 0 errors).
   - `node mvnw.cjs test`: 100% passed across all 10 monorepo reactor modules.
+
 

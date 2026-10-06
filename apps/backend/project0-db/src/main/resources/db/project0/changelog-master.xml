@@ -11,5 +11,6 @@
   <include file="db/project0/changelog-000.000.00000.xml"/>
   <include file="db/project0/changelog-000.000.00001.xml"/>
   <include file="db/project0/changelog-000.000.00002.xml"/>
+  <include file="db/project0/changelog-000.000.00003.xml"/>
 
 </databaseChangeLog>

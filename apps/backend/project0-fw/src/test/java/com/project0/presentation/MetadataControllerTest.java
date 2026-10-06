@@ -19,11 +19,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -251,5 +253,49 @@ class MetadataControllerTest {
         ResponseEntity<ResponseWrapper<ContextHeader, Void>> response = metadataController.deleteEntityRecord(1L, 100L);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(metadataService).deleteEntityRecord(1L, 100L);
+    }
+
+    @Test
+    void testGetEntityRecords_WithFiltersAndSort() {
+        Long typeId = 1L;
+        PageRequest pageRequest = new PageRequest();
+        pageRequest.setNumber(1);
+        pageRequest.setSize(10);
+
+        Page<EntityRecordResponse> mockPage = new Page<>();
+        when(metadataService.getEntityRecords(eq(typeId), any(PageRequest.class), anyMap(), eq("createdDate"), eq("desc"), eq("t-1")))
+                .thenReturn(mockPage);
+
+        Map<String, String> allParams = new HashMap<>();
+        allParams.put("filter[status][eq]", "ACTIVE");
+        allParams.put("filter[name]", "Widget");
+        allParams.put("tenantId", "t-1");
+        allParams.put("sort", "createdDate,desc");
+
+        ResponseEntity<ResponseWrapper<ContextHeader, Page<EntityRecordResponse>>> response = metadataController.getEntityRecords(
+                typeId,
+                pageRequest,
+                "createdDate,desc",
+                "t-1",
+                allParams
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(mockPage, response.getBody().getBody());
+
+        ArgumentCaptor<Map<String, Map<String, String>>> filterCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(metadataService).getEntityRecords(
+                eq(typeId),
+                any(PageRequest.class),
+                filterCaptor.capture(),
+                eq("createdDate"),
+                eq("desc"),
+                eq("t-1")
+        );
+
+        Map<String, Map<String, String>> capturedFilters = filterCaptor.getValue();
+        assertEquals("ACTIVE", capturedFilters.get("status").get("eq"));
+        assertEquals("Widget", capturedFilters.get("name").get("eq"));
     }
 }
