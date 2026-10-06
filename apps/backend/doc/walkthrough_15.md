@@ -1,22 +1,29 @@
-# Walkthrough 15 - Phase 1: Backend Metadata Safety & Contract Hotfixes
+# Walkthrough 15 - Phase 0 & Phase 1: Backend Metadata Safety & Contract Hotfixes
 
 Scope: `@project0/backend` (`project0-fw`, `project0-core`, `project0-db`)
 
 ## 1. Overview & Objectives
 
-In Phase 1 of the Metadata hardening roadmap, we addressed critical security vulnerabilities and contract defects:
-1. **Mass Assignment & Entity Leaks (C1, H2)**: Introduced strict Java records / DTOs for request payloads and response envelopes. Banned binding JPA entities directly in `@RequestBody`.
-2. **Authorization (C2, D4)**: Secured all metadata management endpoints with `@PreAuthorize` using fine-grained authorities (`METADATA_SCHEMA_WRITE`, `METADATA_SCHEMA_READ`, `METADATA_RECORD_WRITE`, `METADATA_RECORD_READ`) and `ROLE_ADMIN`.
-3. **Soft-Delete Filtering (C6)**: Replaced unconstrained repository calls with soft-delete-aware queries (`findByIdAndDeletedDateIsNull`, `findByEntityTypeIdAndDeletedDateIsNull`, `findAllByDeletedDateIsNull`).
-4. **Error Handling & Envelope Standardization (H3, D2)**: Standardized response contracts on `ResponseEntity<ResponseWrapper<ContextHeader, T>>` via `ResponseEntityBuilder`. Introduced domain business exceptions (`MetadataNotFoundException`, `MetadataConflictException`, `SchemaValidationException`) with proper 4xx status mapping. Added Jakarta Bean validation error mapping in `GlobalExceptionHandler`.
-5. **Pagination Fix (H1)**: Fixed `PageBuilder` pagination calculations so `totalElements` is computed consistently across all pages, and `totalPages` calculation `(total + size - 1) / size` correctly handles exact multiples.
-6. **Schema Validation Hardening (C3, C5)**: Enhanced `SchemaValidationService` with component-to-type mapping (boolean switch, numbers, multiselect arrays, json objects), excluded archived fields, and added graceful fallback on Redis cache failure.
+In Phase 0 (Verification of Assumptions) and Phase 1 (Safety & Contract Hotfixes), we investigated and resolved core security, data contract, and persistence defects in the backend metadata module:
+
+1. **Phase 0 Verification & PostgreSQL JSONB Bug Fix (C7)**:
+   - Executed a real PostgreSQL smoke test via Testcontainers against `postgres:16-alpine`.
+   - **Confirmed C7**: PostgreSQL rejected `@Column(columnDefinition="jsonb")` + `AttributeConverter<Map, String>` with `PSQLException: ERROR: column "options" is of type jsonb but expression is of type character varying`.
+   - **Resolution**: Updated `AttributeDefinition` and `EntityRecord` to use `@JdbcTypeCode(SqlTypes.JSON)` for direct JSONB binding, and added the default no-arg constructor required by JPA converter specification.
+2. **Mass Assignment & Entity Leaks (C1, H2)**: Introduced strict Java records / DTOs for request payloads and response envelopes. Banned binding JPA entities directly in `@RequestBody`.
+3. **Authorization (C2, D4)**: Secured all metadata management endpoints with `@PreAuthorize` using fine-grained authorities (`METADATA_SCHEMA_WRITE`, `METADATA_SCHEMA_READ`, `METADATA_RECORD_WRITE`, `METADATA_RECORD_READ`) and `ROLE_ADMIN`.
+4. **Soft-Delete Filtering (C6)**: Replaced unconstrained repository calls with soft-delete-aware queries (`findByIdAndDeletedDateIsNull`, `findByEntityTypeIdAndDeletedDateIsNull`, `findAllByDeletedDateIsNull`).
+5. **Error Handling & Envelope Standardization (H3, D2)**: Standardized response contracts on `ResponseEntity<ResponseWrapper<ContextHeader, T>>` via `ResponseEntityBuilder`. Introduced domain business exceptions (`MetadataNotFoundException`, `MetadataConflictException`, `SchemaValidationException`) with proper 4xx status mapping. Added Jakarta Bean validation error mapping in `GlobalExceptionHandler`.
+6. **Pagination Fix (H1)**: Fixed `PageBuilder` pagination calculations so `totalElements` is computed consistently across all pages, and `totalPages` calculation `(total + size - 1) / size` correctly handles exact multiples.
+7. **Schema Validation Hardening (C3, C5)**: Enhanced `SchemaValidationService` with component-to-type mapping (boolean switch, numbers, multiselect arrays, json objects), excluded archived fields, and added graceful fallback on Redis cache failure.
 
 ---
 
 ## 2. Changes Implemented
 
 ### Domain & DTO Layer (`project0-fw`)
+- [`AttributeDefinition.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/domain/metadata/AttributeDefinition.java) & [`EntityRecord.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/domain/metadata/EntityRecord.java): Migrated `options` and `attributes` to `@JdbcTypeCode(SqlTypes.JSON)` for native PostgreSQL `jsonb` support.
+- [`MapJsonConverter.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/domain/metadata/MapJsonConverter.java): Added default constructor to satisfy JPA converter contract.
 - [`DataType.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/domain/metadata/DataType.java): Typed enum for metadata data types (`STRING`, `NUMBER`, `INTEGER`, `BOOLEAN`, `DATE`, `JSON`, `ARRAY`, `RELATION`).
 - [`UiComponent.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/domain/metadata/UiComponent.java): Typed enum for UI components (`TEXT`, `TEXTAREA`, `NUMBER`, `SWITCH`, `SELECT`, `MULTISELECT`, `DATEPICKER`, `JSON_EDITOR`, `RELATION_PICKER`).
 - [`CreateEntityTypeRequest.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/presentation/dto/metadata/CreateEntityTypeRequest.java) & [`UpdateEntityTypeRequest.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/presentation/dto/metadata/UpdateEntityTypeRequest.java): Request DTO records with Jakarta bean validation constraints.
@@ -44,6 +51,8 @@ In Phase 1 of the Metadata hardening roadmap, we addressed critical security vul
 
 ## 3. Verification & Tests
 
+- **PostgreSQL JSONB Integration Smoke Test**:
+  - [`MetadataPostgresJpaSmokeIT.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/test/java/com/project0/domain/metadata/MetadataPostgresJpaSmokeIT.java): Verified persisting and retrieving `EntityType`, `AttributeDefinition` (with `options` Map), and `EntityRecord` (with multi-typed JSON `attributes` Map) against real PostgreSQL database.
 - **Unit & Slice Tests**:
   - `MetadataDtoValidationTest`: Verified Bean Validation constraints and regular expressions.
   - `PageBuilderTest`: Verified pagination math and `totalElements` propagation across page 1 and page 2+.

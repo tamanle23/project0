@@ -1,5 +1,6 @@
 package com.project0.domain.metadata;
 
+import com.project0.domain.BaseModel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -7,8 +8,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import com.project0.domain.BaseModel;
-import jakarta.persistence.Convert;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.util.Map;
 
 @Getter
@@ -24,7 +26,7 @@ public class EntityRecord extends BaseModel {
     @Column(name = "tenant_id")
     private String tenantId;
 
-    @Column(columnDefinition = "jsonb")
-    @Convert(converter = MapJsonConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "attributes", columnDefinition = "jsonb")
     private Map<String, Object> attributes;
 }

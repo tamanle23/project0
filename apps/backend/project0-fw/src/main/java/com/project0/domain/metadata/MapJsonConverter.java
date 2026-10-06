@@ -1,6 +1,5 @@
 package com.project0.domain.metadata;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
@@ -15,8 +14,12 @@ public class MapJsonConverter implements AttributeConverter<Map<String, Object>,
 
     private final ObjectMapper objectMapper;
 
-    public MapJsonConverter(@Autowired ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public MapJsonConverter() {
+        this.objectMapper = new ObjectMapper();
+    }
+
+    public MapJsonConverter(@Autowired(required = false) ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper != null ? objectMapper : new ObjectMapper();
     }
 
     @Override

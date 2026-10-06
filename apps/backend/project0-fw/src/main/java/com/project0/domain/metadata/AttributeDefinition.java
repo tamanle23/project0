@@ -1,5 +1,6 @@
 package com.project0.domain.metadata;
 
+import com.project0.domain.BaseModel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -7,9 +8,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import com.project0.domain.BaseModel;
-import org.hibernate.annotations.Type;
-import jakarta.persistence.Convert;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.util.Map;
 
 @Getter
@@ -40,8 +41,8 @@ public class AttributeDefinition extends BaseModel {
     @Column(name = "is_archived")
     private Boolean isArchived = false;
 
-    @Column(columnDefinition = "jsonb")
-    @Convert(converter = MapJsonConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "options", columnDefinition = "jsonb")
     private Map<String, Object> options;
 
     @Column(name = "default_value")
