@@ -2,6 +2,9 @@ package com.acc.aibackend.worker;
 
 import com.acc.aibackend.domain.LayoutSpec;
 import com.acc.aibackend.inference.LayoutGenerationService;
+import com.acc.aibackend.pipeline.LayoutPipeline;
+import com.acc.aibackend.pipeline.LayoutValidationStage;
+import com.acc.aibackend.pipeline.MetadataEnrichmentStage;
 import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +32,12 @@ class LayoutWorkerAdapterTest {
                 "llama", llamaService
         );
 
-        workerAdapter = new LayoutWorkerAdapter(registry);
+        LayoutPipeline pipeline = new LayoutPipeline(List.of(
+                new LayoutValidationStage(),
+                new MetadataEnrichmentStage()
+        ));
+
+        workerAdapter = new LayoutWorkerAdapter(registry, pipeline);
     }
 
     private Task createTestTask(String theme, String modelPreference) {
@@ -64,6 +72,7 @@ class LayoutWorkerAdapterTest {
         assertNotNull(spec);
         assertEquals("qwen-123", spec.getLayoutId());
         assertEquals("dark", spec.getTheme());
+        assertNotNull(spec.getMetadata().get("processedAt"));
     }
 
     @Test
@@ -79,6 +88,7 @@ class LayoutWorkerAdapterTest {
         assertNotNull(spec);
         assertEquals("llama-456", spec.getLayoutId());
         assertEquals("light", spec.getTheme());
+        assertNotNull(spec.getMetadata().get("processedAt"));
     }
 
     @Test
@@ -105,7 +115,7 @@ class LayoutWorkerAdapterTest {
                 "qwen", failingService
         );
 
-        LayoutWorkerAdapter failingWorker = new LayoutWorkerAdapter(failingRegistry);
+        LayoutWorkerAdapter failingWorker = new LayoutWorkerAdapter(failingRegistry, null);
         Task task = createTestTask("cyberpunk", null);
 
         TaskResult result = failingWorker.execute(task);

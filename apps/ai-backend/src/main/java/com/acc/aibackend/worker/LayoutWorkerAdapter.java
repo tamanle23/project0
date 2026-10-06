@@ -2,6 +2,7 @@ package com.acc.aibackend.worker;
 
 import com.acc.aibackend.domain.LayoutSpec;
 import com.acc.aibackend.inference.LayoutGenerationService;
+import com.acc.aibackend.pipeline.LayoutPipeline;
 import com.netflix.conductor.client.worker.Worker;
 import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
@@ -14,11 +15,14 @@ import java.util.Map;
 public class LayoutWorkerAdapter implements Worker {
 
     private final Map<String, LayoutGenerationService> strategyRegistry;
+    private final LayoutPipeline layoutPipeline;
     private static final String DEFAULT_STRATEGY = "qwen";
 
     public LayoutWorkerAdapter(
-            @Qualifier("layoutStrategyRegistry") Map<String, LayoutGenerationService> strategyRegistry) {
+            @Qualifier("layoutStrategyRegistry") Map<String, LayoutGenerationService> strategyRegistry,
+            LayoutPipeline layoutPipeline) {
         this.strategyRegistry = strategyRegistry;
+        this.layoutPipeline = layoutPipeline;
     }
 
     @Override
@@ -48,10 +52,13 @@ public class LayoutWorkerAdapter implements Worker {
             }
 
             // 3. Execute Strategy
-            LayoutSpec layout = aiService.generateLayout(theme);
+            LayoutSpec rawLayout = aiService.generateLayout(theme);
 
-            // 4. Return Output
-            result.getOutputData().put("layoutSpec", layout);
+            // 4. Process layout through Pipeline
+            LayoutSpec processedLayout = layoutPipeline != null ? layoutPipeline.execute(rawLayout) : rawLayout;
+
+            // 5. Return Output
+            result.getOutputData().put("layoutSpec", processedLayout);
             result.getOutputData().put("executed_model", modelPreference);
             result.setStatus(TaskResult.Status.COMPLETED);
 
