@@ -178,11 +178,11 @@ Existing changeset `hybrid-metadata-schema-init` is **not edited**.
 | `PageBuilder` is shared by other modules | Fix behind unit tests; grep all callers before merging |
 | Scope creep on filtering | Whitelist operators (`eq, ne, gt, gte, lt, lte, in, contains`) in v1 |
 
-## 7. Open Decisions (need your input before Phase 1)
-- **D1:** Follow plan 14's Clean Architecture + CQRS layout for the new module, or a lighter Modulith module with services (recommended: lighter, faster to land; CQRS can be layered later)?
-- **D2:** Standardize responses on the existing `ResponseWrapper` envelope (console must adapt) or keep raw `Page`/DTO bodies and only fix errors?
-- **D3:** Is PostgreSQL the only supported datastore for this module (JSONB, GIN, partial indexes)? Recommended: yes, and drop MariaDB/HSQL profiles for it.
-- **D4:** Authority model: reuse `ROLE_ADMIN`/`ROLE_CREATOR`, or introduce fine-grained `METADATA_*` authorities?
+## 7. Finalized Decisions
+- **D1 (Architecture):** Lighter Modulith module with services (not heavy CQRS).
+- **D2 (Response Envelope):** Standardize responses on the existing `ResponseWrapper` envelope via `ResponseEntityBuilder` (`responseBuilder.success(...)`).
+- **D3 (Database Support):** PostgreSQL is the only supported datastore for metadata (JSONB, GIN, partial indexes).
+- **D4 (Authority Model):** Fine-grained `METADATA_*` authorities (`METADATA_SCHEMA_WRITE`, `METADATA_RECORD_WRITE`, `METADATA_RECORD_READ`, etc.) combined with `ROLE_ADMIN`.
 
 ## 8. Verification Plan
 - `pnpm --filter @project0/backend check-types` (compile incl. tests)

@@ -1,10 +1,9 @@
 package com.project0.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.project0.domain.metadata.AttributeDefinition;
 import com.project0.repository.jpa.AttributeDefinitionRepository;
+import com.project0.service.exception.SchemaValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,8 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,7 +47,7 @@ class SchemaValidationServiceTest {
     }
 
     @Test
-    void testValidatePayload_CacheHit_Success() throws Exception {
+    void testValidatePayload_CacheHit_Success() {
         Long entityTypeId = 1L;
         Map<String, Object> payload = new HashMap<>();
         payload.put("name", "Test Entity");
@@ -62,7 +61,7 @@ class SchemaValidationServiceTest {
     }
 
     @Test
-    void testValidatePayload_CacheMiss_CompilesAndSaves() throws Exception {
+    void testValidatePayload_CacheMiss_CompilesAndSaves() {
         Long entityTypeId = 1L;
         Map<String, Object> payload = new HashMap<>();
 
@@ -72,7 +71,7 @@ class SchemaValidationServiceTest {
         attr.setIsRequired(false);
 
         when(valueOperations.get("schema:1")).thenReturn(null);
-        when(attributeDefinitionRepository.findByEntityTypeId(entityTypeId)).thenReturn(Collections.singletonList(attr));
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId)).thenReturn(Collections.singletonList(attr));
 
         assertDoesNotThrow(() -> schemaValidationService.validatePayload(entityTypeId, payload));
 
@@ -88,9 +87,24 @@ class SchemaValidationServiceTest {
         String cachedSchema = "{\"$schema\": \"http://json-schema.org/draft-07/schema#\", \"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}";
         when(valueOperations.get("schema:1")).thenReturn(cachedSchema);
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-            () -> schemaValidationService.validatePayload(entityTypeId, payload));
+        SchemaValidationException ex = assertThrows(SchemaValidationException.class,
+                () -> schemaValidationService.validatePayload(entityTypeId, payload));
 
-        assertTrue(ex.getMessage().contains("Payload validation failed"));
+        assertTrue(ex.getErrors().get(0).getMessage().contains("Payload validation failed"));
+    }
+
+    @Test
+    void testValidatePayload_SupportsBooleanSwitch() {
+        Long entityTypeId = 2L;
+        AttributeDefinition attr = new AttributeDefinition();
+        attr.setSystemName("isActive");
+        attr.setUiComponent("switch");
+        attr.setIsRequired(true);
+
+        when(valueOperations.get("schema:2")).thenReturn(null);
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId)).thenReturn(Collections.singletonList(attr));
+
+        Map<String, Object> payload = Map.of("isActive", true);
+        assertDoesNotThrow(() -> schemaValidationService.validatePayload(entityTypeId, payload));
     }
 }

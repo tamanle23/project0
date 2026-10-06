@@ -55,6 +55,23 @@ public class GlobalExceptionHandler {
       return responseBuilder.error(Error.builder().code(ErrorCodes.NONE.name()).message(ex.getMessage()).build());
   }
 
+  @ExceptionHandler(value = { org.springframework.web.bind.MethodArgumentNotValidException.class })
+  protected ResponseEntity<ResponseWrapper<ContextHeader, Object>> handleMethodArgumentNotValidException(org.springframework.web.bind.MethodArgumentNotValidException ex) {
+    if (this.logger.isErrorEnabled()) {
+      this.logger.error("Validation error: ", ex);
+    }
+    java.util.List<Error> errors = ex.getBindingResult().getFieldErrors().stream()
+        .map(fieldError -> Error.builder()
+            .code(ErrorCodes.FAIL_VALIDATION.name())
+            .message(fieldError.getField() + ": " + fieldError.getDefaultMessage())
+            .build())
+        .collect(java.util.stream.Collectors.toList());
+    if (errors.isEmpty()) {
+      errors.add(Error.builder().code(ErrorCodes.FAIL_VALIDATION.name()).message(ex.getMessage()).build());
+    }
+    return responseBuilder.fail(HttpStatus.BAD_REQUEST, errors.toArray(new Error[0]));
+  }
+
   @ExceptionHandler(value = { HttpMessageConversionException.class})
   protected ResponseEntity<ResponseWrapper<ContextHeader, Object>> handleHttpMessageConversionException(RuntimeException ex) {
     if (this.logger.isErrorEnabled()) {

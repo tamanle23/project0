@@ -6,9 +6,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AttributeDefinitionRepository extends BaseRepository<AttributeDefinition> {
     Page<AttributeDefinition> findByEntityTypeId(Long entityTypeId, Pageable pageable);
     List<AttributeDefinition> findByEntityTypeId(Long entityTypeId);
+    Page<AttributeDefinition> findByEntityTypeIdAndDeletedDateIsNull(Long entityTypeId, Pageable pageable);
+    List<AttributeDefinition> findByEntityTypeIdAndDeletedDateIsNull(Long entityTypeId);
+    Optional<AttributeDefinition> findByIdAndDeletedDateIsNull(Long id);
+    boolean existsByEntityTypeIdAndSystemNameAndDeletedDateIsNull(Long entityTypeId, String systemName);
 }

@@ -9,6 +9,7 @@ import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
 import com.project0.domain.metadata.AttributeDefinition;
 import com.project0.repository.jpa.AttributeDefinitionRepository;
+import com.project0.service.exception.SchemaValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,35 +32,49 @@ public class SchemaValidationService {
 
     public void validatePayload(Long entityTypeId, Map<String, Object> payload) {
         String cacheKey = "schema:" + entityTypeId;
-        String schemaJson = redisTemplate.opsForValue().get(cacheKey);
+        String schemaJson = null;
+
+        try {
+            if (redisTemplate != null) {
+                schemaJson = redisTemplate.opsForValue().get(cacheKey);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to get schema from Redis cache for entityTypeId {}: {}", entityTypeId, e.getMessage());
+        }
 
         if (schemaJson == null) {
             schemaJson = compileSchema(entityTypeId);
-            redisTemplate.opsForValue().set(cacheKey, schemaJson);
+            try {
+                if (redisTemplate != null) {
+                    redisTemplate.opsForValue().set(cacheKey, schemaJson);
+                }
+            } catch (Exception e) {
+                log.warn("Failed to set schema in Redis cache for entityTypeId {}: {}", entityTypeId, e.getMessage());
+            }
         }
 
         try {
             JsonNode schemaNode = objectMapper.readTree(schemaJson);
             JsonSchema schema = schemaFactory.getSchema(schemaNode);
-            JsonNode payloadNode = objectMapper.valueToTree(payload);
+            JsonNode payloadNode = objectMapper.valueToTree(payload != null ? payload : Map.of());
 
             Set<ValidationMessage> validationResult = schema.validate(payloadNode);
             if (!validationResult.isEmpty()) {
                 String errors = validationResult.stream()
                         .map(ValidationMessage::getMessage)
                         .collect(Collectors.joining(", "));
-                throw new IllegalArgumentException("Payload validation failed: " + errors);
+                throw new SchemaValidationException("Payload validation failed: " + errors);
             }
-        } catch (IllegalArgumentException e) {
+        } catch (SchemaValidationException e) {
             throw e;
         } catch (Exception e) {
             log.error("Error validating payload against schema", e);
-            throw new RuntimeException("Validation error", e);
+            throw new SchemaValidationException("Validation error: " + e.getMessage());
         }
     }
 
-    private String compileSchema(Long entityTypeId) {
-        List<AttributeDefinition> attributes = attributeDefinitionRepository.findByEntityTypeId(entityTypeId);
+    public String compileSchema(Long entityTypeId) {
+        List<AttributeDefinition> attributes = attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId);
         ObjectNode root = objectMapper.createObjectNode();
         root.put("$schema", "http://json-schema.org/draft-07/schema#");
         root.put("type", "object");
@@ -67,15 +82,24 @@ public class SchemaValidationService {
         ObjectNode properties = objectMapper.createObjectNode();
 
         for (AttributeDefinition attr : attributes) {
-            ObjectNode prop = objectMapper.createObjectNode();
+            if (Boolean.TRUE.equals(attr.getIsArchived())) {
+                continue;
+            }
 
-            // Map simple data types (expand as needed)
-            if ("text".equals(attr.getUiComponent()) || "textarea".equals(attr.getUiComponent())) {
-                 prop.put("type", "string");
-            } else if ("number".equals(attr.getUiComponent())) {
-                 prop.put("type", "number");
+            ObjectNode prop = objectMapper.createObjectNode();
+            String uiComponent = attr.getUiComponent() != null ? attr.getUiComponent().toLowerCase() : "";
+            String dataType = attr.getDataType() != null ? attr.getDataType().toLowerCase() : "";
+
+            if ("switch".equals(uiComponent) || "boolean".equals(dataType)) {
+                prop.put("type", "boolean");
+            } else if ("number".equals(uiComponent) || "number".equals(dataType) || "integer".equals(dataType)) {
+                prop.put("type", "integer".equals(dataType) ? "integer" : "number");
+            } else if ("multiselect".equals(uiComponent) || "array".equals(dataType)) {
+                prop.put("type", "array");
+            } else if ("json_editor".equals(uiComponent) || "json".equals(dataType)) {
+                prop.put("type", "object");
             } else {
-                 prop.put("type", "string"); // Default fallback
+                prop.put("type", "string");
             }
 
             properties.set(attr.getSystemName(), prop);
@@ -83,9 +107,9 @@ public class SchemaValidationService {
 
         root.set("properties", properties);
 
-        // Handle required fields
+        // Handle required fields (excluding archived)
         List<String> requiredFields = attributes.stream()
-                .filter(attr -> Boolean.TRUE.equals(attr.getIsRequired()))
+                .filter(attr -> Boolean.TRUE.equals(attr.getIsRequired()) && !Boolean.TRUE.equals(attr.getIsArchived()))
                 .map(AttributeDefinition::getSystemName)
                 .collect(Collectors.toList());
 
