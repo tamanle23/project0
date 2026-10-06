@@ -5,11 +5,15 @@ import com.project0.core.io.PageRequest;
 import com.project0.domain.metadata.AttributeDefinition;
 import com.project0.domain.metadata.AttributeDefinitionUpdatedEvent;
 import com.project0.domain.metadata.EntityRecord;
+import com.project0.domain.metadata.EntityRelationship;
 import com.project0.domain.metadata.EntityType;
+import com.project0.domain.metadata.RelationshipType;
 import com.project0.presentation.dto.metadata.*;
 import com.project0.repository.jpa.AttributeDefinitionRepository;
 import com.project0.repository.jpa.EntityRecordRepository;
+import com.project0.repository.jpa.EntityRelationshipRepository;
 import com.project0.repository.jpa.EntityTypeRepository;
+import com.project0.repository.jpa.RelationshipTypeRepository;
 import com.project0.service.exception.MetadataConflictException;
 import com.project0.service.exception.MetadataNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +44,10 @@ class MetadataServiceTest {
     private AttributeDefinitionRepository attributeDefinitionRepository;
     @Mock
     private EntityRecordRepository entityRecordRepository;
+    @Mock
+    private RelationshipTypeRepository relationshipTypeRepository;
+    @Mock
+    private EntityRelationshipRepository entityRelationshipRepository;
     @Mock
     private SchemaValidationService schemaValidationService;
     @Mock
@@ -560,5 +568,191 @@ class MetadataServiceTest {
         metadataService.deleteEntityRecord(1L, 100L);
         assertNotNull(record.getDeletedDate());
         verify(entityRecordRepository).save(record);
+    }
+
+    // ==========================================
+    // Phase 5 Relationship Tests
+    // ==========================================
+
+    @Test
+    void testCreateRelationshipType_Success() {
+        CreateRelationshipTypeRequest request = new CreateRelationshipTypeRequest("authored_by", "Author relation", 1L, 2L, "MANY_TO_ONE");
+        EntityType source = new EntityType();
+        source.setId(1L);
+        EntityType target = new EntityType();
+        target.setId(2L);
+
+        when(relationshipTypeRepository.existsBySystemNameAndDeletedDateIsNull("authored_by")).thenReturn(false);
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(source));
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(2L)).thenReturn(Optional.of(target));
+
+        RelationshipType savedType = new RelationshipType();
+        savedType.setId(10L);
+        savedType.setSystemName("authored_by");
+        savedType.setDescription("Author relation");
+        savedType.setSourceEntityType(source);
+        savedType.setTargetEntityType(target);
+        savedType.setCardinality("MANY_TO_ONE");
+
+        when(relationshipTypeRepository.save(any(RelationshipType.class))).thenReturn(savedType);
+
+        RelationshipTypeResponse response = metadataService.createRelationshipType(request);
+
+        assertNotNull(response);
+        assertEquals(10L, response.id());
+        assertEquals("authored_by", response.systemName());
+        assertEquals("MANY_TO_ONE", response.cardinality());
+        assertEquals(1L, response.sourceEntityTypeId());
+        assertEquals(2L, response.targetEntityTypeId());
+    }
+
+    @Test
+    void testCreateRelationshipType_DuplicateConflict() {
+        CreateRelationshipTypeRequest request = new CreateRelationshipTypeRequest("authored_by", "Author relation", null, null, null);
+        when(relationshipTypeRepository.existsBySystemNameAndDeletedDateIsNull("authored_by")).thenReturn(true);
+
+        assertThrows(MetadataConflictException.class, () -> metadataService.createRelationshipType(request));
+        verify(relationshipTypeRepository, never()).save(any());
+    }
+
+    @Test
+    void testCreateEntityRelationship_Success() {
+        Long sourceRecordId = 100L;
+        Long targetRecordId = 200L;
+        Long relTypeId = 10L;
+
+        EntityType sourceType = new EntityType();
+        sourceType.setId(1L);
+        EntityRecord sourceRecord = new EntityRecord();
+        sourceRecord.setId(sourceRecordId);
+        sourceRecord.setEntityType(sourceType);
+        sourceRecord.setTenantId("t-1");
+
+        EntityType targetType = new EntityType();
+        targetType.setId(2L);
+        EntityRecord targetRecord = new EntityRecord();
+        targetRecord.setId(targetRecordId);
+        targetRecord.setEntityType(targetType);
+        targetRecord.setTenantId("t-1");
+
+        RelationshipType relType = new RelationshipType();
+        relType.setId(relTypeId);
+        relType.setSystemName("authored_by");
+        relType.setSourceEntityType(sourceType);
+        relType.setTargetEntityType(targetType);
+        relType.setCardinality("MANY_TO_ONE");
+
+        when(entityRecordRepository.findByIdAndDeletedDateIsNull(sourceRecordId)).thenReturn(Optional.of(sourceRecord));
+        when(entityRecordRepository.findByIdAndDeletedDateIsNull(targetRecordId)).thenReturn(Optional.of(targetRecord));
+        when(relationshipTypeRepository.findByIdAndDeletedDateIsNull(relTypeId)).thenReturn(Optional.of(relType));
+        when(entityRelationshipRepository.existsBySourceEntityIdAndTargetEntityIdAndRelationshipTypeIdAndDeletedDateIsNull(
+                sourceRecordId, targetRecordId, relTypeId)).thenReturn(false);
+        when(entityRelationshipRepository.countBySourceEntityIdAndRelationshipTypeIdAndDeletedDateIsNull(
+                sourceRecordId, relTypeId)).thenReturn(0L);
+
+        EntityRelationship savedRel = new EntityRelationship();
+        savedRel.setId(500L);
+        savedRel.setSourceEntity(sourceRecord);
+        savedRel.setTargetEntity(targetRecord);
+        savedRel.setRelationshipType(relType);
+        savedRel.setEdgeMetadata(Map.of("role", "Lead Author"));
+
+        when(entityRelationshipRepository.save(any(EntityRelationship.class))).thenReturn(savedRel);
+
+        CreateEntityRelationshipRequest request = new CreateEntityRelationshipRequest(targetRecordId, relTypeId, Map.of("role", "Lead Author"));
+        EntityRelationshipResponse response = metadataService.createEntityRelationship(sourceRecordId, request);
+
+        assertNotNull(response);
+        assertEquals(500L, response.id());
+        assertEquals(sourceRecordId, response.sourceEntityId());
+        assertEquals(targetRecordId, response.targetEntityId());
+        assertEquals(relTypeId, response.relationshipTypeId());
+        assertEquals("Lead Author", response.edgeMetadata().get("role"));
+    }
+
+    @Test
+    void testCreateEntityRelationship_CardinalityViolation() {
+        Long sourceRecordId = 100L;
+        Long targetRecordId = 200L;
+        Long relTypeId = 10L;
+
+        EntityType sourceType = new EntityType();
+        sourceType.setId(1L);
+        EntityRecord sourceRecord = new EntityRecord();
+        sourceRecord.setId(sourceRecordId);
+        sourceRecord.setEntityType(sourceType);
+
+        EntityType targetType = new EntityType();
+        targetType.setId(2L);
+        EntityRecord targetRecord = new EntityRecord();
+        targetRecord.setId(targetRecordId);
+        targetRecord.setEntityType(targetType);
+
+        RelationshipType relType = new RelationshipType();
+        relType.setId(relTypeId);
+        relType.setSystemName("manager_of");
+        relType.setCardinality("ONE_TO_ONE");
+
+        when(entityRecordRepository.findByIdAndDeletedDateIsNull(sourceRecordId)).thenReturn(Optional.of(sourceRecord));
+        when(entityRecordRepository.findByIdAndDeletedDateIsNull(targetRecordId)).thenReturn(Optional.of(targetRecord));
+        when(relationshipTypeRepository.findByIdAndDeletedDateIsNull(relTypeId)).thenReturn(Optional.of(relType));
+        when(entityRelationshipRepository.countByTargetEntityIdAndRelationshipTypeIdAndDeletedDateIsNull(targetRecordId, relTypeId))
+                .thenReturn(1L);
+
+        CreateEntityRelationshipRequest request = new CreateEntityRelationshipRequest(targetRecordId, relTypeId, Map.of());
+
+        assertThrows(MetadataConflictException.class, () -> metadataService.createEntityRelationship(sourceRecordId, request));
+        verify(entityRelationshipRepository, never()).save(any());
+    }
+
+    @Test
+    void testCreateEntityRelationship_CrossTenantRejected() {
+        Long sourceRecordId = 100L;
+        Long targetRecordId = 200L;
+        Long relTypeId = 10L;
+
+        EntityRecord sourceRecord = new EntityRecord();
+        sourceRecord.setId(sourceRecordId);
+        sourceRecord.setTenantId("tenant-A");
+
+        EntityRecord targetRecord = new EntityRecord();
+        targetRecord.setId(targetRecordId);
+        targetRecord.setTenantId("tenant-B");
+
+        RelationshipType relType = new RelationshipType();
+        relType.setId(relTypeId);
+
+        when(entityRecordRepository.findByIdAndDeletedDateIsNull(sourceRecordId)).thenReturn(Optional.of(sourceRecord));
+        when(entityRecordRepository.findByIdAndDeletedDateIsNull(targetRecordId)).thenReturn(Optional.of(targetRecord));
+        when(relationshipTypeRepository.findByIdAndDeletedDateIsNull(relTypeId)).thenReturn(Optional.of(relType));
+
+        CreateEntityRelationshipRequest request = new CreateEntityRelationshipRequest(targetRecordId, relTypeId, Map.of());
+
+        assertThrows(MetadataConflictException.class, () -> metadataService.createEntityRelationship(sourceRecordId, request));
+        verify(entityRelationshipRepository, never()).save(any());
+    }
+
+    @Test
+    void testRelationPickerAttribute_ValidatesReferencedRecord() {
+        Long typeId = 1L;
+        EntityType type = new EntityType();
+        type.setId(typeId);
+
+        AttributeDefinition relationAttr = new AttributeDefinition();
+        relationAttr.setSystemName("manager_id");
+        relationAttr.setDataType("string");
+        relationAttr.setUiComponent("relation_picker");
+        relationAttr.setOptions(Map.of("targetEntityTypeId", 2L));
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(typeId)).thenReturn(Optional.of(type));
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(typeId))
+                .thenReturn(List.of(relationAttr));
+        when(entityRecordRepository.findByEntityTypeIdAndIdAndDeletedDateIsNull(2L, 999L))
+                .thenReturn(Optional.empty());
+
+        CreateRecordRequest request = new CreateRecordRequest(Map.of("manager_id", 999L), "t-1");
+
+        assertThrows(MetadataNotFoundException.class, () -> metadataService.createEntityRecord(typeId, request));
+        verify(entityRecordRepository, never()).save(any());
     }
 }

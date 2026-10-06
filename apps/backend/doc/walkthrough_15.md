@@ -83,6 +83,27 @@ In Phase 0, 1, 2, and 3, we investigated and resolved core security, data contra
 - [`MetadataController.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/presentation/MetadataController.java):
   - `GET /api/v1/metadata/entity-types/{id}/records`: Parses `filter[<attr>][<op>]=<val>`, `filter[<attr>]=<val>`, `sort=<prop>,<dir>`, and `tenantId`.
 
+### Relationships & Cardinality (`project0-fw` & `project0-db`)
+- [`changelog-000.000.00004.xml`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-db/src/main/resources/db/project0/changelog-000.000.00004.xml):
+  - Added `source_entity_type_id`, `target_entity_type_id`, `cardinality` to `PROJECT0_RELATIONSHIP_TYPES`.
+  - Added soft-delete partial unique index `uk_rel_type_sysname_active` on `PROJECT0_RELATIONSHIP_TYPES (system_name) WHERE "deletedDate" IS NULL`.
+  - Added soft-delete partial unique index `uk_entity_rel_triplet_active` on `PROJECT0_ENTITY_RELATIONSHIPS (source_entity_id, target_entity_id, relationship_type_id) WHERE "deletedDate" IS NULL`.
+  - Added active indexes `idx_entity_rel_source_active` and `idx_entity_rel_target_active`.
+- [`RelationshipType.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/domain/metadata/RelationshipType.java):
+  - Mapped `sourceEntityType`, `targetEntityType`, and `cardinality` (`ONE_TO_ONE`, `ONE_TO_MANY`, `MANY_TO_ONE`, `MANY_TO_MANY`).
+- [`EntityRelationship.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/domain/metadata/EntityRelationship.java):
+  - Edge table mapping with `@JdbcTypeCode(SqlTypes.JSON)` for `edgeMetadata`.
+- Repositories:
+  - [`RelationshipTypeRepository.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/repository/jpa/RelationshipTypeRepository.java): soft-delete lookup and uniqueness queries.
+  - [`EntityRelationshipRepository.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/repository/jpa/EntityRelationshipRepository.java): triplet existence, source/target counts for cardinality enforcement, and direction-aware paging.
+- [`MetadataService.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/service/MetadataService.java):
+  - RelationshipType CRUD with delete guard (`force=true` check against existing relationships) and optimistic locking.
+  - EntityRelationship CRUD with cross-tenant check, source/target entity type constraint validation, triplet uniqueness, and cardinality constraints (`ONE_TO_ONE`, `ONE_TO_MANY`, `MANY_TO_ONE`, `MANY_TO_MANY`).
+  - `relation_picker` attribute validation ensuring referenced records exist in the target entity type table.
+- [`MetadataController.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/presentation/MetadataController.java):
+  - `/api/v1/metadata/relationship-types`: Full CRUD with `@PreAuthorize` security checks.
+  - `/api/v1/metadata/records/{id}/relationships`: Query with `direction` filter (`incoming`, `outgoing`, both), create relationship, and delete relationship.
+
 ---
 
 ## 3. Verification & Tests
@@ -93,10 +114,11 @@ In Phase 0, 1, 2, and 3, we investigated and resolved core security, data contra
   - `SchemaCompilerTest`: Verified all 9 UI components, constraints, format, enum choices, defaults, and archived exclusion.
   - `SchemaValidationServiceTest`: Verified L1 memory cache, L2 Redis versioned caching, validation failure extraction, boolean switch, and `additionalProperties: false`.
   - `MetadataCacheListenerTest`: Verified L1 and L2 cache eviction.
-  - `MetadataServiceTest`: 22 unit tests verifying EntityType CRUD, `getCompiledSchema`, AttributeDefinition lifecycle, EntityRecord CRUD, delete guards, versioning, default value injection, and specification filtering.
-  - `MetadataControllerTest`: 18 controller slice tests verifying routing, envelope wrapping, and filter/sort query parameters.
+  - `MetadataServiceTest`: 28 unit tests verifying EntityType CRUD, `getCompiledSchema`, AttributeDefinition lifecycle, EntityRecord CRUD, delete guards, versioning, default value injection, specification filtering, RelationshipType CRUD, EntityRelationship validation, cardinality constraints, and `relation_picker` checks.
+  - `MetadataControllerTest`: 22 controller slice tests verifying routing, envelope wrapping, filter/sort query parameters, and relationship endpoints.
 - **Maven Reactor Execution**:
-  - `node mvnw.cjs test -pl :project0-fw`: 60 tests passed (0 failures, 0 errors).
+  - `node mvnw.cjs test -pl :project0-fw`: 70 tests passed (0 failures, 0 errors).
   - `node mvnw.cjs test`: 100% passed across all 10 monorepo reactor modules.
+
 
 

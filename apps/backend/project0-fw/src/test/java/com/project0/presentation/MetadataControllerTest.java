@@ -298,4 +298,51 @@ class MetadataControllerTest {
         assertEquals("ACTIVE", capturedFilters.get("status").get("eq"));
         assertEquals("Widget", capturedFilters.get("name").get("eq"));
     }
+
+    // ==========================================
+    // Phase 5 Relationship Controller Tests
+    // ==========================================
+
+    @Test
+    void testGetRelationshipTypes() {
+        Page<RelationshipTypeResponse> mockPage = new Page<>();
+        when(metadataService.getRelationshipTypes(any(PageRequest.class))).thenReturn(mockPage);
+
+        ResponseEntity<ResponseWrapper<ContextHeader, Page<RelationshipTypeResponse>>> response = metadataController.getRelationshipTypes(null);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockPage, response.getBody().getBody());
+        verify(metadataService).getRelationshipTypes(any(PageRequest.class));
+    }
+
+    @Test
+    void testCreateRelationshipType() {
+        CreateRelationshipTypeRequest request = new CreateRelationshipTypeRequest("authored_by", "Author relation", 1L, 2L, "MANY_TO_ONE");
+        RelationshipTypeResponse mockResponse = new RelationshipTypeResponse(10L, "uid-10", "authored_by", "Author relation", 1L, 2L, "MANY_TO_ONE", 0L, null, null);
+        when(metadataService.createRelationshipType(request)).thenReturn(mockResponse);
+
+        ResponseEntity<ResponseWrapper<ContextHeader, RelationshipTypeResponse>> response = metadataController.createRelationshipType(request);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockResponse, response.getBody().getBody());
+        verify(metadataService).createRelationshipType(request);
+    }
+
+    @Test
+    void testCreateEntityRelationship() {
+        Long recordId = 100L;
+        CreateEntityRelationshipRequest request = new CreateEntityRelationshipRequest(200L, 10L, Map.of("key", "val"));
+        EntityRelationshipResponse mockResponse = new EntityRelationshipResponse(50L, "uid-50", 100L, 200L, 10L, "authored_by", Map.of("key", "val"), 0L, null, null);
+        when(metadataService.createEntityRelationship(recordId, request)).thenReturn(mockResponse);
+
+        ResponseEntity<ResponseWrapper<ContextHeader, EntityRelationshipResponse>> response = metadataController.createEntityRelationship(recordId, request);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockResponse, response.getBody().getBody());
+        verify(metadataService).createEntityRelationship(recordId, request);
+    }
+
+    @Test
+    void testDeleteEntityRelationship() {
+        ResponseEntity<ResponseWrapper<ContextHeader, Void>> response = metadataController.deleteEntityRelationship(100L, 50L);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(metadataService).deleteEntityRelationship(100L, 50L);
+    }
 }

@@ -242,4 +242,82 @@ public class MetadataController {
         metadataService.deleteEntityRecord(id, recordId);
         return responseBuilder.success(null);
     }
+
+    // ==========================================
+    // Relationship Types Endpoints
+    // ==========================================
+
+    @GetMapping("/relationship-types")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_READ') or hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, Page<RelationshipTypeResponse>>> getRelationshipTypes(
+            @ModelAttribute PageRequest pageRequest) {
+        Page<RelationshipTypeResponse> page = metadataService.getRelationshipTypes(populateDefaults(pageRequest));
+        return responseBuilder.success(page);
+    }
+
+    @GetMapping("/relationship-types/{id}")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_READ') or hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, RelationshipTypeResponse>> getRelationshipType(
+            @PathVariable Long id) {
+        RelationshipTypeResponse type = metadataService.getRelationshipType(id);
+        return responseBuilder.success(type);
+    }
+
+    @PostMapping("/relationship-types")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, RelationshipTypeResponse>> createRelationshipType(
+            @Valid @RequestBody CreateRelationshipTypeRequest request) {
+        RelationshipTypeResponse created = metadataService.createRelationshipType(request);
+        return responseBuilder.success(created);
+    }
+
+    @PutMapping("/relationship-types/{id}")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, RelationshipTypeResponse>> updateRelationshipType(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateRelationshipTypeRequest request) {
+        RelationshipTypeResponse updated = metadataService.updateRelationshipType(id, request);
+        return responseBuilder.success(updated);
+    }
+
+    @DeleteMapping("/relationship-types/{id}")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, Void>> deleteRelationshipType(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "false") boolean force) {
+        metadataService.deleteRelationshipType(id, force);
+        return responseBuilder.success(null);
+    }
+
+    // ==========================================
+    // Entity Relationships Endpoints
+    // ==========================================
+
+    @GetMapping("/records/{recordId}/relationships")
+    @PreAuthorize("hasAuthority('METADATA_RECORD_READ') or hasAuthority('METADATA_RECORD_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, Page<EntityRelationshipResponse>>> getRecordRelationships(
+            @PathVariable Long recordId,
+            @RequestParam(required = false) String direction,
+            @ModelAttribute PageRequest pageRequest) {
+        Page<EntityRelationshipResponse> page = metadataService.getRecordRelationships(recordId, direction, populateDefaults(pageRequest));
+        return responseBuilder.success(page);
+    }
+
+    @PostMapping("/records/{recordId}/relationships")
+    @PreAuthorize("hasAuthority('METADATA_RECORD_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, EntityRelationshipResponse>> createEntityRelationship(
+            @PathVariable Long recordId,
+            @Valid @RequestBody CreateEntityRelationshipRequest request) {
+        EntityRelationshipResponse created = metadataService.createEntityRelationship(recordId, request);
+        return responseBuilder.success(created);
+    }
+
+    @DeleteMapping("/records/{recordId}/relationships/{relationshipId}")
+    @PreAuthorize("hasAuthority('METADATA_RECORD_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, Void>> deleteEntityRelationship(
+            @PathVariable Long recordId,
+            @PathVariable Long relationshipId) {
+        metadataService.deleteEntityRelationship(recordId, relationshipId);
+        return responseBuilder.success(null);
+    }
 }

@@ -5,11 +5,15 @@ import com.project0.core.io.PageRequest;
 import com.project0.domain.metadata.AttributeDefinition;
 import com.project0.domain.metadata.AttributeDefinitionUpdatedEvent;
 import com.project0.domain.metadata.EntityRecord;
+import com.project0.domain.metadata.EntityRelationship;
 import com.project0.domain.metadata.EntityType;
+import com.project0.domain.metadata.RelationshipType;
 import com.project0.presentation.dto.metadata.*;
 import com.project0.repository.jpa.AttributeDefinitionRepository;
 import com.project0.repository.jpa.EntityRecordRepository;
+import com.project0.repository.jpa.EntityRelationshipRepository;
 import com.project0.repository.jpa.EntityTypeRepository;
+import com.project0.repository.jpa.RelationshipTypeRepository;
 import com.project0.service.exception.MetadataConflictException;
 import com.project0.service.exception.MetadataNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +33,8 @@ public class MetadataService {
     private final EntityTypeRepository entityTypeRepository;
     private final AttributeDefinitionRepository attributeDefinitionRepository;
     private final EntityRecordRepository entityRecordRepository;
+    private final RelationshipTypeRepository relationshipTypeRepository;
+    private final EntityRelationshipRepository entityRelationshipRepository;
     private final SchemaValidationService schemaValidationService;
     private final ApplicationEventPublisher eventPublisher;
     private final PageBuilder pageBuilder;
@@ -406,6 +412,7 @@ public class MetadataService {
                 .orElseThrow(() -> new MetadataNotFoundException("EntityType not found with id: " + entityTypeId));
 
         Map<String, Object> finalAttributes = applyAttributeDefaults(entityTypeId, request.attributes());
+        validateRelationPickerAttributes(entityTypeId, finalAttributes);
         schemaValidationService.validatePayload(entityTypeId, finalAttributes);
 
         CreateRecordRequest finalRequest = new CreateRecordRequest(finalAttributes, request.tenantId());
@@ -430,6 +437,7 @@ public class MetadataService {
         }
 
         Map<String, Object> finalAttributes = applyAttributeDefaults(entityTypeId, request.attributes());
+        validateRelationPickerAttributes(entityTypeId, finalAttributes);
         schemaValidationService.validatePayload(entityTypeId, finalAttributes);
 
         record.setAttributes(finalAttributes);
@@ -457,6 +465,7 @@ public class MetadataService {
             merged.putAll(request.attributes());
         }
 
+        validateRelationPickerAttributes(entityTypeId, merged);
         schemaValidationService.validatePayload(entityTypeId, merged);
 
         record.setAttributes(merged);
@@ -476,5 +485,224 @@ public class MetadataService {
 
         record.setDeletedDate(LocalDateTime.now());
         entityRecordRepository.save(record);
+    }
+
+    private void validateRelationPickerAttributes(Long entityTypeId, Map<String, Object> attributes) {
+        if (attributes == null || attributes.isEmpty()) return;
+        List<AttributeDefinition> definitions = attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId);
+        for (AttributeDefinition def : definitions) {
+            if (Boolean.TRUE.equals(def.getIsArchived())) continue;
+            if ("relation_picker".equalsIgnoreCase(def.getUiComponent())) {
+                Object val = attributes.get(def.getSystemName());
+                if (val != null) {
+                    Map<String, Object> options = def.getOptions() != null ? def.getOptions() : Map.of();
+                    Object targetTypeIdObj = options.get("targetEntityTypeId");
+                    if (targetTypeIdObj != null) {
+                        Long targetTypeId = targetTypeIdObj instanceof Number n ? n.longValue() : Long.parseLong(targetTypeIdObj.toString());
+                        Long targetRecordId = val instanceof Number n ? n.longValue() : Long.parseLong(val.toString());
+                        boolean exists = entityRecordRepository.findByEntityTypeIdAndIdAndDeletedDateIsNull(targetTypeId, targetRecordId).isPresent();
+                        if (!exists) {
+                            throw new MetadataNotFoundException("Referenced target entity record with id " + targetRecordId 
+                                    + " does not exist for entity type " + targetTypeId);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // ==========================================
+    // 4. Relationship Types Lifecycle
+    // ==========================================
+
+    public Page<RelationshipTypeResponse> getRelationshipTypes(PageRequest pageRequest) {
+        org.springframework.data.domain.Page<RelationshipType> springPage = relationshipTypeRepository.findAllByDeletedDateIsNull(toSpringPageRequest(pageRequest));
+        return pageBuilder.build(
+                pageRequest,
+                springPage::getTotalElements,
+                () -> springPage.getContent().stream().map(MetadataDtoMapper::toResponse).collect(Collectors.toList())
+        );
+    }
+
+    public RelationshipTypeResponse getRelationshipType(Long id) {
+        RelationshipType type = relationshipTypeRepository.findByIdAndDeletedDateIsNull(id)
+                .orElseThrow(() -> new MetadataNotFoundException("RelationshipType not found with id: " + id));
+        return MetadataDtoMapper.toResponse(type);
+    }
+
+    @Transactional
+    public RelationshipTypeResponse createRelationshipType(CreateRelationshipTypeRequest request) {
+        if (relationshipTypeRepository.existsBySystemNameAndDeletedDateIsNull(request.systemName().trim())) {
+            throw new MetadataConflictException("RelationshipType with systemName '" + request.systemName() + "' already exists");
+        }
+
+        EntityType source = null;
+        if (request.sourceEntityTypeId() != null) {
+            source = entityTypeRepository.findByIdAndDeletedDateIsNull(request.sourceEntityTypeId())
+                    .orElseThrow(() -> new MetadataNotFoundException("Source EntityType not found with id: " + request.sourceEntityTypeId()));
+        }
+
+        EntityType target = null;
+        if (request.targetEntityTypeId() != null) {
+            target = entityTypeRepository.findByIdAndDeletedDateIsNull(request.targetEntityTypeId())
+                    .orElseThrow(() -> new MetadataNotFoundException("Target EntityType not found with id: " + request.targetEntityTypeId()));
+        }
+
+        RelationshipType type = MetadataDtoMapper.toEntity(request, source, target);
+        RelationshipType saved = relationshipTypeRepository.save(type);
+        return MetadataDtoMapper.toResponse(saved);
+    }
+
+    @Transactional
+    public RelationshipTypeResponse updateRelationshipType(Long id, UpdateRelationshipTypeRequest request) {
+        RelationshipType type = relationshipTypeRepository.findByIdAndDeletedDateIsNull(id)
+                .orElseThrow(() -> new MetadataNotFoundException("RelationshipType not found with id: " + id));
+
+        if (request.version() != null && !request.version().equals(type.getVersion())) {
+            throw new MetadataConflictException("Optimistic lock conflict: RelationshipType version mismatch (expected: " 
+                    + type.getVersion() + ", actual: " + request.version() + ")");
+        }
+
+        if (request.description() != null) {
+            type.setDescription(request.description().trim());
+        }
+        if (request.sourceEntityTypeId() != null) {
+            EntityType source = entityTypeRepository.findByIdAndDeletedDateIsNull(request.sourceEntityTypeId())
+                    .orElseThrow(() -> new MetadataNotFoundException("Source EntityType not found with id: " + request.sourceEntityTypeId()));
+            type.setSourceEntityType(source);
+        }
+        if (request.targetEntityTypeId() != null) {
+            EntityType target = entityTypeRepository.findByIdAndDeletedDateIsNull(request.targetEntityTypeId())
+                    .orElseThrow(() -> new MetadataNotFoundException("Target EntityType not found with id: " + request.targetEntityTypeId()));
+            type.setTargetEntityType(target);
+        }
+        if (request.cardinality() != null) {
+            type.setCardinality(request.cardinality());
+        }
+
+        RelationshipType saved = relationshipTypeRepository.save(type);
+        return MetadataDtoMapper.toResponse(saved);
+    }
+
+    @Transactional
+    public void deleteRelationshipType(Long id, boolean force) {
+        RelationshipType type = relationshipTypeRepository.findByIdAndDeletedDateIsNull(id)
+                .orElseThrow(() -> new MetadataNotFoundException("RelationshipType not found with id: " + id));
+
+        boolean hasRelationships = entityRelationshipRepository.existsByRelationshipTypeIdAndDeletedDateIsNull(id);
+        if (hasRelationships && !force) {
+            throw new MetadataConflictException("Cannot delete RelationshipType with existing entity relationships without force=true");
+        }
+
+        type.setDeletedDate(LocalDateTime.now());
+        relationshipTypeRepository.save(type);
+    }
+
+    // ==========================================
+    // 5. Entity Relationships Lifecycle
+    // ==========================================
+
+    public Page<EntityRelationshipResponse> getRecordRelationships(Long entityRecordId, String direction, PageRequest pageRequest) {
+        entityRecordRepository.findByIdAndDeletedDateIsNull(entityRecordId)
+                .orElseThrow(() -> new MetadataNotFoundException("EntityRecord not found with id: " + entityRecordId));
+
+        org.springframework.data.domain.Pageable pageable = toSpringPageRequest(pageRequest);
+        org.springframework.data.domain.Page<EntityRelationship> springPage;
+
+        if ("outgoing".equalsIgnoreCase(direction)) {
+            springPage = entityRelationshipRepository.findBySourceEntityIdAndDeletedDateIsNull(entityRecordId, pageable);
+        } else if ("incoming".equalsIgnoreCase(direction)) {
+            springPage = entityRelationshipRepository.findByTargetEntityIdAndDeletedDateIsNull(entityRecordId, pageable);
+        } else {
+            springPage = entityRelationshipRepository.findBySourceEntityIdOrTargetEntityIdAndDeletedDateIsNull(entityRecordId, entityRecordId, pageable);
+        }
+
+        return pageBuilder.build(
+                pageRequest,
+                springPage::getTotalElements,
+                () -> springPage.getContent().stream().map(MetadataDtoMapper::toResponse).collect(Collectors.toList())
+        );
+    }
+
+    @Transactional
+    public EntityRelationshipResponse createEntityRelationship(Long sourceRecordId, CreateEntityRelationshipRequest request) {
+        EntityRecord source = entityRecordRepository.findByIdAndDeletedDateIsNull(sourceRecordId)
+                .orElseThrow(() -> new MetadataNotFoundException("Source EntityRecord not found with id: " + sourceRecordId));
+
+        EntityRecord target = entityRecordRepository.findByIdAndDeletedDateIsNull(request.targetEntityId())
+                .orElseThrow(() -> new MetadataNotFoundException("Target EntityRecord not found with id: " + request.targetEntityId()));
+
+        RelationshipType relType = relationshipTypeRepository.findByIdAndDeletedDateIsNull(request.relationshipTypeId())
+                .orElseThrow(() -> new MetadataNotFoundException("RelationshipType not found with id: " + request.relationshipTypeId()));
+
+        // Tenant match check
+        if (source.getTenantId() != null && target.getTenantId() != null && !source.getTenantId().equals(target.getTenantId())) {
+            throw new MetadataConflictException("Cross-tenant relationships are not permitted (source tenant: " 
+                    + source.getTenantId() + ", target tenant: " + target.getTenantId() + ")");
+        }
+
+        // Validate source entity type constraint if defined
+        if (relType.getSourceEntityType() != null && !relType.getSourceEntityType().getId().equals(source.getEntityType().getId())) {
+            throw new MetadataConflictException("Source record entity type " + source.getEntityType().getId() 
+                    + " does not match allowed relationship source type " + relType.getSourceEntityType().getId());
+        }
+
+        // Validate target entity type constraint if defined
+        if (relType.getTargetEntityType() != null && !relType.getTargetEntityType().getId().equals(target.getEntityType().getId())) {
+            throw new MetadataConflictException("Target record entity type " + target.getEntityType().getId() 
+                    + " does not match allowed relationship target type " + relType.getTargetEntityType().getId());
+        }
+
+        // Triplet uniqueness check
+        if (entityRelationshipRepository.existsBySourceEntityIdAndTargetEntityIdAndRelationshipTypeIdAndDeletedDateIsNull(
+                sourceRecordId, request.targetEntityId(), request.relationshipTypeId())) {
+            throw new MetadataConflictException("Relationship between source record " + sourceRecordId 
+                    + " and target record " + request.targetEntityId() 
+                    + " with relationship type " + request.relationshipTypeId() + " already exists");
+        }
+
+        // Cardinality checks
+        String cardinality = relType.getCardinality() != null ? relType.getCardinality().toUpperCase() : "MANY_TO_MANY";
+        if ("ONE_TO_ONE".equals(cardinality) || "ONE_TO_MANY".equals(cardinality)) {
+            // Target can only have ONE incoming relationship of this type
+            long incomingCount = entityRelationshipRepository.countByTargetEntityIdAndRelationshipTypeIdAndDeletedDateIsNull(
+                    request.targetEntityId(), request.relationshipTypeId());
+            if (incomingCount > 0) {
+                throw new MetadataConflictException("Cardinality violation: Target record already has an incoming relationship of type " + relType.getSystemName());
+            }
+        }
+        if ("ONE_TO_ONE".equals(cardinality) || "MANY_TO_ONE".equals(cardinality)) {
+            // Source can only have ONE outgoing relationship of this type
+            long outgoingCount = entityRelationshipRepository.countBySourceEntityIdAndRelationshipTypeIdAndDeletedDateIsNull(
+                    sourceRecordId, request.relationshipTypeId());
+            if (outgoingCount > 0) {
+                throw new MetadataConflictException("Cardinality violation: Source record already has an outgoing relationship of type " + relType.getSystemName());
+            }
+        }
+
+        EntityRelationship rel = new EntityRelationship();
+        rel.setSourceEntity(source);
+        rel.setTargetEntity(target);
+        rel.setRelationshipType(relType);
+        rel.setEdgeMetadata(request.edgeMetadata() != null ? request.edgeMetadata() : Map.of());
+
+        EntityRelationship saved = entityRelationshipRepository.save(rel);
+        return MetadataDtoMapper.toResponse(saved);
+    }
+
+    @Transactional
+    public void deleteEntityRelationship(Long sourceRecordId, Long relationshipId) {
+        entityRecordRepository.findByIdAndDeletedDateIsNull(sourceRecordId)
+                .orElseThrow(() -> new MetadataNotFoundException("Source EntityRecord not found with id: " + sourceRecordId));
+
+        EntityRelationship rel = entityRelationshipRepository.findByIdAndDeletedDateIsNull(relationshipId)
+                .orElseThrow(() -> new MetadataNotFoundException("EntityRelationship not found with id: " + relationshipId));
+
+        if (!rel.getSourceEntity().getId().equals(sourceRecordId) && !rel.getTargetEntity().getId().equals(sourceRecordId)) {
+            throw new MetadataConflictException("Relationship " + relationshipId + " is not connected to record " + sourceRecordId);
+        }
+
+        rel.setDeletedDate(LocalDateTime.now());
+        entityRelationshipRepository.save(rel);
     }
 }

@@ -8,7 +8,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import com.project0.domain.BaseModel;
-import jakarta.persistence.Convert;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.util.Map;
 
 @Getter
@@ -30,6 +31,6 @@ public class EntityRelationship extends BaseModel {
     private RelationshipType relationshipType;
 
     @Column(name = "edge_metadata", columnDefinition = "jsonb")
-    @Convert(converter = MapJsonConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> edgeMetadata;
 }

@@ -2,7 +2,9 @@ package com.project0.presentation.dto.metadata;
 
 import com.project0.domain.metadata.AttributeDefinition;
 import com.project0.domain.metadata.EntityRecord;
+import com.project0.domain.metadata.EntityRelationship;
 import com.project0.domain.metadata.EntityType;
+import com.project0.domain.metadata.RelationshipType;
 
 public final class MetadataDtoMapper {
 
@@ -93,5 +95,48 @@ public final class MetadataDtoMapper {
         record.setSchemaVersion(entityType.getSchemaVersion() != null ? entityType.getSchemaVersion() : 1L);
         record.setAttributes(request.attributes());
         return record;
+    }
+
+    public static RelationshipTypeResponse toResponse(RelationshipType type) {
+        if (type == null) return null;
+        return new RelationshipTypeResponse(
+                type.getId(),
+                type.getUid(),
+                type.getSystemName(),
+                type.getDescription(),
+                type.getSourceEntityType() != null ? type.getSourceEntityType().getId() : null,
+                type.getTargetEntityType() != null ? type.getTargetEntityType().getId() : null,
+                type.getCardinality() != null ? type.getCardinality() : "MANY_TO_MANY",
+                type.getVersion(),
+                type.getCreatedDate(),
+                type.getLastUpdatedDate()
+        );
+    }
+
+    public static RelationshipType toEntity(CreateRelationshipTypeRequest request, EntityType source, EntityType target) {
+        if (request == null) return null;
+        RelationshipType type = new RelationshipType();
+        type.setSystemName(request.systemName().trim());
+        type.setDescription(request.description() != null ? request.description().trim() : null);
+        type.setSourceEntityType(source);
+        type.setTargetEntityType(target);
+        type.setCardinality(request.cardinality() != null ? request.cardinality() : "MANY_TO_MANY");
+        return type;
+    }
+
+    public static EntityRelationshipResponse toResponse(EntityRelationship rel) {
+        if (rel == null) return null;
+        return new EntityRelationshipResponse(
+                rel.getId(),
+                rel.getUid(),
+                rel.getSourceEntity() != null ? rel.getSourceEntity().getId() : null,
+                rel.getTargetEntity() != null ? rel.getTargetEntity().getId() : null,
+                rel.getRelationshipType() != null ? rel.getRelationshipType().getId() : null,
+                rel.getRelationshipType() != null ? rel.getRelationshipType().getSystemName() : null,
+                rel.getEdgeMetadata(),
+                rel.getVersion(),
+                rel.getCreatedDate(),
+                rel.getLastUpdatedDate()
+        );
     }
 }
