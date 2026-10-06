@@ -6,6 +6,9 @@ import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.map.IMap;
+import com.project0.boot.config.HazelcastConfiguration;
 import com.project0.core.io.Error;
 import com.project0.domain.metadata.AttributeDefinition;
 import com.project0.domain.metadata.EntityType;
@@ -15,7 +18,6 @@ import com.project0.service.exception.MetadataNotFoundException;
 import com.project0.service.exception.SchemaValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SchemaValidationService {
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final HazelcastInstance hazelcastInstance;
     private final ObjectMapper objectMapper;
     private final AttributeDefinitionRepository attributeDefinitionRepository;
     private final EntityTypeRepository entityTypeRepository;
@@ -40,6 +42,13 @@ public class SchemaValidationService {
 
     // L1 in-memory cache holding parsed JsonSchema objects for maximum throughput
     private final Map<String, JsonSchema> l1ParsedSchemaCache = new ConcurrentHashMap<>();
+
+    private IMap<String, String> getHazelcastSchemaMap() {
+        if (hazelcastInstance != null) {
+            return hazelcastInstance.getMap(HazelcastConfiguration.METADATA_SCHEMAS_MAP);
+        }
+        return null;
+    }
 
     private String buildCacheKey(Long entityTypeId, Long schemaVersion) {
         long version = schemaVersion != null ? schemaVersion : 1L;
@@ -64,25 +73,27 @@ public class SchemaValidationService {
             return l1Schema;
         }
 
-        // 2. Check L2 Redis cache
+        // 2. Check L2 Hazelcast cache
         String schemaJson = null;
         try {
-            if (redisTemplate != null) {
-                schemaJson = redisTemplate.opsForValue().get(cacheKey);
+            IMap<String, String> schemaMap = getHazelcastSchemaMap();
+            if (schemaMap != null) {
+                schemaJson = schemaMap.get(cacheKey);
             }
         } catch (Exception e) {
-            log.warn("Redis L2 cache read failed for {}: {}", cacheKey, e.getMessage());
+            log.warn("Hazelcast L2 cache read failed for {}: {}", cacheKey, e.getMessage());
         }
 
         // 3. Compile if cache miss
         if (schemaJson == null) {
             schemaJson = compileSchema(entityTypeId);
             try {
-                if (redisTemplate != null) {
-                    redisTemplate.opsForValue().set(cacheKey, schemaJson, 1, TimeUnit.HOURS);
+                IMap<String, String> schemaMap = getHazelcastSchemaMap();
+                if (schemaMap != null) {
+                    schemaMap.set(cacheKey, schemaJson, 1, TimeUnit.HOURS);
                 }
             } catch (Exception e) {
-                log.warn("Redis L2 cache write failed for {}: {}", cacheKey, e.getMessage());
+                log.warn("Hazelcast L2 cache write failed for {}: {}", cacheKey, e.getMessage());
             }
         }
 

@@ -7,6 +7,9 @@ import com.project0.domain.metadata.EntityType;
 import com.project0.repository.jpa.AttributeDefinitionRepository;
 import com.project0.repository.jpa.EntityTypeRepository;
 import com.project0.service.exception.SchemaValidationException;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.map.IMap;
+import com.project0.boot.config.HazelcastConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,8 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,10 +36,10 @@ import static org.mockito.Mockito.*;
 class SchemaValidationServiceTest {
 
     @Mock
-    private RedisTemplate<String, String> redisTemplate;
+    private HazelcastInstance hazelcastInstance;
 
     @Mock
-    private ValueOperations<String, String> valueOperations;
+    private IMap<String, String> schemaMap;
 
     @Mock
     private AttributeDefinitionRepository attributeDefinitionRepository;
@@ -63,7 +64,7 @@ class SchemaValidationServiceTest {
         entityType.setId(1L);
         entityType.setSchemaVersion(1L);
 
-        lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        lenient().doReturn(schemaMap).when(hazelcastInstance).getMap(HazelcastConfiguration.METADATA_SCHEMAS_MAP);
         lenient().when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(entityType));
     }
 
@@ -75,7 +76,7 @@ class SchemaValidationServiceTest {
 
         String cachedSchema = "{\"$schema\": \"http://json-schema.org/draft-07/schema#\", \"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}";
 
-        when(valueOperations.get("schema:1:v1")).thenReturn(cachedSchema);
+        when(schemaMap.get("schema:1:v1")).thenReturn(cachedSchema);
 
         assertDoesNotThrow(() -> schemaValidationService.validatePayload(entityTypeId, payload));
     }
@@ -91,12 +92,12 @@ class SchemaValidationServiceTest {
         attr.setDataType("integer");
         attr.setIsRequired(false);
 
-        when(valueOperations.get("schema:1:v1")).thenReturn(null);
+        when(schemaMap.get("schema:1:v1")).thenReturn(null);
         when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId)).thenReturn(Collections.singletonList(attr));
 
         assertDoesNotThrow(() -> schemaValidationService.validatePayload(entityTypeId, payload));
 
-        verify(valueOperations).set(eq("schema:1:v1"), anyString(), eq(1L), eq(TimeUnit.HOURS));
+        verify(schemaMap).set(eq("schema:1:v1"), anyString(), eq(1L), eq(TimeUnit.HOURS));
     }
 
     @Test
@@ -105,7 +106,7 @@ class SchemaValidationServiceTest {
         Map<String, Object> payload = new HashMap<>();
 
         String cachedSchema = "{\"$schema\": \"http://json-schema.org/draft-07/schema#\", \"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}";
-        when(valueOperations.get("schema:1:v1")).thenReturn(cachedSchema);
+        when(schemaMap.get("schema:1:v1")).thenReturn(cachedSchema);
 
         SchemaValidationException ex = assertThrows(SchemaValidationException.class,
                 () -> schemaValidationService.validatePayload(entityTypeId, payload));
@@ -122,7 +123,7 @@ class SchemaValidationServiceTest {
         attr.setUiComponent("switch");
         attr.setIsRequired(true);
 
-        when(valueOperations.get("schema:1:v1")).thenReturn(null);
+        when(schemaMap.get("schema:1:v1")).thenReturn(null);
         when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId)).thenReturn(Collections.singletonList(attr));
 
         Map<String, Object> payload = Map.of("isActive", true);
@@ -138,7 +139,7 @@ class SchemaValidationServiceTest {
         attr.setDataType("string");
         attr.setIsRequired(false);
 
-        when(valueOperations.get("schema:1:v1")).thenReturn(null);
+        when(schemaMap.get("schema:1:v1")).thenReturn(null);
         when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId)).thenReturn(Collections.singletonList(attr));
 
         Map<String, Object> payload = Map.of("name", "Valid", "unknownField", "Should Fail");

@@ -1,9 +1,11 @@
 package com.project0.service;
 
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.map.IMap;
+import com.project0.boot.config.HazelcastConfiguration;
 import com.project0.domain.metadata.AttributeDefinitionUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -16,7 +18,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class MetadataCacheListener {
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final HazelcastInstance hazelcastInstance;
     private final SchemaValidationService schemaValidationService;
 
     @Async
@@ -28,20 +30,28 @@ public class MetadataCacheListener {
         // 1. Evict in-memory L1 cache
         schemaValidationService.invalidateL1Cache(entityTypeId);
 
-        // 2. Evict distributed L2 Redis cache keys
+        // 2. Evict distributed L2 Hazelcast cache keys
         try {
-            if (redisTemplate != null) {
-                // Delete base key if present
-                redisTemplate.delete("schema:" + entityTypeId);
+            if (hazelcastInstance != null) {
+                IMap<String, String> map = hazelcastInstance.getMap(HazelcastConfiguration.METADATA_SCHEMAS_MAP);
+                if (map != null) {
+                    // Delete base key if present
+                    map.remove("schema:" + entityTypeId);
 
-                // Evict versioned keys schema:{id}:*
-                Set<String> keys = redisTemplate.keys("schema:" + entityTypeId + ":*");
-                if (keys != null && !keys.isEmpty()) {
-                    redisTemplate.delete(keys);
+                    // Evict versioned keys schema:{id}:*
+                    String prefix = "schema:" + entityTypeId + ":";
+                    Set<String> keys = map.keySet();
+                    if (keys != null) {
+                        for (String key : keys) {
+                            if (key != null && key.startsWith(prefix)) {
+                                map.remove(key);
+                            }
+                        }
+                    }
                 }
             }
         } catch (Exception e) {
-            log.warn("Failed to evict Redis cache for entityTypeId {}: {}", entityTypeId, e.getMessage());
+            log.warn("Failed to evict Hazelcast cache for entityTypeId {}: {}", entityTypeId, e.getMessage());
         }
     }
 }
