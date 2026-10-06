@@ -39,5 +39,5 @@ Implement the TikTok OAuth 2.0 flow within the App Integrations (`/apps`) module
   - Wire up the `Connect` and `Manage` buttons to open the modal.
 
 ## 3. Verification Plan
-- **Automated Tests**: Run `pnpm --filter @project0/console build:web` and `pnpm --filter @project0/console lint`.
+- **Automated Tests**: Run `pnpm --filter @unipost/console build:web` and `pnpm --filter @unipost/console lint`.
 - **Manual Verification**: Run the Sandbox Demo flow in the UI to ensure states transition properly, mock tokens are dispensed, and the connected dashboard is displayed.

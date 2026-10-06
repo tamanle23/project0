@@ -15,7 +15,7 @@
     "@headlessui/react": "2.2.9",
     "@next/bundle-analyzer": "15.5.12",
     "@portabletext/react": "^8.0.1",
-    "@project0/ui": "workspace:^",
+    "@unipost/ui": "workspace:^",
     "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/typography": "^0.5.19",

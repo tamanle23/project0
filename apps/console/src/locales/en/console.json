@@ -56,7 +56,7 @@
   },
   "storage": {
     "title": "Storage Providers",
-    "description": "Manage your Cloud Storage services for @project0/backend file uploads!",
+    "description": "Manage your Cloud Storage services for @unipost/backend file uploads!",
     "filterPlaceholder": "Filter storage providers...",
     "types": {
       "system": "System Internal",

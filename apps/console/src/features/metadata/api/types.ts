@@ -108,7 +108,7 @@ export interface PageResponse<T> {
   content: T[];
   totalElements: number;
   totalPages: number;
-  number: number; // 1-indexed in project0 PageRequest
+  number: number; // 1-indexed in unipost PageRequest
   size: number;
 }
 

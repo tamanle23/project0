@@ -35,11 +35,11 @@ We have redesigned the Facebook Integration modal to provide a clean, 1-click en
 ### Automated Verification
 - **Web Build**:
   ```bash
-  pnpm --filter @project0/console build:web
+  pnpm --filter @unipost/console build:web
   ```
   Result: **Exit code 0** (completed in 550ms).
 - **ESLint**:
   ```bash
-  pnpm --filter @project0/console lint
+  pnpm --filter @unipost/console lint
   ```
   Result: **Exit code 0** (0 errors, 0 warnings).

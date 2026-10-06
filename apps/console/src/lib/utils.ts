@@ -1,1 +1,1 @@
-export { cn, sleep, getPageNumbers } from '@project0/ui/utils';
+export { cn, sleep, getPageNumbers } from '@unipost/ui/utils';

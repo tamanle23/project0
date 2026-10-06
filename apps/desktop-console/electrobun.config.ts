@@ -2,8 +2,8 @@ import type { ElectrobunConfig } from "electrobun";
 
 export default {
 	app: {
-		name: "project0-desktop",
-		identifier: "dev.project0.desktop",
+		name: "unipost-desktop",
+		identifier: "dev.unipost.desktop",
 		version: "1.0.0",
 	},
 	build: {

@@ -1,6 +1,6 @@
 import Link from './Link'
 import siteMetadata from '@/data/siteMetadata'
-import { SocialIcon } from '@project0/ui/icons'
+import { SocialIcon } from '@unipost/ui/icons'
 
 export default function Footer() {
   return (

@@ -1,6 +1,6 @@
 # Implement Refresh Token Support in JWT Authentication
 
-Modify the backend's JWT authentication framework (`project0-fw` and `project0-ms-identity`) to generate, validate, and process refresh tokens when issuing and refreshing authentication tokens.
+Modify the backend's JWT authentication framework (`unipost-fw` and `unipost-ms-identity`) to generate, validate, and process refresh tokens when issuing and refreshing authentication tokens.
 
 ## User Review Required
 
@@ -10,9 +10,9 @@ Modify the backend's JWT authentication framework (`project0-fw` and `project0-m
 
 ## Proposed Changes
 
-### Core Framework Layer (`apps/backend/project0-fw`)
+### Core Framework Layer (`apps/backend/unipost-fw`)
 
-#### [MODIFY] [JwtTokenHelper.java](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/fw/core/jwt/JwtTokenHelper.java)
+#### [MODIFY] [JwtTokenHelper.java](file:///c:/Users/Admin/workspace/git/unipost/apps/backend/unipost-fw/src/main/java/com/unipost/fw/core/jwt/JwtTokenHelper.java)
 - Enhance `getClaims(String token)` to catch `ExpiredJwtException` and extract claims safely for expired access token inspection.
 - Update `generateRefreshToken` to encode user subject (`sub`), audience (`audience`), and token type (`type: refresh`).
 - Update `generateToken(UserDetailsImpl userDetails, String userAgent)` to automatically populate the `refreshToken` property in `AuthenticationToken`.
@@ -20,25 +20,25 @@ Modify the backend's JWT authentication framework (`project0-fw` and `project0-m
 
 ---
 
-### Identity Microservice Layer (`apps/backend/project0-ms-identity`)
+### Identity Microservice Layer (`apps/backend/unipost-ms-identity`)
 
-#### [NEW] [TokenRefreshValidator.java](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-ms-identity/src/main/java/com/project0/user/controller/validator/TokenRefreshValidator.java)
+#### [NEW] [TokenRefreshValidator.java](file:///c:/Users/Admin/workspace/git/unipost/apps/backend/unipost-ms-identity/src/main/java/com/unipost/user/controller/validator/TokenRefreshValidator.java)
 - Implement `TokenRefreshValidator` extending `AbstractValidator<AuthenticationToken>` to validate that the request body contains a non-empty refresh token.
 
-#### [MODIFY] [ValidatorConfiguration.java](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-ms-identity/src/main/java/com/project0/user/ValidatorConfiguration.java)
+#### [MODIFY] [ValidatorConfiguration.java](file:///c:/Users/Admin/workspace/git/unipost/apps/backend/unipost-ms-identity/src/main/java/com/unipost/user/ValidatorConfiguration.java)
 - Register the `@Bean(name = TOKEN_REFRESH)` for `TokenRefreshValidator`.
 
-#### [MODIFY] [TokenServiceImpl.java](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-ms-identity/src/main/java/com/project0/user/service/TokenServiceImpl.java)
+#### [MODIFY] [TokenServiceImpl.java](file:///c:/Users/Admin/workspace/git/unipost/apps/backend/unipost-ms-identity/src/main/java/com/unipost/user/service/TokenServiceImpl.java)
 - Update `refreshToken` method to validate the refresh token from `request.getBody()`, re-load user details if necessary, and return the new `AuthenticationToken`.
 
 ---
 
 ### Documentation & History
 
-#### [NEW] [implementation_plan_02.md](file:///c:/Users/Admin/workspace/git/project0/apps/backend/doc/implementation_plan_02.md)
+#### [NEW] [implementation_plan_02.md](file:///c:/Users/Admin/workspace/git/unipost/apps/backend/doc/implementation_plan_02.md)
 - Persist this implementation plan to the target app's `doc/` directory as `implementation_plan_02.md`.
 
 ## Verification Plan
 
 ### Automated Build & Test Verification
-- Run Maven build and tests on `project0-fw` and `project0-ms-identity` using `./mvnw clean test` from `apps/backend`.
+- Run Maven build and tests on `unipost-fw` and `unipost-ms-identity` using `./mvnw clean test` from `apps/backend`.

@@ -1,6 +1,6 @@
 # Master Rules & Architecture Reference (Source of Truth)
 
-This document is the authoritative, comprehensive repository of all architectural standards, development workflows, design systems, and operational constraints for the **project0** monorepo.
+This document is the authoritative, comprehensive repository of all architectural standards, development workflows, design systems, and operational constraints for the **unipost** monorepo.
 
 ---
 
@@ -32,25 +32,25 @@ Whenever a rule needs to be introduced, updated, or modified:
 ### Workspace Registry Matrix
 | Identifier | Path | Framework / Runtime | Internal Dependencies |
 | :--- | :--- | :--- | :--- |
-| `@project0/backend` | `apps/backend` | Java 21, Spring Boot, Spring Modulith, Spring Cloud, Maven | None |
-| `@project0/console` | `apps/console` | React 19, Vite 8, Tailwind CSS v4, TanStack Router/Query | `@project0/ui`, `@project0/i18n`, `@project0/typescript-config` |
-| `@project0/desktop` | `apps/desktop-console` | Electrobun 2.0 (Bun runtime + Cottontail window manager) | `@project0/console`, `@project0/typescript-config` |
+| `@unipost/backend` | `apps/backend` | Java 21, Spring Boot, Spring Modulith, Spring Cloud, Maven | None |
+| `@unipost/console` | `apps/console` | React 19, Vite 8, Tailwind CSS v4, TanStack Router/Query | `@unipost/ui`, `@unipost/i18n`, `@unipost/typescript-config` |
+| `@unipost/desktop` | `apps/desktop-console` | Electrobun 2.0 (Bun runtime + Cottontail window manager) | `@unipost/console`, `@unipost/typescript-config` |
 | `mobile-ui` | `apps/mobile-ui` | Expo SDK 57, React Native 0.86, React 19, Zustand | None |
-| `tekgo-ui` | `apps/tekgo-ui` | Next.js 15 (App Router), React 19, MDX, Pliny | `@project0/ui` |
-| `@project0/i18n` | `packages/i18n` | Shared i18next dictionaries and translation utilities | None |
-| `@project0/typescript-config` | `packages/typescript-config` | Shared TypeScript tsconfig base configurations | None |
-| `@project0/ui` | `packages/ui` | Shared React components and Liquid Glass design utilities | None |
+| `tekgo-ui` | `apps/tekgo-ui` | Next.js 15 (App Router), React 19, MDX, Pliny | `@unipost/ui` |
+| `@unipost/i18n` | `packages/i18n` | Shared i18next dictionaries and translation utilities | None |
+| `@unipost/typescript-config` | `packages/typescript-config` | Shared TypeScript tsconfig base configurations | None |
+| `@unipost/ui` | `packages/ui` | Shared React components and Liquid Glass design utilities | None |
 
 ### Operational Directives & Boundaries
 1. **Persistent Mapping**: Treat the registry above as the definitive workspace index. Never perform full-repository directory scans to discover apps or packages.
 2. **Direct Scoping**: When working on an application or package, scope all searches, edits, and file reads directly to its registered directory.
 3. **Monorepo Command Execution**:
    - Always run commands from the repository root using `--filter` or Turborepo pipelines.
-   - Example: `pnpm --filter tekgo-ui dev` or `turbo run build --filter=@project0/console`.
+   - Example: `pnpm --filter tekgo-ui dev` or `turbo run build --filter=@unipost/console`.
    - Never change directories (`cd`) inside agent commands.
 4. **Package Manager Discipline**:
    - Strictly use `pnpm`. Never invoke `npm` or `yarn`.
-   - Local workspace dependencies must always use the `workspace:*` protocol (e.g., `"@project0/ui": "workspace:*"`).
+   - Local workspace dependencies must always use the `workspace:*` protocol (e.g., `"@unipost/ui": "workspace:*"`).
    - Sync root `pnpm-lock.yaml` with `pnpm install` whenever dependencies change.
 5. **Architectural Isolation**:
    - Deployable applications reside in `apps/`; reusable shared code resides in `packages/`.
@@ -196,7 +196,7 @@ To ensure visual consistency, architectural predictability, and seamless collabo
    - Cache resolution operates in two tiers: L1 parsed in-memory cache (`ConcurrentHashMap<String, JsonSchema>`) for microsecond throughput, backed by L2 Redis with TTL fallback.
    - Cache misses must gracefully fall through to in-process recompilation. A Redis outage must NEVER fail schema compilation or record validation.
 2. **Schema Invalidation & Evolution**:
-   - Every attribute definition creation, update, reorder, archive, or unarchive MUST increment `PROJECT0_ENTITY_TYPES.schema_version` within the same transaction.
+   - Every attribute definition creation, update, reorder, archive, or unarchive MUST increment `UNIPOST_ENTITY_TYPES.schema_version` within the same transaction.
    - Spring Modulith event publication triggers local L1 cache clearing. Stale version entries become unreachable by construction.
 3. **Database Constraints & Soft-Deletes**:
    - Unique constraints on dynamic metadata entities (`system_name`, `(entity_type_id, system_name)`, and `(source_entity_id, target_entity_id, relationship_type_id)`) MUST use PostgreSQL partial unique indexes conditioned on `WHERE "deletedDate" IS NULL`.

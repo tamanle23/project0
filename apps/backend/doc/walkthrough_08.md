@@ -1,7 +1,7 @@
 # Technical Debt Evaluation — Spring Security Authorization & RBAC Design
 
 **Date:** 2026-09-22  
-**Scope:** `project0-fw` (`CustomPermissionEvaluator`, `JwtTokenHelper`, `JwtAuthenticationTokenFilter`), `project0-ms-identity` (`UserServiceImpl`, `UserRole`, `UserPermission`)  
+**Scope:** `unipost-fw` (`CustomPermissionEvaluator`, `JwtTokenHelper`, `JwtAuthenticationTokenFilter`), `unipost-ms-identity` (`UserServiceImpl`, `UserRole`, `UserPermission`)  
 **Artifact Index:** `walkthrough_08.md`
 
 ---
@@ -16,7 +16,7 @@ An architectural evaluation of the current Spring Security authorization system,
 
 ### TD-SEC-01: Hardcoded Superuser Bypass in `CustomPermissionEvaluator`
 
-* **Location:** `com.project0.fw.security.CustomPermissionEvaluator` (Line 34)
+* **Location:** `com.unipost.fw.security.CustomPermissionEvaluator` (Line 34)
 * **Description:**
   ```java
   (permission.equalsIgnoreCase(PermissionActionConstants.LIST) && 
@@ -33,7 +33,7 @@ An architectural evaluation of the current Spring Security authorization system,
 
 ### TD-SEC-02: Authority Inflation & JWT Payload Bloat
 
-* **Location:** `com.project0.user.service.impl.UserServiceImpl` (Lines 437–459), `com.project0.fw.core.jwt.JwtTokenHelper`
+* **Location:** `com.unipost.user.service.impl.UserServiceImpl` (Lines 437–459), `com.unipost.fw.core.jwt.JwtTokenHelper`
 * **Description:**
   - During authentication, every permission code associated with a user's roles AND direct permissions is flattened into a single string list and stored directly inside the JWT token's `authorities` claim.
 * **Impact & Risk:**
@@ -47,7 +47,7 @@ An architectural evaluation of the current Spring Security authorization system,
 
 ### TD-SEC-03: Stale Permissions & Delayed Revocation (Stateless Gap)
 
-* **Location:** `com.project0.fw.core.jwt.JwtAuthenticationTokenFilter`
+* **Location:** `com.unipost.fw.core.jwt.JwtAuthenticationTokenFilter`
 * **Description:**
   - Since permissions are encoded directly into the JWT token payload at login, subsequent database updates (revoking a role or removing a permission from a user) have **no immediate effect** on active sessions.
 * **Impact & Risk:**
@@ -59,7 +59,7 @@ An architectural evaluation of the current Spring Security authorization system,
 
 ### TD-SEC-04: Schema-Code Naming Disconnect in Permissions
 
-* **Location:** `com.project0.user.model.Permission`, `com.project0.fw.security.CustomPermissionEvaluator`
+* **Location:** `com.unipost.user.model.Permission`, `com.unipost.fw.security.CustomPermissionEvaluator`
 * **Description:**
   - `Permission` entity defines separate `target` (e.g. `users`) and `action` (e.g. `list`) fields, but `CustomPermissionEvaluator` constructs string comparisons using `NamedModel.code` formatted as `TARGET_ACTION` (e.g. `USERS_LIST`).
 * **Impact & Risk:**
@@ -73,7 +73,7 @@ An architectural evaluation of the current Spring Security authorization system,
 
 | ID | Title | Severity | Target Module |
 |---|---|---|---|
-| **TD-SEC-01** | Replace hardcoded `ROLE_ADMINISTRATOR` with `RoleHierarchy` | Medium | `project0-fw` |
-| **TD-SEC-02** | Refactor JWT payload: store roles only, load permissions to Redis | High | `project0-fw`, `project0-ms-identity` |
-| **TD-SEC-03** | Implement Redis-backed JWT revocation check | High | `project0-fw` |
-| **TD-SEC-04** | Enforce `target_action` code format in `Permission` model | Low | `project0-ms-identity` |
+| **TD-SEC-01** | Replace hardcoded `ROLE_ADMINISTRATOR` with `RoleHierarchy` | Medium | `unipost-fw` |
+| **TD-SEC-02** | Refactor JWT payload: store roles only, load permissions to Redis | High | `unipost-fw`, `unipost-ms-identity` |
+| **TD-SEC-03** | Implement Redis-backed JWT revocation check | High | `unipost-fw` |
+| **TD-SEC-04** | Enforce `target_action` code format in `Permission` model | Low | `unipost-ms-identity` |

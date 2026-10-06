@@ -2,7 +2,7 @@
 
 ## Changes Made
 - Identified the root cause of Swagger UI's "missing version field" error which occurred exclusively after logging in. 
-- Disabled Spring Data introspection in `springdoc-openapi` across all backend services (`project0-ms-aio`, `project0-ms-fs`, `project0-ms-identity`, `project0-ms-worker`, `project0-report-engine`) by setting `springdoc.show-spring-data-pageable: false` and `springdoc.show-spring-data-rest: false` in their respective `application.yml`/`application-local.yml` files.
+- Disabled Spring Data introspection in `springdoc-openapi` across all backend services (`unipost-ms-aio`, `unipost-ms-fs`, `unipost-ms-identity`, `unipost-ms-worker`, `unipost-report-engine`) by setting `springdoc.show-spring-data-pageable: false` and `springdoc.show-spring-data-rest: false` in their respective `application.yml`/`application-local.yml` files.
 
 ## Root Cause Analysis
 - Before the `permitAlls` fix, Swagger UI was blocked by a `401 Unauthorized`.

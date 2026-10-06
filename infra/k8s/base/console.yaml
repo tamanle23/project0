@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: console
-        image: project0/console:latest
+        image: unipost/console:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80

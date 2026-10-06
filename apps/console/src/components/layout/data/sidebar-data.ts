@@ -28,7 +28,7 @@ import { useMemo } from 'react'
 
 export const sidebarTeams = [
   {
-    name: 'Project0',
+    name: 'Unipost',
     logo: Command,
     plan: 'Vite + ShadcnUI',
   },

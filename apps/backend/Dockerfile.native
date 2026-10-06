@@ -6,15 +6,15 @@ WORKDIR /workspace
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
-COPY project0-core/pom.xml project0-core/
-COPY project0-resources/pom.xml project0-resources/
-COPY project0-fw/pom.xml project0-fw/
-COPY project0-db/pom.xml project0-db/
-COPY project0-ms-fs/pom.xml project0-ms-fs/
-COPY project0-ms-identity/pom.xml project0-ms-identity/
-COPY project0-report-engine/pom.xml project0-report-engine/
-COPY project0-ms-worker/pom.xml project0-ms-worker/
-COPY project0-ms-aio/pom.xml project0-ms-aio/
+COPY unipost-core/pom.xml unipost-core/
+COPY unipost-resources/pom.xml unipost-resources/
+COPY unipost-fw/pom.xml unipost-fw/
+COPY unipost-db/pom.xml unipost-db/
+COPY unipost-ms-fs/pom.xml unipost-ms-fs/
+COPY unipost-ms-identity/pom.xml unipost-ms-identity/
+COPY unipost-report-engine/pom.xml unipost-report-engine/
+COPY unipost-ms-worker/pom.xml unipost-ms-worker/
+COPY unipost-ms-aio/pom.xml unipost-ms-aio/
 
 # Download dependencies
 RUN ./mvnw dependency:go-offline -B
@@ -23,11 +23,11 @@ RUN ./mvnw dependency:go-offline -B
 COPY . .
 
 # Build native image
-RUN ./mvnw -pl project0-ms-aio -am clean package -Pnative -DskipTests
+RUN ./mvnw -pl unipost-ms-aio -am clean package -Pnative -DskipTests
 
 FROM oraclelinux:9-micro
 WORKDIR /app
-COPY --from=builder /workspace/project0-ms-aio/target/project0-ms-aio /app/application
+COPY --from=builder /workspace/unipost-ms-aio/target/unipost-ms-aio /app/application
 
 EXPOSE 8080
 ENTRYPOINT ["/app/application"]

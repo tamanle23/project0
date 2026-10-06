@@ -5,7 +5,7 @@ metadata:
 stringData:
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: password
-  POSTGRES_DB: project0
+  POSTGRES_DB: unipost
 ---
 apiVersion: apps/v1
 kind: StatefulSet

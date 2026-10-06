@@ -191,8 +191,8 @@ export function simulateDemoTokenExchange(): {
       avatar_url_100: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=128&auto=format&fit=crop&q=80',
       avatar_url_200: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=256&auto=format&fit=crop&q=80',
       avatar_large_url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=512&auto=format&fit=crop&q=80',
-      display_name: 'Project0 Studio TikTok',
-      profile_deep_link: 'tiktok://user/profile/project0',
+      display_name: 'Unipost Studio TikTok',
+      profile_deep_link: 'tiktok://user/profile/unipost',
       is_verified: true,
     },
   }

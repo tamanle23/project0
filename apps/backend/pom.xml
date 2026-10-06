@@ -3,21 +3,21 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.project0</groupId>
-  <artifactId>project0</artifactId>
+  <groupId>com.unipost</groupId>
+  <artifactId>unipost</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
-    <module>./project0-core</module>
-    <module>./project0-resources</module>
-    <module>./project0-fw</module>
-    <module>./project0-db</module>
-    <module>./project0-ms-fs</module>
-    <module>./project0-ms-identity</module>
-    <module>./project0-report-engine</module>
-    <module>./project0-ms-worker</module>
-    <module>./project0-ms-aio</module>
+    <module>./unipost-core</module>
+    <module>./unipost-resources</module>
+    <module>./unipost-fw</module>
+    <module>./unipost-db</module>
+    <module>./unipost-ms-fs</module>
+    <module>./unipost-ms-identity</module>
+    <module>./unipost-report-engine</module>
+    <module>./unipost-ms-worker</module>
+    <module>./unipost-ms-aio</module>
   </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -68,57 +68,57 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>project0-core</artifactId>
+        <artifactId>unipost-core</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>project0-resources</artifactId>
+        <artifactId>unipost-resources</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>project0-fw</artifactId>
+        <artifactId>unipost-fw</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>project0-db</artifactId>
+        <artifactId>unipost-db</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>project0-ms-fs</artifactId>
+        <artifactId>unipost-ms-fs</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>project0-ms-identity</artifactId>
+        <artifactId>unipost-ms-identity</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>project0-ms-pos</artifactId>
+        <artifactId>unipost-ms-pos</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>project0-ms-cms</artifactId>
+        <artifactId>unipost-ms-cms</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>project0-report-engine</artifactId>
+        <artifactId>unipost-report-engine</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>project0-ms-worker</artifactId>
+        <artifactId>unipost-ms-worker</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>project0-ms-aio</artifactId>
+        <artifactId>unipost-ms-aio</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
     </dependencies>

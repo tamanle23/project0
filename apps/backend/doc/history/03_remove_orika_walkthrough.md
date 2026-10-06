@@ -3,16 +3,16 @@
 ## Changes Made
 
 ### 1. Deleted Orika Bean Configuration
-- Removed `BeanMapperContextAware.java` (`com.project0.fw.mapper.BeanMapperContextAware`) and deleted the empty `mapper` directory.
+- Removed `BeanMapperContextAware.java` (`com.unipost.fw.mapper.BeanMapperContextAware`) and deleted the empty `mapper` directory.
 - This eliminated Orika's `FactoryBean<MapperFacade>` and custom converter registration.
 
 ### 2. Cleaned Base Controller
-- In [CommonController.java](file:///c:/Users/Admin/workspace/git/prjz/project0-fw/src/main/java/com/project0/fw/CommonController.java):
+- In [CommonController.java](file:///c:/Users/Admin/workspace/git/prjz/unipost-fw/src/main/java/com/unipost/fw/CommonController.java):
   - Removed `import ma.glasnost.orika.MapperFacade;`
   - Removed the unused injected field `@Inject protected MapperFacade mapper;`.
 
 ### 3. Removed Maven Dependency
-- In [project0-fw/pom.xml](file:///c:/Users/Admin/workspace/git/prjz/project0-fw/pom.xml):
+- In [unipost-fw/pom.xml](file:///c:/Users/Admin/workspace/git/prjz/unipost-fw/pom.xml):
   - Removed `ma.glasnost.orika:orika-core:1.5.1`.
 
 ## Verification

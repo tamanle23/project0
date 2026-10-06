@@ -18,7 +18,7 @@ import {
   Video,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { IconYoutube } from '@project0/ui/icons'
+import { IconYoutube } from '@unipost/ui/icons'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -255,7 +255,7 @@ export function YouTubeConnectModal({
     try {
       if (isDemoMode) {
         const newExpiresAt = new Date(Date.now() + 3600 * 1000).toISOString()
-        updateAccessToken('ya29.a0AfH6SMB_refreshed_demo_access_token_project0', newExpiresAt)
+        updateAccessToken('ya29.a0AfH6SMB_refreshed_demo_access_token_unipost', newExpiresAt)
         toast.success('Access Token refreshed successfully with Sandbox Refresh Token!')
         return
       }

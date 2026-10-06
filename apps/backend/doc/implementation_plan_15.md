@@ -1,6 +1,6 @@
 # Implementation Plan 15 - Backend Metadata / SchemaBuilder Module Hardening & Completion
 
-Scope: `@project0/backend` (`apps/backend/project0-fw`, `project0-db`, `project0-ms-worker`). Companion console work is in `apps/console/doc/implementation_plan_52.md`.
+Scope: `@unipost/backend` (`apps/backend/unipost-fw`, `unipost-db`, `unipost-ms-worker`). Companion console work is in `apps/console/doc/implementation_plan_52.md`.
 
 ## 1. Investigation Summary
 
@@ -8,12 +8,12 @@ Scope: `@project0/backend` (`apps/backend/project0-fw`, `project0-db`, `project0
 
 | Layer | Artifact | Notes |
 | :--- | :--- | :--- |
-| API | [`MetadataController`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/presentation/MetadataController.java) | 6 endpoints under `/api/v1/metadata`: list/create EntityType, list/create Attribute, list/create Record. **No GET-by-id, PUT, or DELETE anywhere.** |
-| Service | [`MetadataService`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/service/MetadataService.java) | Thin pass-through to repositories; publishes `AttributeDefinitionUpdatedEvent` on attribute create only. |
-| Validation | [`SchemaValidationService`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/service/SchemaValidationService.java) | Compiles attributes to JSON Schema Draft-07 (networknt), caches in Redis key `schema:{id}`. |
-| Cache | [`MetadataCacheListener`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/service/MetadataCacheListener.java) | `@Async @TransactionalEventListener(AFTER_COMMIT)` deletes the Redis key. |
+| API | [`MetadataController`](file:///c:/Users/Admin/workspace/git/unipost/apps/backend/unipost-fw/src/main/java/com/unipost/presentation/MetadataController.java) | 6 endpoints under `/api/v1/metadata`: list/create EntityType, list/create Attribute, list/create Record. **No GET-by-id, PUT, or DELETE anywhere.** |
+| Service | [`MetadataService`](file:///c:/Users/Admin/workspace/git/unipost/apps/backend/unipost-fw/src/main/java/com/unipost/service/MetadataService.java) | Thin pass-through to repositories; publishes `AttributeDefinitionUpdatedEvent` on attribute create only. |
+| Validation | [`SchemaValidationService`](file:///c:/Users/Admin/workspace/git/unipost/apps/backend/unipost-fw/src/main/java/com/unipost/service/SchemaValidationService.java) | Compiles attributes to JSON Schema Draft-07 (networknt), caches in Redis key `schema:{id}`. |
+| Cache | [`MetadataCacheListener`](file:///c:/Users/Admin/workspace/git/unipost/apps/backend/unipost-fw/src/main/java/com/unipost/service/MetadataCacheListener.java) | `@Async @TransactionalEventListener(AFTER_COMMIT)` deletes the Redis key. |
 | Domain | `domain/metadata/*` | `EntityType`, `AttributeDefinition`, `EntityRecord` (JSONB `attributes`), `RelationshipType`, `EntityRelationship` (edge table), `MapJsonConverter`. |
-| DB | [`changelog-000.000.00001.xml`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-db/src/main/resources/db/project0/changelog-000.000.00001.xml) | 5 tables, JSONB columns, unique `(entity_type_id, system_name)`. |
+| DB | [`changelog-000.000.00001.xml`](file:///c:/Users/Admin/workspace/git/unipost/apps/backend/unipost-db/src/main/resources/db/unipost/changelog-000.000.00001.xml) | 5 tables, JSONB columns, unique `(entity_type_id, system_name)`. |
 | Tests | `MetadataServiceTest`, `MetadataControllerTest`, `SchemaValidationServiceTest`, `MapJsonConverterTest`, `MetadataCacheListenerTest` | Mockito-only; controller tests call methods directly (no MockMvc, no security, no DB, no Redis). |
 
 ### 1.2 Findings (ordered by severity)
@@ -45,7 +45,7 @@ Scope: `@project0/backend` (`apps/backend/project0-fw`, `project0-db`, `project0
 | # | Finding |
 | :-: | :--- |
 | M1 | **No schema versioning.** Changing `required`/type/choices does not revalidate existing records; no `schemaVersion` on `EntityType`/`EntityRecord`; no migration/backfill path. No attribute display order. |
-| M2 | **No query capability on JSONB.** No filter/sort by attribute, no GIN index on `PROJECT0_ENTITIES.attributes`, no index on `PROJECT0_ENTITIES.entity_type_id` (PostgreSQL does not auto-index FKs). |
+| M2 | **No query capability on JSONB.** No filter/sort by attribute, no GIN index on `UNIPOST_ENTITIES.attributes`, no index on `UNIPOST_ENTITIES.entity_type_id` (PostgreSQL does not auto-index FKs). |
 | M3 | **Relationships are dead code.** `RelationshipType`/`EntityRelationship` have entities + tables but no repositories, service, or endpoints; the console's `relation_picker` has nothing behind it. |
 | M4 | **Tenancy is cosmetic.** `tenant_id` is client-supplied and never filtered or checked against the caller. |
 | M5 | **Defaults not applied server-side.** `defaultValue` is stored (as `VARCHAR(255)`) but never applied; type of default is untyped. |
@@ -63,7 +63,7 @@ The console work delivered under plan 52 has three problems that this backend pl
 ## 2. Target Design
 
 ```
-com.project0.metadata/                      (Spring Modulith module, @ApplicationModule)
+com.unipost.metadata/                      (Spring Modulith module, @ApplicationModule)
 ├── package-info.java                       # allowed deps, named interface "api"
 ├── api/                                    # exposed to other modules
 │   ├── MetadataSchemaApi.java              # compileSchema(typeId), validate(typeId, payload)
@@ -122,17 +122,17 @@ Exit criteria: no entity crosses the controller; all errors are 4xx where the cl
 
    Exclude archived attributes from `required` and from `properties` for new writes (still accept historical keys on update with a lenient mode flag); `additionalProperties: false`; apply `default`.
 2. **Expose it:** `GET /entity-types/{id}/schema` returns the compiled Draft-07 document + `schemaVersion`. The console preview calls this instead of re-implementing it.
-3. **Versioning:** add `schema_version BIGINT` to `PROJECT0_ENTITY_TYPES`, incremented in the same transaction as any attribute change. Cache key becomes `schema:{typeId}:v{version}` - stale entries are unreachable by construction (fixes C4's race without relying on invalidation timing).
+3. **Versioning:** add `schema_version BIGINT` to `UNIPOST_ENTITY_TYPES`, incremented in the same transaction as any attribute change. Cache key becomes `schema:{typeId}:v{version}` - stale entries are unreachable by construction (fixes C4's race without relying on invalidation timing).
 4. **Two-level cache + fallback (C5):** Caffeine L1 holding the **parsed `JsonSchema`** (kills re-parsing), Redis L2 with TTL (e.g. 1h) holding JSON. Any Redis exception is caught, logged, metered, and falls through to in-process compile; Redis never fails a write.
 5. **Reliable invalidation (C4):** move to Spring Modulith's event publication registry (`@ApplicationModuleListener`) so L1 eviction across nodes is retried/persisted; with versioned keys invalidation becomes a memory-hygiene concern only.
 
 ### Phase 4 - Records: validate on update, defaults, search, performance
-- `RecordService.update/patch`: merge, apply defaults server-side (M5), validate against **current** schema, stamp `schema_version` (new column on `PROJECT0_ENTITIES`).
+- `RecordService.update/patch`: merge, apply defaults server-side (M5), validate against **current** schema, stamp `schema_version` (new column on `UNIPOST_ENTITIES`).
 - Structured validation errors from `networknt` messages -> `[{field, code, message}]` (maps to H3 and drives console inline errors).
 - **Filter/sort on attributes:** `GET .../records?filter[status]=active&filter[price][gte]=10&sort=attributes.price,desc` via a `Specification` using `jsonb_extract_path_text` / `@>`; whitelisted to defined, non-archived attributes only (no SQL injection surface); typed casts by `dataType`.
 - **Indexes (M2)** in new changeset: `idx_entities_type (entity_type_id) WHERE deletedDate IS NULL`, `GIN (attributes jsonb_path_ops)`.
 - **Tenancy (M4):** derive `tenantId` from the security context; ignore client value; add tenant predicate to all record queries.
-- **Revalidation job:** Spring Batch job in `project0-ms-worker` that scans records with `schema_version < current`, reports violations (does not mutate), exposed as `POST /entity-types/{id}/revalidate` -> job execution id. Addresses M1 evolution safety.
+- **Revalidation job:** Spring Batch job in `unipost-ms-worker` that scans records with `schema_version < current`, reports violations (does not mutate), exposed as `POST /entity-types/{id}/revalidate` -> job execution id. Addresses M1 evolution safety.
 
 ### Phase 5 - Relationships
 - Repositories + `RelationshipService` + endpoints: CRUD for `RelationshipType` (with optional `sourceEntityTypeId`/`targetEntityTypeId` constraints, `cardinality` - new columns) and `EntityRelationship` (`POST/DELETE /records/{id}/relationships`, `GET` with direction filter).
@@ -141,7 +141,7 @@ Exit criteria: no entity crosses the controller; all errors are 4xx where the cl
 - Edge metadata validated against an optional per-relationship-type schema.
 
 ### Phase 6 - Modularity, observability, tests, docs
-- Move to `com.project0.metadata` Modulith module (M6); `@ApplicationModule` + named interface; `ModularityTests` (`pnpm --filter @project0/backend test:modulith`) must pass. Decision D1 on aligning with plan 14's CQRS layout.
+- Move to `com.unipost.metadata` Modulith module (M6); `@ApplicationModule` + named interface; `ModularityTests` (`pnpm --filter @unipost/backend test:modulith`) must pass. Decision D1 on aligning with plan 14's CQRS layout.
 - Micrometer metrics: `metadata.schema.cache{level,result}`, `metadata.validation.failures{entityType}`, compile timer; structured log on schema change with before/after version.
 - Tests: MockMvc slice tests (binding, validation, 401/403, error codes); `SchemaCompilerTest` table-driven over all 9 components (+ boundary cases); Testcontainers integration (PG + Redis down scenario); concurrency test reproducing C4 against versioned keys; Liquibase changeset test against PG.
 - Docs: record C3/C4/C6/C7 in `docs/master_rules_reference.md` (hard-learned failure modes rule); `walkthrough_15.md`; update console `implementation_plan_52` follow-up list.
@@ -150,12 +150,12 @@ Exit criteria: no entity crosses the controller; all errors are 4xx where the cl
 
 | Change | Reason |
 | :--- | :--- |
-| `PROJECT0_ENTITY_TYPES.schema_version BIGINT NOT NULL DEFAULT 1` | cache versioning, evolution |
-| `PROJECT0_ATTRIBUTE_DEFINITIONS.display_order INT` | ordering |
-| `PROJECT0_ENTITIES.schema_version BIGINT` | record/schema drift detection |
+| `UNIPOST_ENTITY_TYPES.schema_version BIGINT NOT NULL DEFAULT 1` | cache versioning, evolution |
+| `UNIPOST_ATTRIBUTE_DEFINITIONS.display_order INT` | ordering |
+| `UNIPOST_ENTITIES.schema_version BIGINT` | record/schema drift detection |
 | Replace unique constraints with partial unique indexes `WHERE deletedDate IS NULL` | name reuse after soft delete |
 | `idx_entities_type`, `GIN(attributes jsonb_path_ops)` | list/filter performance |
-| `PROJECT0_RELATIONSHIP_TYPES`: `source_entity_type_id`, `target_entity_type_id`, `cardinality` | relationship constraints |
+| `UNIPOST_RELATIONSHIP_TYPES`: `source_entity_type_id`, `target_entity_type_id`, `cardinality` | relationship constraints |
 | Data fix-up: backfill `schema_version`, `display_order` | existing rows |
 
 Existing changeset `hybrid-metadata-schema-init` is **not edited**.
@@ -185,8 +185,8 @@ Existing changeset `hybrid-metadata-schema-init` is **not edited**.
 - **D4 (Authority Model):** Fine-grained `METADATA_*` authorities (`METADATA_SCHEMA_WRITE`, `METADATA_RECORD_WRITE`, `METADATA_RECORD_READ`, etc.) combined with `ROLE_ADMIN`.
 
 ## 8. Verification Plan
-- `pnpm --filter @project0/backend check-types` (compile incl. tests)
-- `pnpm --filter @project0/backend test` (unit + slice + Testcontainers, requires Docker)
-- `pnpm --filter @project0/backend test:modulith`
-- Liquibase: apply changeset on a copy of local `project0` DB, run rollback, re-apply.
+- `pnpm --filter @unipost/backend check-types` (compile incl. tests)
+- `pnpm --filter @unipost/backend test` (unit + slice + Testcontainers, requires Docker)
+- `pnpm --filter @unipost/backend test:modulith`
+- Liquibase: apply changeset on a copy of local `unipost` DB, run rollback, re-apply.
 - Manual: with console pointed at the real backend (mock switch off) run create type -> add all 9 attribute kinds -> create/update/filter/delete records; confirm 400/404/409 bodies and pagination on page 2+.

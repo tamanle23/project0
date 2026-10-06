@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: tekgo-ui
-        image: project0/tekgo-ui:latest
+        image: unipost/tekgo-ui:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000

@@ -7,7 +7,7 @@
 - As established previously, this `Error` bypasses the standard `GlobalExceptionHandler`, resulting in a generic 500 HTML response that Swagger UI cannot parse as JSON, prompting the "missing version field" error.
 
 ## Changes Made
-- Added the `kotlin-reflect` dependency (version `1.9.10`, matching the `kotlin-stdlib` version) to `apps/backend/project0-fw/pom.xml`.
+- Added the `kotlin-reflect` dependency (version `1.9.10`, matching the `kotlin-stdlib` version) to `apps/backend/unipost-fw/pom.xml`.
 
 ## Validation
 - This satisfies Springdoc's internal Kotlin checks, preventing the `NoClassDefFoundError` entirely.

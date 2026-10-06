@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import type { Authors } from '@/lib/content'
-import { SocialIcon } from '@project0/ui/icons'
+import { SocialIcon } from '@unipost/ui/icons'
 import Image from '@/components/Image'
 
 interface Props {

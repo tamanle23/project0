@@ -1,5 +1,5 @@
 {
-  "name": "@project0",
+  "name": "@unipost",
   "private": true,
   "scripts": {
     "build": "turbo build",

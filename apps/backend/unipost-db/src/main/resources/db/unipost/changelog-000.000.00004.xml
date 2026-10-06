@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="hybrid-metadata-relationships-04" author="antigravity">
+        <!-- 1. Add source_entity_type_id, target_entity_type_id, cardinality to UNIPOST_RELATIONSHIP_TYPES -->
+        <addColumn tableName="UNIPOST_RELATIONSHIP_TYPES">
+            <column name="source_entity_type_id" type="BIGINT">
+                <constraints foreignKeyName="fk_rel_type_source_entity_type" referencedTableName="UNIPOST_ENTITY_TYPES" referencedColumnNames="id"/>
+            </column>
+            <column name="target_entity_type_id" type="BIGINT">
+                <constraints foreignKeyName="fk_rel_type_target_entity_type" referencedTableName="UNIPOST_ENTITY_TYPES" referencedColumnNames="id"/>
+            </column>
+            <column name="cardinality" type="VARCHAR(50)" defaultValue="MANY_TO_MANY"/>
+        </addColumn>
+
+        <!-- 2. Replace UNIPOST_RELATIONSHIP_TYPES system_name unique constraint with partial index for soft-delete support -->
+        <sql dbms="postgresql">
+            DO $$
+            DECLARE
+                r RECORD;
+            BEGIN
+                FOR r IN (
+                    SELECT conname 
+                    FROM pg_constraint 
+                    WHERE conrelid = 'UNIPOST_RELATIONSHIP_TYPES'::regclass 
+                      AND contype = 'u' 
+                      AND pg_get_constraintdef(oid) LIKE '%system_name%'
+                ) LOOP
+                    EXECUTE 'ALTER TABLE UNIPOST_RELATIONSHIP_TYPES DROP CONSTRAINT ' || quote_ident(r.conname);
+                END LOOP;
+            END $$;
+
+            CREATE UNIQUE INDEX IF NOT EXISTS uk_rel_type_sysname_active 
+            ON UNIPOST_RELATIONSHIP_TYPES (system_name) 
+            WHERE "deletedDate" IS NULL;
+        </sql>
+
+        <!-- 3. Replace uk_entity_rel_triplet on UNIPOST_ENTITY_RELATIONSHIPS with partial unique index for soft-delete support -->
+        <sql dbms="postgresql">
+            DO $$
+            DECLARE
+                r RECORD;
+            BEGIN
+                FOR r IN (
+                    SELECT conname 
+                    FROM pg_constraint 
+                    WHERE conrelid = 'UNIPOST_ENTITY_RELATIONSHIPS'::regclass 
+                      AND contype = 'u' 
+                      AND pg_get_constraintdef(oid) LIKE '%source_entity_id%'
+                ) LOOP
+                    EXECUTE 'ALTER TABLE UNIPOST_ENTITY_RELATIONSHIPS DROP CONSTRAINT ' || quote_ident(r.conname);
+                END LOOP;
+            END $$;
+
+            CREATE UNIQUE INDEX IF NOT EXISTS uk_entity_rel_triplet_active 
+            ON UNIPOST_ENTITY_RELATIONSHIPS (source_entity_id, target_entity_id, relationship_type_id) 
+            WHERE "deletedDate" IS NULL;
+
+            CREATE INDEX IF NOT EXISTS idx_entity_rel_source_active 
+            ON UNIPOST_ENTITY_RELATIONSHIPS (source_entity_id) 
+            WHERE "deletedDate" IS NULL;
+
+            CREATE INDEX IF NOT EXISTS idx_entity_rel_target_active 
+            ON UNIPOST_ENTITY_RELATIONSHIPS (target_entity_id) 
+            WHERE "deletedDate" IS NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

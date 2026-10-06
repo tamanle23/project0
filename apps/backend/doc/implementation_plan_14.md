@@ -11,22 +11,22 @@
 The refactoring applies a layered structure per bounded context (e.g., `identity`, `article`):
 
 **Domain Layer (Core)**
-- `com.project0.domain.[context].model`: Entities, Value Objects, Aggregates.
-- `com.project0.domain.[context].repository`: Repository Interfaces.
-- `com.project0.domain.[context].exception`: Domain-specific exceptions.
+- `com.unipost.domain.[context].model`: Entities, Value Objects, Aggregates.
+- `com.unipost.domain.[context].repository`: Repository Interfaces.
+- `com.unipost.domain.[context].exception`: Domain-specific exceptions.
 
 **Application Layer (Use Cases)**
-- `com.project0.app.[context].command`: Command records and Command Handlers.
-- `com.project0.app.[context].query`: Query records and Query Handlers.
-- `com.project0.app.shared.mediator`: Interfaces for `CommandDispatcher` and `QueryDispatcher`.
+- `com.unipost.app.[context].command`: Command records and Command Handlers.
+- `com.unipost.app.[context].query`: Query records and Query Handlers.
+- `com.unipost.app.shared.mediator`: Interfaces for `CommandDispatcher` and `QueryDispatcher`.
 
 **Infrastructure Layer (Adapters)**
-- `com.project0.infra.[context].repository`: Spring Data JPA implementations of domain repositories.
-- `com.project0.infra.[context].entity`: JPA Entities (mapped to/from Domain Entities).
-- `com.project0.infra.shared.mediator`: Spring-based implementation of dispatchers.
+- `com.unipost.infra.[context].repository`: Spring Data JPA implementations of domain repositories.
+- `com.unipost.infra.[context].entity`: JPA Entities (mapped to/from Domain Entities).
+- `com.unipost.infra.shared.mediator`: Spring-based implementation of dispatchers.
 
 **Presentation Layer (Web)**
-- `com.project0.web.[context].controller`: REST Controllers dispatching commands/queries.
+- `com.unipost.web.[context].controller`: REST Controllers dispatching commands/queries.
 
 ## 3. Implementation: Proof-of-Concept (User Registration)
 

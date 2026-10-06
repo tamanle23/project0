@@ -16,13 +16,13 @@ spec:
     spec:
       containers:
       - name: backend
-        image: project0/backend:latest
+        image: unipost/backend:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
         env:
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://postgres:5432/project0
+          value: jdbc:postgresql://postgres:5432/unipost
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:

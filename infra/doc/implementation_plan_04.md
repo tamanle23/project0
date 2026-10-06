@@ -27,14 +27,14 @@ Create `apps/console/Dockerfile`. This will build the Vite app and serve it usin
 
 ### 3. Update Kubernetes Manifests
 Modify the K8s `Deployment` YAMLs in `apps/infra/k8s/base/`:
-- **[MODIFY] `tekgo-ui.yaml`**: Update the image to `project0/tekgo-ui:latest`, change `containerPort` to `3000` (and `targetPort` in the Service to `3000`). Ensure `imagePullPolicy: IfNotPresent` is set for Kind.
-- **[MODIFY] `console.yaml`**: Update the image to `project0/console:latest`. (Keeps port `80`).
+- **[MODIFY] `tekgo-ui.yaml`**: Update the image to `unipost/tekgo-ui:latest`, change `containerPort` to `3000` (and `targetPort` in the Service to `3000`). Ensure `imagePullPolicy: IfNotPresent` is set for Kind.
+- **[MODIFY] `console.yaml`**: Update the image to `unipost/console:latest`. (Keeps port `80`).
 
 ### 4. Update the Runbook
 Add instructions to `apps/infra/README.md` on how to build the Docker images and load them into the local Kind cluster:
 ```bash
-docker build -t project0/tekgo-ui:latest -f apps/tekgo-ui/Dockerfile .
-docker build -t project0/console:latest -f apps/console/Dockerfile .
-kind load docker-image project0/tekgo-ui:latest --name project0-local
-kind load docker-image project0/console:latest --name project0-local
+docker build -t unipost/tekgo-ui:latest -f apps/tekgo-ui/Dockerfile .
+docker build -t unipost/console:latest -f apps/console/Dockerfile .
+kind load docker-image unipost/tekgo-ui:latest --name unipost-local
+kind load docker-image unipost/console:latest --name unipost-local
 ```

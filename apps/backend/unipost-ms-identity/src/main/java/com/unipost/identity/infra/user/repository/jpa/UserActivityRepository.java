@@ -1,0 +1,8 @@
+package com.unipost.identity.infra.user.repository.jpa;
+
+import com.unipost.user.model.UserActivity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+public interface UserActivityRepository extends JpaRepository<UserActivity, Long>, JpaSpecificationExecutor<UserActivity>{
+}

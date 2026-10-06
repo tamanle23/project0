@@ -1,12 +1,12 @@
 # UserGraphqlController — Walkthrough
 
 **Date:** 2026-09-22  
-**Scope:** `project0-ms-identity` module
+**Scope:** `unipost-ms-identity` module
 
 ## Changes Made
 
 ### 1. `users.graphqls` — GraphQL Schema
-**File:** `project0-ms-identity/src/main/resources/graphql/users.graphqls`
+**File:** `unipost-ms-identity/src/main/resources/graphql/users.graphqls`
 
 - Defined `extend type Query` with 6 operations mirroring all `UserQueryController` read endpoints
 - Two input types: `UserSearchInput` (userName, userTypes, page, size) and `PageInput` (page, size)
@@ -16,7 +16,7 @@
 - Output types: `UserVm`, `UserPage`, `UserProfileVm`, `PermissionVm`, `UserPermissionVm`, `RoleVm`, `UserRoleVm`, `RolePage`, `PermissionPage`
 
 ### 2. `UserGraphqlController.java` — Controller
-**File:** `project0-ms-identity/src/main/java/com/project0/user/controller/graphql/UserGraphqlController.java`
+**File:** `unipost-ms-identity/src/main/java/com/unipost/user/controller/graphql/UserGraphqlController.java`
 
 - Extended `CommonController` (inherits `extractRequest`, `context`, logger)
 - Injected `UserService<User>` and `UserMapper` via `@Autowired`
@@ -33,7 +33,7 @@
 - Two Java `record` types declared as inner classes: `UserSearchInput`, `PageInput`
 
 ### 3. `application.yml` — GraphQL Config
-**File:** `project0-ms-identity/src/main/resources/application.yml`
+**File:** `unipost-ms-identity/src/main/resources/application.yml`
 
 Added:
 ```yaml

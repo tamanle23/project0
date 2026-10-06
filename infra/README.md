@@ -1,6 +1,6 @@
-# Project0 Infrastructure & GitOps Architecture
+# Unipost Infrastructure & GitOps Architecture
 
-This directory (`/infra`) contains the Infrastructure-as-Code (IaC) and Kubernetes manifests for the Project0 ecosystem. 
+This directory (`/infra`) contains the Infrastructure-as-Code (IaC) and Kubernetes manifests for the Unipost ecosystem. 
 
 The core philosophy of this setup is **GitOps**: Git is the absolute, single source of truth for your entire physical system. You do not deploy to production manually; you simply update Git, and automated systems reconcile the cloud to match your repository.
 
@@ -36,19 +36,19 @@ Use this workflow to test the entire microservice ecosystem locally on your mach
 ### Step 1: Build Local Images
 Run these commands from the **root** of the monorepo to build the optimized Turborepo multi-stage images:
 ```bash
-docker build -t project0/tekgo-ui:latest -f apps/tekgo-ui/Dockerfile .
-docker build -t project0/console:latest -f apps/console/Dockerfile .
-docker build -t project0/backend:latest -f apps/backend/project0-ms-aio/deloyment/Dockerfile .
+docker build -t unipost/tekgo-ui:latest -f apps/tekgo-ui/Dockerfile .
+docker build -t unipost/console:latest -f apps/console/Dockerfile .
+docker build -t unipost/backend:latest -f apps/backend/unipost-ms-aio/deloyment/Dockerfile .
 ```
 
 ### Step 2: Spin Up Cluster & Load Images
 ```bash
-kind create cluster --name project0-local
+kind create cluster --name unipost-local
 
 # Load your locally built images into the cluster
-kind load docker-image project0/tekgo-ui:latest --name project0-local
-kind load docker-image project0/console:latest --name project0-local
-kind load docker-image project0/backend:latest --name project0-local
+kind load docker-image unipost/tekgo-ui:latest --name unipost-local
+kind load docker-image unipost/console:latest --name unipost-local
+kind load docker-image unipost/backend:latest --name unipost-local
 ```
 
 ### Step 3: Install Local Ingress Controller

@@ -6,12 +6,12 @@ description: Compact monorepo registry, packaging boundaries, i18n sync, and Liq
 # WORKSPACE REGISTRY & ROUTING
 - Specs: `pnpm` workspace + Turborepo pipelines (`build`, `dev`, `lint`, `test`, `check-types`).
 - Registry:
-  - `@project0/backend`: `apps/backend` (Java 21 / Spring Modulith) | Deps: None
-  - `@project0/console`: `apps/console` (React 19 / Vite 8) | Deps: `@project0/ui`, `@project0/i18n`, `@project0/typescript-config`
-  - `@project0/desktop`: `apps/desktop-console` (Electrobun) | Deps: `@project0/console`, `@project0/typescript-config`
+  - `@unipost/backend`: `apps/backend` (Java 21 / Spring Modulith) | Deps: None
+  - `@unipost/console`: `apps/console` (React 19 / Vite 8) | Deps: `@unipost/ui`, `@unipost/i18n`, `@unipost/typescript-config`
+  - `@unipost/desktop`: `apps/desktop-console` (Electrobun) | Deps: `@unipost/console`, `@unipost/typescript-config`
   - `mobile-ui`: `apps/mobile-ui` (Expo SDK 57 / React Native 0.86) | Deps: None
-  - `tekgo-ui`: `apps/tekgo-ui` (Next.js 15 / React 19) | Deps: `@project0/ui`
-  - Packages: `@project0/i18n` (`packages/i18n`), `@project0/typescript-config` (`packages/typescript-config`), `@project0/ui` (`packages/ui`)
+  - `tekgo-ui`: `apps/tekgo-ui` (Next.js 15 / React 19) | Deps: `@unipost/ui`
+  - Packages: `@unipost/i18n` (`packages/i18n`), `@unipost/typescript-config` (`packages/typescript-config`), `@unipost/ui` (`packages/ui`)
 - Directive: Treat registry as authoritative. NEVER perform full-repo tree scans to locate apps. Scope all operations directly inside registered paths.
 
 # MONOREPO & PACKAGING BOUNDARIES
@@ -48,8 +48,8 @@ description: Compact monorepo registry, packaging boundaries, i18n sync, and Liq
 
 # DYNAMIC METADATA ENGINE INVARIANTS
 - Schema Caching: MUST use versioned cache keys `schema:{id}:v{version}` with L1 in-memory parsed `JsonSchema` + L2 Redis fallback. Redis failures MUST NEVER break schema compile or validation.
-- Schema Evolution: Any attribute definition mutation MUST increment `PROJECT0_ENTITY_TYPES.schema_version` in the same transaction.
-- Soft-Delete Indexes: Metadata tables (`PROJECT0_ENTITY_TYPES`, `PROJECT0_ATTRIBUTE_DEFINITIONS`, `PROJECT0_RELATIONSHIP_TYPES`, `PROJECT0_ENTITY_RELATIONSHIPS`) MUST use partial unique indexes `WHERE "deletedDate" IS NULL`.
+- Schema Evolution: Any attribute definition mutation MUST increment `UNIPOST_ENTITY_TYPES.schema_version` in the same transaction.
+- Soft-Delete Indexes: Metadata tables (`UNIPOST_ENTITY_TYPES`, `UNIPOST_ATTRIBUTE_DEFINITIONS`, `UNIPOST_RELATIONSHIP_TYPES`, `UNIPOST_ENTITY_RELATIONSHIPS`) MUST use partial unique indexes `WHERE "deletedDate" IS NULL`.
 - Record Validation: Compilation MUST set `additionalProperties: false`. Server-side defaults MUST be applied prior to JSON Schema validation.
 - Relationships: MUST enforce cardinality constraints and reject cross-tenant relations. `relation_picker` attributes MUST validate target record existence.
 

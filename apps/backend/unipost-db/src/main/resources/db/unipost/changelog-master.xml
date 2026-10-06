@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+  <property name="schema" value="UNIPOST"/>
+  <property name="table_prefix" value="UNIPOST_"/>
+
+  <include file="db/unipost/changelog-000.000.00000.xml"/>
+  <include file="db/unipost/changelog-000.000.00001.xml"/>
+  <include file="db/unipost/changelog-000.000.00002.xml"/>
+  <include file="db/unipost/changelog-000.000.00003.xml"/>
+  <include file="db/unipost/changelog-000.000.00004.xml"/>
+
+</databaseChangeLog>

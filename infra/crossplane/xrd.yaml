@@ -1,9 +1,9 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xapploadbalancers.infra.project0.io
+  name: xapploadbalancers.infra.unipost.io
 spec:
-  group: infra.project0.io
+  group: infra.unipost.io
   names:
     kind: XAppLoadBalancer
     plural: xapploadbalancers

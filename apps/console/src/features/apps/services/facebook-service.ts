@@ -270,7 +270,7 @@ export function simulateDemoFacebookLogin(): {
   const mockPages: FacebookPage[] = [
     {
       id: '102938475610293',
-      name: 'Project0 Official Store',
+      name: 'Unipost Official Store',
       category: 'E-commerce & Retail',
       accessToken:
         'EAAB' +
@@ -281,7 +281,7 @@ export function simulateDemoFacebookLogin(): {
     },
     {
       id: '584736291029384',
-      name: 'Project0 Community Hub',
+      name: 'Unipost Community Hub',
       category: 'Community Organization',
       accessToken:
         'EAAB' +

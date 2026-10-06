@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <properties>
+    <property name="table_prefix" value="unipost_"/>
+    <property name="table_prefix_cms" value="unipost_cms_"/>
+    <property name="table_prefix_identity" value="unipost_identity_"/>
+    <property name="table_prefix_worker" value="unipost_worker_"/>
+  </properties>
+  <settings>
+    <setting name="mapUnderscoreToCamelCase" value="true" />
+    <setting name="defaultFetchSize" value="100" />
+    <setting name="defaultStatementTimeout" value="30" />
+    <setting name="defaultEnumTypeHandler" value="org.apache.ibatis.type.EnumOrdinalTypeHandler"/>
+  </settings>
+  <typeHandlers>
+    <typeHandler handler="org.apache.ibatis.type.EnumTypeHandler" javaType="com.unipost.user.model.enums.UserType" />
+    <typeHandler handler="org.apache.ibatis.type.EnumTypeHandler" javaType="com.unipost.workflow.RecordState" />
+    <typeHandler handler="org.apache.ibatis.type.EnumTypeHandler" javaType="com.unipost.domain.enums.RecordMode" />
+    <typeHandler handler="org.apache.ibatis.type.EnumTypeHandler" javaType="com.unipost.worker.model.enums.TaskFrequency" />
+    <typeHandler handler="org.apache.ibatis.type.EnumTypeHandler" javaType="com.unipost.worker.model.enums.TaskType" />
+    <typeHandler handler="org.apache.ibatis.type.EnumTypeHandler" javaType="com.unipost.worker.model.enums.TriggerType" />
+    <typeHandler handler="org.apache.ibatis.type.EnumTypeHandler" javaType="com.unipost.worker.model.enums.TaskStatus" />
+
+  </typeHandlers>
+</configuration>

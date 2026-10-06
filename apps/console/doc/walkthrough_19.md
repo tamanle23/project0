@@ -23,11 +23,11 @@ We have updated the sidebar navigation in `apps/console` to add a dedicated **"A
 ### Automated Verification
 - **Web Build**:
   ```bash
-  pnpm --filter @project0/console build:web
+  pnpm --filter @unipost/console build:web
   ```
   Result: **Exit code 0** (completed cleanly in 7.50s).
 - **ESLint**:
   ```bash
-  pnpm --filter @project0/console lint
+  pnpm --filter @unipost/console lint
   ```
   Result: **Exit code 0** (0 errors, 0 warnings).
