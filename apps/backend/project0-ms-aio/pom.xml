@@ -27,10 +27,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>project0-ms-identity</artifactId>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>org.springframework.cloud</groupId>-->
-<!--      <artifactId>spring-cloud-starter-consul-all</artifactId>-->
-<!--    </dependency>-->
     <dependency>
       <groupId>org.springframework.modulith</groupId>
       <artifactId>spring-modulith-starter-core</artifactId>
@@ -80,8 +76,8 @@
         <version>${springboot.version}</version>
         <configuration>
           <mainClass>com.project0.aio.Application</mainClass>
-          <outputDirectory>../builds/project0-ms-aio/</outputDirectory>
-          <outputFile>../builds/project0-ms-aio/project0-ms-aio-${project.version}-build-info.properties</outputFile>
+          <outputDirectory>../dist/project0-ms-aio/</outputDirectory>
+          <outputFile>../dist/project0-ms-aio/project0-ms-aio-${project.version}-build-info.properties</outputFile>
           <additionalProperties>
             <java.source>${java.version}</java.source>
             <java.target>${java.version}</java.target>
