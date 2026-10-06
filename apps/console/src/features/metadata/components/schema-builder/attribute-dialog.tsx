@@ -4,6 +4,9 @@ import {
   useCreateAttributeDefinition,
   useUpdateAttributeDefinition,
 } from '../../api/metadata-api';
+import { metadataService } from '../../api/metadata-service';
+import { ConflictBanner, isConflictError } from '../conflict-banner';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   FIELD_TYPE_LIST,
   FIELD_TYPE_REGISTRY,
@@ -39,6 +42,7 @@ export const AttributeDialog: React.FC<Props> = ({ entityTypeId }) => {
   const { isAttributeDialogOpen, editingAttribute, closeAttributeDialog } =
     useMetadataUiStore();
 
+  const queryClient = useQueryClient();
   const createMutation = useCreateAttributeDefinition(entityTypeId);
   const updateMutation = useUpdateAttributeDefinition(entityTypeId);
 
@@ -137,6 +141,45 @@ export const AttributeDialog: React.FC<Props> = ({ entityTypeId }) => {
     setChoices(choices.filter((_, i) => i !== index));
   };
 
+  const [isConflict, setIsConflict] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [latestVersion, setLatestVersion] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    setIsConflict(false);
+    setLatestVersion(undefined);
+  }, [editingAttribute, isAttributeDialogOpen]);
+
+  const handleRefresh = async () => {
+    if (!editingAttribute) return;
+    setIsRefreshing(true);
+    try {
+      const latest = await metadataService.getAttributeDefinition(
+        entityTypeId,
+        editingAttribute.id
+      );
+      if (latest) {
+        setName(latest.name);
+        setSystemName(latest.systemName);
+        setUiComponent(latest.uiComponent);
+        setDataType(latest.dataType);
+        setIsRequired(Boolean(latest.isRequired));
+        setIsArchived(Boolean(latest.isArchived));
+        setDefaultValue(latest.defaultValue || '');
+        setChoices(latest.options?.choices || []);
+        setMinVal(latest.options?.min !== undefined ? String(latest.options.min) : '');
+        setMaxVal(latest.options?.max !== undefined ? String(latest.options.max) : '');
+        setPlaceholder(latest.options?.placeholder || '');
+        setPattern(latest.options?.pattern || '');
+        setLatestVersion(latest.version);
+        setIsConflict(false);
+        queryClient.invalidateQueries({ queryKey: ['metadata', 'attributes', entityTypeId] });
+      }
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !systemName.trim()) return;
@@ -161,10 +204,14 @@ export const AttributeDialog: React.FC<Props> = ({ entityTypeId }) => {
             isArchived,
             defaultValue: defaultValue.trim(),
             options,
+            version: latestVersion ?? editingAttribute.version,
           },
         },
         {
           onSuccess: () => closeAttributeDialog(),
+          onError: (err: unknown) => {
+            if (isConflictError(err)) setIsConflict(true);
+          },
         }
       );
     } else {
@@ -201,6 +248,8 @@ export const AttributeDialog: React.FC<Props> = ({ entityTypeId }) => {
               Configure the metadata schema specification, storage types, and validation constraints.
             </DialogDescription>
           </DialogHeader>
+
+          {isConflict && <ConflictBanner onRefresh={handleRefresh} isRefreshing={isRefreshing} />}
 
           <Tabs defaultValue="general" className="w-full">
             <TabsList className="grid grid-cols-2 mb-4 bg-muted/60 dark:bg-white/5 border border-white/10">

@@ -6,6 +6,9 @@ import {
   useUpdateEntityRecord,
   useEntityType,
 } from '../../api/metadata-api';
+import { metadataService } from '../../api/metadata-service';
+import { ConflictBanner, isConflictError } from '../conflict-banner';
+import { useQueryClient } from '@tanstack/react-query';
 import { buildZodSchema, getInitialFormValues } from '../../data/schema-generator';
 import { DynamicFieldRenderer } from '../dynamic-fields/dynamic-field-renderer';
 import {
@@ -31,6 +34,7 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
   const { data: attributesResponse } = useAttributeDefinitions(entityTypeId);
   const { data: entityType } = useEntityType(entityTypeId);
 
+  const queryClient = useQueryClient();
   const createMutation = useCreateEntityRecord(entityTypeId);
   const updateMutation = useUpdateEntityRecord(entityTypeId);
 
@@ -53,6 +57,35 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
       setGlobalError(null);
     }
   }, [isRecordEditorDialogOpen, editingRecord, attributes]);
+
+  const [isConflict, setIsConflict] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [latestVersion, setLatestVersion] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    setIsConflict(false);
+    setLatestVersion(undefined);
+  }, [editingRecord, isRecordEditorDialogOpen]);
+
+  const handleRefresh = async () => {
+    if (!editingRecord) return;
+    setIsRefreshing(true);
+    try {
+      const latest = await metadataService.getEntityRecord(entityTypeId, editingRecord.id);
+      if (latest) {
+        setFormData(
+          getInitialFormValues(attributes, latest.attributes as Record<string, unknown>)
+        );
+        setErrors({});
+        setGlobalError(null);
+        setLatestVersion(latest.version);
+        setIsConflict(false);
+        queryClient.invalidateQueries({ queryKey: ['metadata', 'records', entityTypeId] });
+      }
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const handleFieldChange = (fieldName: string, value: unknown) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }));
@@ -106,11 +139,16 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
           recordId: editingRecord.id,
           dto: {
             attributes: payloadAttributes,
+            version: latestVersion ?? editingRecord.version,
           },
         },
         {
           onSuccess: () => closeRecordEditorDialog(),
           onError: (err: unknown) => {
+            if (isConflictError(err)) {
+              setIsConflict(true);
+              return;
+            }
             setGlobalError(err instanceof Error ? err.message : 'Failed to update record.');
           },
         }
@@ -145,6 +183,8 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
               Submit structured attribute values conforming to the compiled schema constraints.
             </DialogDescription>
           </DialogHeader>
+
+          {isConflict && <ConflictBanner onRefresh={handleRefresh} isRefreshing={isRefreshing} />}
 
           {globalError && (
             <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-destructive/10 text-destructive text-xs border border-destructive/20">

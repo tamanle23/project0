@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useMetadataUiStore } from '../../store/use-metadata-ui-store';
 import { useCreateEntityType, useUpdateEntityType } from '../../api/metadata-api';
+import { metadataService } from '../../api/metadata-service';
+import { ConflictBanner, isConflictError } from '../conflict-banner';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Dialog,
   DialogContent,
@@ -22,6 +25,7 @@ export const EntityTypeDialog: React.FC = () => {
     setSelectedEntityTypeId,
   } = useMetadataUiStore();
 
+  const queryClient = useQueryClient();
   const createMutation = useCreateEntityType();
   const updateMutation = useUpdateEntityType(editingEntityType?.id || '');
 
@@ -62,6 +66,34 @@ export const EntityTypeDialog: React.FC = () => {
     }
   };
 
+  const [isConflict, setIsConflict] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [latestVersion, setLatestVersion] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    setIsConflict(false);
+    setLatestVersion(undefined);
+  }, [editingEntityType, isEntityTypeDialogOpen]);
+
+  const handleRefresh = async () => {
+    if (!editingEntityType) return;
+    setIsRefreshing(true);
+    try {
+      const latest = await metadataService.getEntityTypeById(editingEntityType.id);
+      if (latest) {
+        setName(latest.name);
+        setSystemName(latest.systemName);
+        setDescription(latest.description || '');
+        setLatestVersion(latest.version);
+        setIsConflict(false);
+        queryClient.invalidateQueries({ queryKey: ['metadata', 'entity-types'] });
+        queryClient.invalidateQueries({ queryKey: ['metadata', 'entity-type', editingEntityType.id] });
+      }
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !systemName.trim()) return;
@@ -72,9 +104,13 @@ export const EntityTypeDialog: React.FC = () => {
           name: name.trim(),
           systemName: systemName.trim(),
           description: description.trim(),
+          version: latestVersion ?? editingEntityType.version,
         },
         {
           onSuccess: () => closeEntityTypeDialog(),
+          onError: (err: unknown) => {
+            if (isConflictError(err)) setIsConflict(true);
+          },
         }
       );
     } else {
@@ -110,6 +146,8 @@ export const EntityTypeDialog: React.FC = () => {
               Define a new data model schema domain for managing dynamic attributes and records.
             </DialogDescription>
           </DialogHeader>
+
+          {isConflict && <ConflictBanner onRefresh={handleRefresh} isRefreshing={isRefreshing} />}
 
           <div className="space-y-4">
             <div className="space-y-2">

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import type { AttributeDefinition } from '../../api/types';
 import { useMetadataUiStore } from '../../store/use-metadata-ui-store';
+import { useCompiledSchema } from '../../api/metadata-api';
 import {
   Dialog,
   DialogContent,
@@ -9,99 +9,37 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Check, Copy, Code } from 'lucide-react';
 
 interface Props {
+  entityTypeId: string | number;
   entityTypeName?: string;
-  attributes: AttributeDefinition[];
 }
 
-export const SchemaJsonPreview: React.FC<Props> = ({ entityTypeName, attributes }) => {
+export const SchemaJsonPreview: React.FC<Props> = ({ entityTypeId, entityTypeName }) => {
   const { isJsonSchemaPreviewOpen, closeJsonSchemaPreview } = useMetadataUiStore();
   const [copied, setCopied] = useState(false);
 
-  // Compile JSON Schema Draft-07 (matching Spring Modulith SchemaValidationService.java)
-  const compiledSchema = useMemo(() => {
-    const properties: Record<string, unknown> = {};
-    const required: string[] = [];
-
-    attributes.forEach((attr) => {
-      if (attr.isArchived) return;
-
-      const propDef: Record<string, unknown> = {};
-
-      switch (attr.uiComponent) {
-        case 'text':
-        case 'textarea':
-          propDef.type = 'string';
-          if (attr.options?.pattern) {
-            propDef.pattern = attr.options.pattern;
-          }
-          break;
-        case 'number':
-          propDef.type = attr.dataType === 'DECIMAL' ? 'number' : 'integer';
-          if (attr.options?.min !== undefined) propDef.minimum = attr.options.min;
-          if (attr.options?.max !== undefined) propDef.maximum = attr.options.max;
-          break;
-        case 'switch':
-          propDef.type = 'boolean';
-          break;
-        case 'select':
-          propDef.type = 'string';
-          if (attr.options?.choices && attr.options.choices.length > 0) {
-            propDef.enum = attr.options.choices;
-          }
-          break;
-        case 'multiselect':
-          propDef.type = 'array';
-          propDef.items = { type: 'string' };
-          if (attr.options?.choices && attr.options.choices.length > 0) {
-            propDef.items = { type: 'string', enum: attr.options.choices };
-          }
-          break;
-        case 'datepicker':
-          propDef.type = 'string';
-          propDef.format = attr.dataType === 'DATE' ? 'date' : 'date-time';
-          break;
-        case 'json_editor':
-          propDef.type = 'object';
-          break;
-        case 'relation_picker':
-          propDef.type = 'string';
-          propDef.description = `Reference to target entity: ${attr.options?.targetEntityTypeId || 'external'}`;
-          break;
-        default:
-          propDef.type = 'string';
-      }
-
-      if (attr.defaultValue) {
-        propDef.default = attr.defaultValue;
-      }
-
-      properties[attr.systemName] = propDef;
-
-      if (attr.isRequired) {
-        required.push(attr.systemName);
-      }
-    });
-
-    const schema: Record<string, unknown> = {
-      $schema: 'http://json-schema.org/draft-07/schema#',
-      title: `${entityTypeName || 'Entity'}Schema`,
-      type: 'object',
-      properties,
-    };
-
-    if (required.length > 0) {
-      schema.required = required;
-    }
-
-    return schema;
-  }, [attributes, entityTypeName]);
+  // Only fetch while the dialog is open; schema is compiled authoritatively by the backend.
+  const { data, isLoading, isError, error } = useCompiledSchema(
+    isJsonSchemaPreviewOpen ? entityTypeId : null
+  );
 
   const jsonString = useMemo(() => {
-    return JSON.stringify(compiledSchema, null, 2);
-  }, [compiledSchema]);
+    if (!data) return '';
+    const schema =
+      typeof data.jsonSchema === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(data.jsonSchema as string);
+            } catch {
+              return data.jsonSchema;
+            }
+          })()
+        : data.jsonSchema;
+    return typeof schema === 'string' ? schema : JSON.stringify(schema, null, 2);
+  }, [data]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(jsonString);
@@ -119,11 +57,17 @@ export const SchemaJsonPreview: React.FC<Props> = ({ entityTypeName, attributes 
               <DialogTitle className="text-xl font-bold">
                 Compiled JSON Schema (Draft-07)
               </DialogTitle>
+              {data?.schemaVersion !== undefined && (
+                <Badge variant="secondary" className="font-mono text-xs">
+                  v{data.schemaVersion}
+                </Badge>
+              )}
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={handleCopy}
+              disabled={!jsonString}
               className="gap-1.5 text-xs bg-white/40 dark:bg-white/5"
             >
               {copied ? (
@@ -138,14 +82,24 @@ export const SchemaJsonPreview: React.FC<Props> = ({ entityTypeName, attributes 
             </Button>
           </div>
           <DialogDescription>
-            Live JSON Schema specification compiled directly from active attribute definitions. Matches the backend validation engine.
+            Authoritative JSON Schema for {entityTypeName || 'this entity type'}, compiled by the
+            backend validation engine.
           </DialogDescription>
         </DialogHeader>
 
         <div className="relative mt-2">
-          <pre className="max-h-[500px] overflow-auto p-4 rounded-xl font-mono text-xs bg-slate-950 text-slate-100 border border-white/10 shadow-inner">
-            <code>{jsonString}</code>
-          </pre>
+          {isLoading ? (
+            <p className="p-4 text-sm text-muted-foreground">Loading compiled schema...</p>
+          ) : isError ? (
+            <p className="p-4 text-sm text-destructive">
+              Failed to load compiled schema
+              {error instanceof Error ? `: ${error.message}` : '.'}
+            </p>
+          ) : (
+            <pre className="max-h-[500px] overflow-auto p-4 rounded-xl font-mono text-xs bg-slate-950 text-slate-100 border border-white/10 shadow-inner">
+              <code>{jsonString}</code>
+            </pre>
+          )}
         </div>
       </DialogContent>
     </Dialog>

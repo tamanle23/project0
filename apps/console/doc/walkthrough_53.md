@@ -33,3 +33,16 @@ Implemented the **Strategy Pattern** for the Metadata Management module in `@uni
 
 ## Verification Results
 - `pnpm --filter @unipost/console build`: **SUCCESS** (TypeScript compilation and Vite production bundles created cleanly without errors).
+
+## Phase 3: Console Schema Preview & Optimistic Locking
+
+### Schema preview
+- [`schema-json-preview.tsx`](file:///C:/Users/Admin/workspace/git/unipost/apps/console/src/features/metadata/components/schema-builder/schema-json-preview.tsx) now shows the backend's compiled schema via `useCompiledSchema` (`GET /v1/metadata/entity-types/{id}/schema`) with a `schemaVersion` badge. It fetches only while the dialog is open. The client-side compiler was removed.
+- `schema-builder.tsx` passes `entityTypeId` instead of `attributes`.
+
+### Optimistic locking (409)
+- New [`conflict-banner.tsx`](file:///C:/Users/Admin/workspace/git/unipost/apps/console/src/features/metadata/components/conflict-banner.tsx): `isConflictError` (axios `response.status` or mock `status` 409) and `ConflictBanner` ("This record has been modified by another user. Please reload the latest changes." plus a Refresh button).
+- `entity-type-dialog.tsx`, `attribute-dialog.tsx`, `record-editor-dialog.tsx`: updates send the current `version`. On 409 the banner appears; Refresh refetches the latest item, repopulates the form and adopts its version so the next save succeeds.
+
+### Verification
+- `pnpm --filter @unipost/console build`: success.

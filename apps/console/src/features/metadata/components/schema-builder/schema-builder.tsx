@@ -130,8 +130,8 @@ export const SchemaBuilder: React.FC<Props> = ({ entityTypeId }) => {
       <AttributeDialog entityTypeId={entityTypeId} />
       <AttributeDeleteDialog entityTypeId={entityTypeId} />
       <SchemaJsonPreview
+        entityTypeId={entityTypeId}
         entityTypeName={entityType?.name}
-        attributes={attributes}
       />
     </div>
   );
