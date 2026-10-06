@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useMemo } from 'react'
+import { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react'
 import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
 
 type Theme = 'dark' | 'light' | 'system'
@@ -106,7 +106,7 @@ export function ThemeProvider({
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [theme, resolvedTheme])
 
-  const applyGlassVariables = (intensity: number) => {
+  const applyGlassVariables = useCallback((intensity: number) => {
     const clamped = Math.max(0, Math.min(100, intensity))
     // Dynamic blur: 0px (crystal clear) up to 36px (dense frosted glass)
     const blurPx = Math.round((clamped / 100) * 36)
@@ -119,59 +119,75 @@ export function ThemeProvider({
     root.style.setProperty('--glass-blur', `${blurPx}px`)
     root.style.setProperty('--glass-intensity', `${intensityRatio}`)
     root.style.setProperty('--glass-specular-alpha', `${specularAlpha}`)
-  }
+  }, [])
 
   useEffect(() => {
     applyGlassVariables(glassIntensity)
-  }, [glassIntensity])
+  }, [glassIntensity, applyGlassVariables])
 
   useEffect(() => {
     const root = window.document.documentElement
     root.setAttribute('data-wallpaper', wallpaper)
   }, [wallpaper])
 
-  const setTheme = (theme: Theme) => {
+  const setTheme = useCallback((theme: Theme) => {
     setCookie(storageKey, theme, THEME_COOKIE_MAX_AGE)
     _setTheme(theme)
-  }
+  }, [storageKey])
 
-  const previewGlassIntensity = (intensity: number) => {
+  const previewGlassIntensity = useCallback((intensity: number) => {
     applyGlassVariables(intensity)
-  }
+  }, [applyGlassVariables])
 
-  const setGlassIntensity = (intensity: number) => {
+  const setGlassIntensity = useCallback((intensity: number) => {
     const clamped = Math.max(0, Math.min(100, intensity))
     previewGlassIntensity(clamped)
     setCookie(GLASS_INTENSITY_COOKIE_NAME, clamped.toString(), THEME_COOKIE_MAX_AGE)
     _setGlassIntensity(clamped)
-  }
+  }, [previewGlassIntensity])
 
-  const setWallpaper = (newWallpaper: WallpaperStyle) => {
+  const setWallpaper = useCallback((newWallpaper: WallpaperStyle) => {
     setCookie(WALLPAPER_COOKIE_NAME, newWallpaper, THEME_COOKIE_MAX_AGE)
     _setWallpaper(newWallpaper)
-  }
+  }, [])
 
-  const resetTheme = () => {
+  const resetTheme = useCallback(() => {
     removeCookie(storageKey)
     removeCookie(GLASS_INTENSITY_COOKIE_NAME)
     removeCookie(WALLPAPER_COOKIE_NAME)
     _setTheme(DEFAULT_THEME)
     _setGlassIntensity(DEFAULT_GLASS_INTENSITY)
     _setWallpaper(DEFAULT_WALLPAPER)
-  }
+  }, [storageKey])
 
-  const contextValue = {
-    defaultTheme,
-    resolvedTheme,
-    resetTheme,
-    theme,
-    setTheme,
-    glassIntensity,
-    setGlassIntensity,
-    previewGlassIntensity,
-    wallpaper,
-    setWallpaper,
-  }
+  // Optimization: Memoize context value to preserve referential equality and prevent
+  // unnecessary re-renders of all theme consumer components across the application.
+  const contextValue = useMemo<ThemeProviderState>(
+    () => ({
+      defaultTheme,
+      resolvedTheme,
+      resetTheme,
+      theme,
+      setTheme,
+      glassIntensity,
+      setGlassIntensity,
+      previewGlassIntensity,
+      wallpaper,
+      setWallpaper,
+    }),
+    [
+      defaultTheme,
+      resolvedTheme,
+      resetTheme,
+      theme,
+      setTheme,
+      glassIntensity,
+      setGlassIntensity,
+      previewGlassIntensity,
+      wallpaper,
+      setWallpaper,
+    ]
+  )
 
   return (
     <ThemeContext value={contextValue} {...props}>
