@@ -26,14 +26,17 @@ class LayoutStrategyConfigTest {
 
         LayoutGenerationService qwenService = config.qwenLayoutStrategy(dummyModel);
         LayoutGenerationService llamaService = config.llamaLayoutStrategy(dummyModel);
+        LayoutGenerationService embeddedService = theme -> null;
 
         assertNotNull(qwenService);
         assertNotNull(llamaService);
 
-        Map<String, LayoutGenerationService> registry = config.layoutStrategyRegistry(qwenService, llamaService);
+        Map<String, LayoutGenerationService> registry = config.layoutStrategyRegistry(qwenService, llamaService, embeddedService);
 
-        assertEquals(2, registry.size());
+        assertEquals(4, registry.size());
         assertSame(qwenService, registry.get("qwen"));
         assertSame(llamaService, registry.get("llama"));
+        assertSame(embeddedService, registry.get("embedded"));
+        assertSame(embeddedService, registry.get("native"));
     }
 }
