@@ -185,3 +185,27 @@ To ensure visual consistency, architectural predictability, and seamless collabo
 - **Synchronous Updates**: Whenever an agent or engineer adds, modifies, or deletes a route, screen, or core visual component, they MUST update the corresponding `DESIGN.md` and `ROUTE.md` files in the app's directory.
 - **Design Token Synchronization**: Any token adjustments in CSS or TypeScript must be mirrored in `DESIGN.md` so that Google Stitch generations remain in lockstep with the running codebase.
 - **Google Stitch Workflow**: When requesting new screens or layouts from Google Stitch or AI coding assistants, feed `DESIGN.md` and `ROUTE.md` as contextual constraints to ensure pixel-perfect fidelity with the monorepo's Liquid Glass standard.
+
+---
+
+## 9. Dynamic Metadata Engine Architecture & Failure Modes
+
+### Core Architectural Invariants
+1. **Schema Caching (C4 & C5)**:
+   - Dynamic Draft-07 schemas compiled from attribute definitions must use immutable, versioned cache keys: `schema:{entityTypeId}:v{schemaVersion}`.
+   - Cache resolution operates in two tiers: L1 parsed in-memory cache (`ConcurrentHashMap<String, JsonSchema>`) for microsecond throughput, backed by L2 Redis with TTL fallback.
+   - Cache misses must gracefully fall through to in-process recompilation. A Redis outage must NEVER fail schema compilation or record validation.
+2. **Schema Invalidation & Evolution**:
+   - Every attribute definition creation, update, reorder, archive, or unarchive MUST increment `PROJECT0_ENTITY_TYPES.schema_version` within the same transaction.
+   - Spring Modulith event publication triggers local L1 cache clearing. Stale version entries become unreachable by construction.
+3. **Database Constraints & Soft-Deletes**:
+   - Unique constraints on dynamic metadata entities (`system_name`, `(entity_type_id, system_name)`, and `(source_entity_id, target_entity_id, relationship_type_id)`) MUST use PostgreSQL partial unique indexes conditioned on `WHERE "deletedDate" IS NULL`.
+   - Never use unconditional unique constraints on soft-deleted metadata tables.
+4. **Validation Integrity (C3)**:
+   - JSON Schema compilation generates `additionalProperties: false` to prevent schema drift and arbitrary payload contamination.
+   - Server-side defaults must be injected into records before JSON Schema validation occurs.
+   - `relation_picker` attributes must be validated against real records of the target entity type prior to saving.
+5. **Relationship Cardinality & Multi-Tenancy**:
+   - Entity relationships must strictly enforce cardinality (`ONE_TO_ONE`, `ONE_TO_MANY`, `MANY_TO_ONE`, `MANY_TO_MANY`).
+   - Cross-tenant relationship linking is strictly forbidden.
+

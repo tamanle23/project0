@@ -17,6 +17,7 @@ import com.project0.repository.jpa.RelationshipTypeRepository;
 import com.project0.service.exception.MetadataConflictException;
 import com.project0.service.exception.MetadataNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -46,9 +48,12 @@ public class MetadataService {
     }
 
     private void incrementSchemaVersion(EntityType entityType) {
-        long nextVersion = (entityType.getSchemaVersion() != null ? entityType.getSchemaVersion() : 1L) + 1L;
+        long prevVersion = entityType.getSchemaVersion() != null ? entityType.getSchemaVersion() : 1L;
+        long nextVersion = prevVersion + 1L;
         entityType.setSchemaVersion(nextVersion);
         entityTypeRepository.save(entityType);
+        log.info("Schema evolved for entityType '{}' (id: {}): version {} -> {}", 
+                entityType.getSystemName(), entityType.getId(), prevVersion, nextVersion);
     }
 
     // ==========================================

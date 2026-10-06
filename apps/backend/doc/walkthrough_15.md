@@ -104,6 +104,19 @@ In Phase 0, 1, 2, and 3, we investigated and resolved core security, data contra
   - `/api/v1/metadata/relationship-types`: Full CRUD with `@PreAuthorize` security checks.
   - `/api/v1/metadata/records/{id}/relationships`: Query with `direction` filter (`incoming`, `outgoing`, both), create relationship, and delete relationship.
 
+### Observability, Architecture Invariants & Rules (`project0-fw` & `.agents/rules`)
+- **Structured Schema Evolution Logging**:
+  - In [`MetadataService.java`](file:///c:/Users/Admin/workspace/git/project0/apps/backend/project0-fw/src/main/java/com/project0/service/MetadataService.java), added `@Slf4j` and structured logging on schema changes:
+    `Schema evolved for entityType '{}' (id: {}): version {} -> {}`.
+- **Institutional Knowledge & Master Rules**:
+  - Updated [`docs/master_rules_reference.md`](file:///c:/Users/Admin/workspace/git/project0/docs/master_rules_reference.md) with **Section 9: Dynamic Metadata Engine Architecture & Failure Modes**, detailing:
+    1. Two-tier schema caching with versioned keys and resilient Redis fallback.
+    2. Atomic schema version evolution and Modulith cache eviction.
+    3. Soft-delete partial unique indexes on PostgreSQL.
+    4. Validation integrity with `additionalProperties: false`, server defaults, and `relation_picker` referential integrity.
+    5. Relationship cardinality and strict multi-tenancy boundaries.
+  - Distilled and appended active constraints to [`.agents/rules/01-workspace-specific.md`](file:///c:/Users/Admin/workspace/git/project0/.agents/rules/01-workspace-specific.md) following the monorepo rule management SOP.
+
 ---
 
 ## 3. Verification & Tests
@@ -118,7 +131,8 @@ In Phase 0, 1, 2, and 3, we investigated and resolved core security, data contra
   - `MetadataControllerTest`: 22 controller slice tests verifying routing, envelope wrapping, filter/sort query parameters, and relationship endpoints.
 - **Maven Reactor Execution**:
   - `node mvnw.cjs test -pl :project0-fw`: 70 tests passed (0 failures, 0 errors).
-  - `node mvnw.cjs test`: 100% passed across all 10 monorepo reactor modules.
+  - `node mvnw.cjs test`: 100% passed across all 10 monorepo reactor modules (including Spring Modulith `ModularityTests`).
+
 
 
 

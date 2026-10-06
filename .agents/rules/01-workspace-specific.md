@@ -45,3 +45,11 @@ description: Compact monorepo registry, packaging boundaries, i18n sync, and Liq
 - DESIGN.md: Acts as portable Google Stitch design system context. MUST define OKLCH/hex color tokens, Liquid Glass blur/specular metrics, typography scale, component specs, and Stitch prompt templates.
 - ROUTE.md: MUST define routing engine, complete screen registry table, screen blueprints with state/store bindings, and user flow diagrams.
 - Synchronization: When routes, screens, or UI tokens are added/edited, MUST synchronously update `DESIGN.md` and `ROUTE.md`. NEVER leave them out of sync.
+
+# DYNAMIC METADATA ENGINE INVARIANTS
+- Schema Caching: MUST use versioned cache keys `schema:{id}:v{version}` with L1 in-memory parsed `JsonSchema` + L2 Redis fallback. Redis failures MUST NEVER break schema compile or validation.
+- Schema Evolution: Any attribute definition mutation MUST increment `PROJECT0_ENTITY_TYPES.schema_version` in the same transaction.
+- Soft-Delete Indexes: Metadata tables (`PROJECT0_ENTITY_TYPES`, `PROJECT0_ATTRIBUTE_DEFINITIONS`, `PROJECT0_RELATIONSHIP_TYPES`, `PROJECT0_ENTITY_RELATIONSHIPS`) MUST use partial unique indexes `WHERE "deletedDate" IS NULL`.
+- Record Validation: Compilation MUST set `additionalProperties: false`. Server-side defaults MUST be applied prior to JSON Schema validation.
+- Relationships: MUST enforce cardinality constraints and reject cross-tenant relations. `relation_picker` attributes MUST validate target record existence.
+
