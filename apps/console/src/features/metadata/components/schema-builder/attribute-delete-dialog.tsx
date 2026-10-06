@@ -27,9 +27,12 @@ export const AttributeDeleteDialog: React.FC<Props> = ({ entityTypeId }) => {
 
   const handleDelete = () => {
     if (!deletingAttribute) return;
-    deleteMutation.mutate(deletingAttribute.id, {
-      onSuccess: () => closeDeleteAttributeDialog(),
-    });
+    deleteMutation.mutate(
+      { attributeId: deletingAttribute.id, force: true },
+      {
+        onSuccess: () => closeDeleteAttributeDialog(),
+      }
+    );
   };
 
   return (

@@ -1,43 +1,33 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { springApiClient } from '@/features/spring-auth/api-client';
-import { mockMetadataStore } from '../data/mock-metadata';
+import { metadataService } from './metadata-service';
 import type {
   AttributeDefinition,
+  CompiledSchema,
   CreateAttributeDefinitionDto,
   CreateEntityRecordDto,
   CreateEntityTypeDto,
+  CreateEntityRelationshipDto,
+  CreateRelationshipTypeDto,
   EntityRecord,
+  EntityRelationship,
   EntityType,
   PageRequestParams,
   PageResponse,
+  RelationshipType,
   UpdateAttributeDefinitionDto,
   UpdateEntityRecordDto,
   UpdateEntityTypeDto,
+  UpdateRelationshipTypeDto,
 } from './types';
 
-const BASE_URL = '/v1/metadata';
-
 // ==========================================
-// 1. Entity Types
+// 1. Entity Types Hooks
 // ==========================================
 
 export const useEntityTypes = (params?: PageRequestParams) => {
   return useQuery({
     queryKey: ['metadata', 'entity-types', params],
-    queryFn: async (): Promise<PageResponse<EntityType>> => {
-      try {
-        const res = await springApiClient.get<PageResponse<EntityType>>(`${BASE_URL}/entity-types`, {
-          params: {
-            number: params?.number || 1,
-            size: params?.size || 10,
-            sort: params?.sort,
-          },
-        });
-        return res.data;
-      } catch {
-        return mockMetadataStore.getEntityTypes(params);
-      }
-    },
+    queryFn: (): Promise<PageResponse<EntityType>> => metadataService.getEntityTypes(params),
     staleTime: 60 * 1000,
   });
 };
@@ -45,31 +35,25 @@ export const useEntityTypes = (params?: PageRequestParams) => {
 export const useEntityType = (id: string | number | null) => {
   return useQuery({
     queryKey: ['metadata', 'entity-type', id],
-    queryFn: async (): Promise<EntityType | null> => {
-      if (!id) return null;
-      try {
-        const res = await springApiClient.get<EntityType>(`${BASE_URL}/entity-types/${id}`);
-        return res.data;
-      } catch {
-        const fallback = mockMetadataStore.getEntityTypeById(id);
-        return fallback || null;
-      }
-    },
+    queryFn: (): Promise<EntityType | null> => (id ? metadataService.getEntityTypeById(id) : Promise.resolve(null)),
     enabled: Boolean(id),
+  });
+};
+
+export const useCompiledSchema = (entityTypeId: string | number | null) => {
+  return useQuery({
+    queryKey: ['metadata', 'compiled-schema', entityTypeId],
+    queryFn: (): Promise<CompiledSchema | null> =>
+      entityTypeId ? metadataService.getCompiledSchema(entityTypeId) : Promise.resolve(null),
+    enabled: Boolean(entityTypeId),
+    staleTime: 30 * 1000,
   });
 };
 
 export const useCreateEntityType = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (dto: CreateEntityTypeDto): Promise<EntityType> => {
-      try {
-        const res = await springApiClient.post<EntityType>(`${BASE_URL}/entity-types`, dto);
-        return res.data;
-      } catch {
-        return mockMetadataStore.createEntityType(dto);
-      }
-    },
+    mutationFn: (dto: CreateEntityTypeDto): Promise<EntityType> => metadataService.createEntityType(dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['metadata', 'entity-types'] });
     },
@@ -79,17 +63,11 @@ export const useCreateEntityType = () => {
 export const useUpdateEntityType = (id: string | number) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (dto: UpdateEntityTypeDto): Promise<EntityType> => {
-      try {
-        const res = await springApiClient.put<EntityType>(`${BASE_URL}/entity-types/${id}`, dto);
-        return res.data;
-      } catch {
-        return mockMetadataStore.updateEntityType(id, dto);
-      }
-    },
+    mutationFn: (dto: UpdateEntityTypeDto): Promise<EntityType> => metadataService.updateEntityType(id, dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['metadata', 'entity-types'] });
       queryClient.invalidateQueries({ queryKey: ['metadata', 'entity-type', id] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'compiled-schema', id] });
     },
   });
 };
@@ -97,14 +75,7 @@ export const useUpdateEntityType = (id: string | number) => {
 export const useDeleteEntityType = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string | number): Promise<boolean> => {
-      try {
-        await springApiClient.delete(`${BASE_URL}/entity-types/${id}`);
-        return true;
-      } catch {
-        return mockMetadataStore.deleteEntityType(id);
-      }
-    },
+    mutationFn: (id: string | number): Promise<boolean> => metadataService.deleteEntityType(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['metadata', 'entity-types'] });
     },
@@ -112,7 +83,7 @@ export const useDeleteEntityType = () => {
 };
 
 // ==========================================
-// 2. Attribute Definitions
+// 2. Attribute Definitions Hooks
 // ==========================================
 
 export const useAttributeDefinitions = (
@@ -121,25 +92,11 @@ export const useAttributeDefinitions = (
 ) => {
   return useQuery({
     queryKey: ['metadata', 'attributes', entityTypeId, params],
-    queryFn: async (): Promise<PageResponse<AttributeDefinition>> => {
+    queryFn: (): Promise<PageResponse<AttributeDefinition>> => {
       if (!entityTypeId) {
-        return { content: [], totalElements: 0, totalPages: 0, number: 1, size: 10 };
+        return Promise.resolve({ content: [], totalElements: 0, totalPages: 0, number: 1, size: 10 });
       }
-      try {
-        const res = await springApiClient.get<PageResponse<AttributeDefinition>>(
-          `${BASE_URL}/entity-types/${entityTypeId}/attributes`,
-          {
-            params: {
-              number: params?.number || 1,
-              size: params?.size || 50,
-              sort: params?.sort,
-            },
-          }
-        );
-        return res.data;
-      } catch {
-        return mockMetadataStore.getAttributeDefinitions(entityTypeId, params);
-      }
+      return metadataService.getAttributeDefinitions(entityTypeId, params);
     },
     enabled: Boolean(entityTypeId),
     staleTime: 30 * 1000,
@@ -149,19 +106,12 @@ export const useAttributeDefinitions = (
 export const useCreateAttributeDefinition = (entityTypeId: string | number) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (dto: CreateAttributeDefinitionDto): Promise<AttributeDefinition> => {
-      try {
-        const res = await springApiClient.post<AttributeDefinition>(
-          `${BASE_URL}/entity-types/${entityTypeId}/attributes`,
-          dto
-        );
-        return res.data;
-      } catch {
-        return mockMetadataStore.createAttribute(entityTypeId, dto);
-      }
-    },
+    mutationFn: (dto: CreateAttributeDefinitionDto): Promise<AttributeDefinition> =>
+      metadataService.createAttributeDefinition(entityTypeId, dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['metadata', 'attributes', entityTypeId] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'compiled-schema', entityTypeId] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'entity-type', entityTypeId] });
     },
   });
 };
@@ -169,25 +119,18 @@ export const useCreateAttributeDefinition = (entityTypeId: string | number) => {
 export const useUpdateAttributeDefinition = (entityTypeId: string | number) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
+    mutationFn: ({
       attributeId,
       dto,
     }: {
       attributeId: string | number;
       dto: UpdateAttributeDefinitionDto;
-    }): Promise<AttributeDefinition> => {
-      try {
-        const res = await springApiClient.put<AttributeDefinition>(
-          `${BASE_URL}/entity-types/${entityTypeId}/attributes/${attributeId}`,
-          dto
-        );
-        return res.data;
-      } catch {
-        return mockMetadataStore.updateAttribute(entityTypeId, attributeId, dto);
-      }
-    },
+    }): Promise<AttributeDefinition> =>
+      metadataService.updateAttributeDefinition(entityTypeId, attributeId, dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['metadata', 'attributes', entityTypeId] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'compiled-schema', entityTypeId] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'entity-type', entityTypeId] });
     },
   });
 };
@@ -195,24 +138,63 @@ export const useUpdateAttributeDefinition = (entityTypeId: string | number) => {
 export const useDeleteAttributeDefinition = (entityTypeId: string | number) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (attributeId: string | number): Promise<boolean> => {
-      try {
-        await springApiClient.delete(
-          `${BASE_URL}/entity-types/${entityTypeId}/attributes/${attributeId}`
-        );
-        return true;
-      } catch {
-        return mockMetadataStore.deleteAttribute(entityTypeId, attributeId);
-      }
-    },
+    mutationFn: ({
+      attributeId,
+      force,
+    }: {
+      attributeId: string | number;
+      force?: boolean;
+    }): Promise<boolean> =>
+      metadataService.deleteAttributeDefinition(entityTypeId, attributeId, force),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['metadata', 'attributes', entityTypeId] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'compiled-schema', entityTypeId] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'entity-type', entityTypeId] });
+    },
+  });
+};
+
+export const useArchiveAttributeDefinition = (entityTypeId: string | number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (attributeId: string | number): Promise<AttributeDefinition> =>
+      metadataService.archiveAttribute(entityTypeId, attributeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'attributes', entityTypeId] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'compiled-schema', entityTypeId] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'entity-type', entityTypeId] });
+    },
+  });
+};
+
+export const useUnarchiveAttributeDefinition = (entityTypeId: string | number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (attributeId: string | number): Promise<AttributeDefinition> =>
+      metadataService.unarchiveAttribute(entityTypeId, attributeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'attributes', entityTypeId] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'compiled-schema', entityTypeId] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'entity-type', entityTypeId] });
+    },
+  });
+};
+
+export const useReorderAttributeDefinitions = (entityTypeId: string | number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (attributeIds: Array<string | number>): Promise<boolean> =>
+      metadataService.reorderAttributes(entityTypeId, attributeIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'attributes', entityTypeId] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'compiled-schema', entityTypeId] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'entity-type', entityTypeId] });
     },
   });
 };
 
 // ==========================================
-// 3. Entity Records
+// 3. Entity Records Hooks
 // ==========================================
 
 export const useEntityRecords = (
@@ -221,45 +203,36 @@ export const useEntityRecords = (
 ) => {
   return useQuery({
     queryKey: ['metadata', 'records', entityTypeId, params],
-    queryFn: async (): Promise<PageResponse<EntityRecord>> => {
+    queryFn: (): Promise<PageResponse<EntityRecord>> => {
       if (!entityTypeId) {
-        return { content: [], totalElements: 0, totalPages: 0, number: 1, size: 10 };
+        return Promise.resolve({ content: [], totalElements: 0, totalPages: 0, number: 1, size: 10 });
       }
-      try {
-        const res = await springApiClient.get<PageResponse<EntityRecord>>(
-          `${BASE_URL}/entity-types/${entityTypeId}/records`,
-          {
-            params: {
-              number: params?.number || 1,
-              size: params?.size || 10,
-              sort: params?.sort,
-            },
-          }
-        );
-        return res.data;
-      } catch {
-        return mockMetadataStore.getEntityRecords(entityTypeId, params);
-      }
+      return metadataService.getEntityRecords(entityTypeId, params);
     },
     enabled: Boolean(entityTypeId),
     staleTime: 30 * 1000,
   });
 };
 
+export const useEntityRecord = (
+  entityTypeId: string | number | null,
+  recordId: string | number | null
+) => {
+  return useQuery({
+    queryKey: ['metadata', 'record', entityTypeId, recordId],
+    queryFn: (): Promise<EntityRecord | null> => {
+      if (!entityTypeId || !recordId) return Promise.resolve(null);
+      return metadataService.getEntityRecord(entityTypeId, recordId);
+    },
+    enabled: Boolean(entityTypeId && recordId),
+  });
+};
+
 export const useCreateEntityRecord = (entityTypeId: string | number) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (dto: CreateEntityRecordDto): Promise<EntityRecord> => {
-      try {
-        const res = await springApiClient.post<EntityRecord>(
-          `${BASE_URL}/entity-types/${entityTypeId}/records`,
-          dto
-        );
-        return res.data;
-      } catch {
-        return mockMetadataStore.createRecord(entityTypeId, dto);
-      }
-    },
+    mutationFn: (dto: CreateEntityRecordDto): Promise<EntityRecord> =>
+      metadataService.createEntityRecord(entityTypeId, dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['metadata', 'records', entityTypeId] });
     },
@@ -269,25 +242,39 @@ export const useCreateEntityRecord = (entityTypeId: string | number) => {
 export const useUpdateEntityRecord = (entityTypeId: string | number) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
+    mutationFn: ({
       recordId,
       dto,
     }: {
       recordId: string | number;
       dto: UpdateEntityRecordDto;
-    }): Promise<EntityRecord> => {
-      try {
-        const res = await springApiClient.put<EntityRecord>(
-          `${BASE_URL}/entity-types/${entityTypeId}/records/${recordId}`,
-          dto
-        );
-        return res.data;
-      } catch {
-        return mockMetadataStore.updateRecord(entityTypeId, recordId, dto);
-      }
-    },
-    onSuccess: () => {
+    }): Promise<EntityRecord> =>
+      metadataService.updateEntityRecord(entityTypeId, recordId, dto),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['metadata', 'records', entityTypeId] });
+      queryClient.invalidateQueries({
+        queryKey: ['metadata', 'record', entityTypeId, variables.recordId],
+      });
+    },
+  });
+};
+
+export const usePatchEntityRecord = (entityTypeId: string | number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      recordId,
+      dto,
+    }: {
+      recordId: string | number;
+      dto: Partial<CreateEntityRecordDto>;
+    }): Promise<EntityRecord> =>
+      metadataService.patchEntityRecord(entityTypeId, recordId, dto),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'records', entityTypeId] });
+      queryClient.invalidateQueries({
+        queryKey: ['metadata', 'record', entityTypeId, variables.recordId],
+      });
     },
   });
 };
@@ -295,18 +282,108 @@ export const useUpdateEntityRecord = (entityTypeId: string | number) => {
 export const useDeleteEntityRecord = (entityTypeId: string | number) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (recordId: string | number): Promise<boolean> => {
-      try {
-        await springApiClient.delete(
-          `${BASE_URL}/entity-types/${entityTypeId}/records/${recordId}`
-        );
-        return true;
-      } catch {
-        return mockMetadataStore.deleteRecord(entityTypeId, recordId);
-      }
-    },
+    mutationFn: (recordId: string | number): Promise<boolean> =>
+      metadataService.deleteEntityRecord(entityTypeId, recordId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['metadata', 'records', entityTypeId] });
+    },
+  });
+};
+
+// ==========================================
+// 4. Relationship Types Hooks
+// ==========================================
+
+export const useRelationshipTypes = (params?: PageRequestParams) => {
+  return useQuery({
+    queryKey: ['metadata', 'relationship-types', params],
+    queryFn: (): Promise<PageResponse<RelationshipType>> =>
+      metadataService.getRelationshipTypes(params),
+    staleTime: 60 * 1000,
+  });
+};
+
+export const useRelationshipType = (id: string | number | null) => {
+  return useQuery({
+    queryKey: ['metadata', 'relationship-type', id],
+    queryFn: (): Promise<RelationshipType | null> =>
+      id ? metadataService.getRelationshipType(id) : Promise.resolve(null),
+    enabled: Boolean(id),
+  });
+};
+
+export const useCreateRelationshipType = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (dto: CreateRelationshipTypeDto): Promise<RelationshipType> =>
+      metadataService.createRelationshipType(dto),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'relationship-types'] });
+    },
+  });
+};
+
+export const useUpdateRelationshipType = (id: string | number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (dto: UpdateRelationshipTypeDto): Promise<RelationshipType> =>
+      metadataService.updateRelationshipType(id, dto),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'relationship-types'] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'relationship-type', id] });
+    },
+  });
+};
+
+export const useDeleteRelationshipType = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, force }: { id: string | number; force?: boolean }): Promise<boolean> =>
+      metadataService.deleteRelationshipType(id, force),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'relationship-types'] });
+    },
+  });
+};
+
+// ==========================================
+// 5. Entity Relationships Hooks
+// ==========================================
+
+export const useRecordRelationships = (
+  recordId: string | number | null,
+  params?: PageRequestParams
+) => {
+  return useQuery({
+    queryKey: ['metadata', 'record-relationships', recordId, params],
+    queryFn: (): Promise<PageResponse<EntityRelationship>> => {
+      if (!recordId) {
+        return Promise.resolve({ content: [], totalElements: 0, totalPages: 0, number: 1, size: 20 });
+      }
+      return metadataService.getRecordRelationships(recordId, params);
+    },
+    enabled: Boolean(recordId),
+  });
+};
+
+export const useCreateEntityRelationship = (recordId: string | number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (dto: CreateEntityRelationshipDto): Promise<EntityRelationship> =>
+      metadataService.createEntityRelationship(recordId, dto),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'record-relationships', recordId] });
+    },
+  });
+};
+
+export const useDeleteEntityRelationship = (recordId: string | number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (relationshipId: string | number): Promise<boolean> =>
+      metadataService.deleteEntityRelationship(recordId, relationshipId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'record-relationships', recordId] });
     },
   });
 };
