@@ -26,6 +26,9 @@ public class EntityRecord extends BaseModel {
     @Column(name = "tenant_id")
     private String tenantId;
 
+    @Column(name = "schema_version")
+    private Long schemaVersion = 1L;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "attributes", columnDefinition = "jsonb")
     private Map<String, Object> attributes;

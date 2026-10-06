@@ -13,7 +13,11 @@ public interface AttributeDefinitionRepository extends BaseRepository<AttributeD
     Page<AttributeDefinition> findByEntityTypeId(Long entityTypeId, Pageable pageable);
     List<AttributeDefinition> findByEntityTypeId(Long entityTypeId);
     Page<AttributeDefinition> findByEntityTypeIdAndDeletedDateIsNull(Long entityTypeId, Pageable pageable);
+    Page<AttributeDefinition> findByEntityTypeIdAndDeletedDateIsNullOrderByDisplayOrderAsc(Long entityTypeId, Pageable pageable);
     List<AttributeDefinition> findByEntityTypeIdAndDeletedDateIsNull(Long entityTypeId);
+    List<AttributeDefinition> findByEntityTypeIdAndDeletedDateIsNullOrderByDisplayOrderAsc(Long entityTypeId);
     Optional<AttributeDefinition> findByIdAndDeletedDateIsNull(Long id);
+    Optional<AttributeDefinition> findByEntityTypeIdAndIdAndDeletedDateIsNull(Long entityTypeId, Long id);
     boolean existsByEntityTypeIdAndSystemNameAndDeletedDateIsNull(Long entityTypeId, String systemName);
+    List<AttributeDefinition> findAllByIdInAndEntityTypeIdAndDeletedDateIsNull(List<Long> ids, Long entityTypeId);
 }

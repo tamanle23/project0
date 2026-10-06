@@ -41,6 +41,9 @@ public class AttributeDefinition extends BaseModel {
     @Column(name = "is_archived")
     private Boolean isArchived = false;
 
+    @Column(name = "display_order")
+    private Integer displayOrder = 0;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "options", columnDefinition = "jsonb")
     private Map<String, Object> options;

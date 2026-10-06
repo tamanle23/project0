@@ -8,6 +8,7 @@ public record EntityRecordResponse(
         String uid,
         Long entityTypeId,
         String tenantId,
+        Long schemaVersion,
         Map<String, Object> attributes,
         Long version,
         LocalDateTime createdDate,

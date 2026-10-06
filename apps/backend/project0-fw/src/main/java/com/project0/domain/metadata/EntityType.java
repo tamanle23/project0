@@ -16,9 +16,12 @@ public class EntityType extends BaseModel {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "system_name", nullable = false, unique = true)
+    @Column(name = "system_name", nullable = false)
     private String systemName;
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "schema_version", nullable = false)
+    private Long schemaVersion = 1L;
 }

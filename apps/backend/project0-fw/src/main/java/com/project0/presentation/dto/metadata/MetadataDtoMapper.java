@@ -16,6 +16,7 @@ public final class MetadataDtoMapper {
                 entityType.getName(),
                 entityType.getSystemName(),
                 entityType.getDescription(),
+                entityType.getSchemaVersion(),
                 entityType.getVersion(),
                 entityType.getCreatedDate(),
                 entityType.getLastUpdatedDate()
@@ -28,6 +29,7 @@ public final class MetadataDtoMapper {
         entityType.setName(request.name().trim());
         entityType.setSystemName(request.systemName().trim());
         entityType.setDescription(request.description() != null ? request.description().trim() : null);
+        entityType.setSchemaVersion(1L);
         return entityType;
     }
 
@@ -43,6 +45,7 @@ public final class MetadataDtoMapper {
                 attr.getUiComponent(),
                 attr.getIsRequired(),
                 attr.getIsArchived(),
+                attr.getDisplayOrder() != null ? attr.getDisplayOrder() : 0,
                 attr.getOptions(),
                 attr.getDefaultValue(),
                 attr.getVersion(),
@@ -61,6 +64,7 @@ public final class MetadataDtoMapper {
         attr.setUiComponent(request.uiComponent().trim().toLowerCase());
         attr.setIsRequired(Boolean.TRUE.equals(request.isRequired()));
         attr.setIsArchived(Boolean.TRUE.equals(request.isArchived()));
+        attr.setDisplayOrder(0);
         attr.setOptions(request.options());
         attr.setDefaultValue(request.defaultValue());
         return attr;
@@ -73,6 +77,7 @@ public final class MetadataDtoMapper {
                 record.getUid(),
                 record.getEntityType() != null ? record.getEntityType().getId() : null,
                 record.getTenantId(),
+                record.getSchemaVersion() != null ? record.getSchemaVersion() : 1L,
                 record.getAttributes(),
                 record.getVersion(),
                 record.getCreatedDate(),
@@ -85,6 +90,7 @@ public final class MetadataDtoMapper {
         EntityRecord record = new EntityRecord();
         record.setEntityType(entityType);
         record.setTenantId(request.tenantId());
+        record.setSchemaVersion(entityType.getSchemaVersion() != null ? entityType.getSchemaVersion() : 1L);
         record.setAttributes(request.attributes());
         return record;
     }

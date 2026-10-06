@@ -9,5 +9,7 @@ public record UpdateEntityTypeRequest(
         String name,
 
         @Size(max = 4000, message = "description must not exceed 4000 characters")
-        String description
+        String description,
+
+        Long version
 ) {}

@@ -13,6 +13,7 @@ public record AttributeDefinitionResponse(
         String uiComponent,
         Boolean isRequired,
         Boolean isArchived,
+        Integer displayOrder,
         Map<String, Object> options,
         String defaultValue,
         Long version,

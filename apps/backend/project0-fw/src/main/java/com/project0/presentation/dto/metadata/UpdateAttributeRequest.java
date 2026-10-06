@@ -12,8 +12,11 @@ public record UpdateAttributeRequest(
         String uiComponent,
         Boolean isRequired,
         Boolean isArchived,
+        Integer displayOrder,
         Map<String, Object> options,
 
         @Size(max = 255, message = "defaultValue must not exceed 255 characters")
-        String defaultValue
+        String defaultValue,
+
+        Long version
 ) {}

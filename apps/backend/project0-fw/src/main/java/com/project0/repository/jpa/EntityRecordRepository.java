@@ -15,4 +15,6 @@ public interface EntityRecordRepository extends BaseRepository<EntityRecord> {
     Page<EntityRecord> findByEntityTypeIdAndDeletedDateIsNull(Long entityTypeId, Pageable pageable);
     List<EntityRecord> findByEntityTypeIdAndDeletedDateIsNull(Long entityTypeId);
     Optional<EntityRecord> findByIdAndDeletedDateIsNull(Long id);
+    Optional<EntityRecord> findByEntityTypeIdAndIdAndDeletedDateIsNull(Long entityTypeId, Long id);
+    boolean existsByEntityTypeIdAndDeletedDateIsNull(Long entityTypeId);
 }

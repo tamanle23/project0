@@ -42,6 +42,29 @@ public class MetadataController {
         return responseBuilder.success(created);
     }
 
+    @GetMapping("/entity-types/{id}")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_READ') or hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, EntityTypeResponse>> getEntityType(@PathVariable Long id) {
+        EntityTypeResponse entityType = metadataService.getEntityType(id);
+        return responseBuilder.success(entityType);
+    }
+
+    @PutMapping("/entity-types/{id}")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, EntityTypeResponse>> updateEntityType(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateEntityTypeRequest request) {
+        EntityTypeResponse updated = metadataService.updateEntityType(id, request);
+        return responseBuilder.success(updated);
+    }
+
+    @DeleteMapping("/entity-types/{id}")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, Void>> deleteEntityType(@PathVariable Long id) {
+        metadataService.deleteEntityType(id);
+        return responseBuilder.success(null);
+    }
+
     @GetMapping("/entity-types/{id}/attributes")
     @PreAuthorize("hasAuthority('METADATA_SCHEMA_READ') or hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
     public ResponseEntity<ResponseWrapper<ContextHeader, Page<AttributeDefinitionResponse>>> getAttributeDefinitions(
@@ -60,6 +83,62 @@ public class MetadataController {
         return responseBuilder.success(created);
     }
 
+    @GetMapping("/entity-types/{id}/attributes/{attrId}")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_READ') or hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, AttributeDefinitionResponse>> getAttributeDefinition(
+            @PathVariable Long id,
+            @PathVariable Long attrId) {
+        AttributeDefinitionResponse attribute = metadataService.getAttributeDefinition(id, attrId);
+        return responseBuilder.success(attribute);
+    }
+
+    @PutMapping("/entity-types/{id}/attributes/{attrId}")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, AttributeDefinitionResponse>> updateAttributeDefinition(
+            @PathVariable Long id,
+            @PathVariable Long attrId,
+            @Valid @RequestBody UpdateAttributeRequest request) {
+        AttributeDefinitionResponse updated = metadataService.updateAttributeDefinition(id, attrId, request);
+        return responseBuilder.success(updated);
+    }
+
+    @DeleteMapping("/entity-types/{id}/attributes/{attrId}")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, Void>> deleteAttributeDefinition(
+            @PathVariable Long id,
+            @PathVariable Long attrId,
+            @RequestParam(defaultValue = "false") boolean force) {
+        metadataService.deleteAttributeDefinition(id, attrId, force);
+        return responseBuilder.success(null);
+    }
+
+    @PostMapping("/entity-types/{id}/attributes/{attrId}/archive")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, AttributeDefinitionResponse>> archiveAttribute(
+            @PathVariable Long id,
+            @PathVariable Long attrId) {
+        AttributeDefinitionResponse updated = metadataService.archiveAttributeDefinition(id, attrId);
+        return responseBuilder.success(updated);
+    }
+
+    @PostMapping("/entity-types/{id}/attributes/{attrId}/unarchive")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, AttributeDefinitionResponse>> unarchiveAttribute(
+            @PathVariable Long id,
+            @PathVariable Long attrId) {
+        AttributeDefinitionResponse updated = metadataService.unarchiveAttributeDefinition(id, attrId);
+        return responseBuilder.success(updated);
+    }
+
+    @PutMapping("/entity-types/{id}/attributes/order")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, Void>> reorderAttributes(
+            @PathVariable Long id,
+            @Valid @RequestBody ReorderAttributesRequest request) {
+        metadataService.reorderAttributes(id, request);
+        return responseBuilder.success(null);
+    }
+
     @GetMapping("/entity-types/{id}/records")
     @PreAuthorize("hasAuthority('METADATA_RECORD_READ') or hasAuthority('METADATA_RECORD_WRITE') or hasRole('ADMIN')")
     public ResponseEntity<ResponseWrapper<ContextHeader, Page<EntityRecordResponse>>> getEntityRecords(
@@ -76,5 +155,43 @@ public class MetadataController {
             @Valid @RequestBody CreateRecordRequest request) {
         EntityRecordResponse created = metadataService.createEntityRecord(id, request);
         return responseBuilder.success(created);
+    }
+
+    @GetMapping("/entity-types/{id}/records/{recordId}")
+    @PreAuthorize("hasAuthority('METADATA_RECORD_READ') or hasAuthority('METADATA_RECORD_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, EntityRecordResponse>> getEntityRecord(
+            @PathVariable Long id,
+            @PathVariable Long recordId) {
+        EntityRecordResponse record = metadataService.getEntityRecord(id, recordId);
+        return responseBuilder.success(record);
+    }
+
+    @PutMapping("/entity-types/{id}/records/{recordId}")
+    @PreAuthorize("hasAuthority('METADATA_RECORD_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, EntityRecordResponse>> updateEntityRecord(
+            @PathVariable Long id,
+            @PathVariable Long recordId,
+            @Valid @RequestBody UpdateRecordRequest request) {
+        EntityRecordResponse updated = metadataService.updateEntityRecord(id, recordId, request);
+        return responseBuilder.success(updated);
+    }
+
+    @PatchMapping("/entity-types/{id}/records/{recordId}")
+    @PreAuthorize("hasAuthority('METADATA_RECORD_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, EntityRecordResponse>> patchEntityRecord(
+            @PathVariable Long id,
+            @PathVariable Long recordId,
+            @Valid @RequestBody PatchRecordRequest request) {
+        EntityRecordResponse updated = metadataService.patchEntityRecord(id, recordId, request);
+        return responseBuilder.success(updated);
+    }
+
+    @DeleteMapping("/entity-types/{id}/records/{recordId}")
+    @PreAuthorize("hasAuthority('METADATA_RECORD_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, Void>> deleteEntityRecord(
+            @PathVariable Long id,
+            @PathVariable Long recordId) {
+        metadataService.deleteEntityRecord(id, recordId);
+        return responseBuilder.success(null);
     }
 }

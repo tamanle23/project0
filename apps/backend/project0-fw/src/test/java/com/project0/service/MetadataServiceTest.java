@@ -185,4 +185,263 @@ class MetadataServiceTest {
         verify(schemaValidationService, never()).validatePayload(any(), any());
         verify(entityRecordRepository, never()).save(any());
     }
+
+    @Test
+    void testGetEntityType_Success() {
+        EntityType type = new EntityType();
+        type.setId(1L);
+        type.setName("Customer");
+        type.setSystemName("customer");
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(type));
+
+        EntityTypeResponse result = metadataService.getEntityType(1L);
+        assertNotNull(result);
+        assertEquals(1L, result.id());
+        assertEquals("Customer", result.name());
+    }
+
+    @Test
+    void testUpdateEntityType_Success() {
+        EntityType type = new EntityType();
+        type.setId(1L);
+        type.setName("Old Name");
+        type.setSystemName("customer");
+        type.setVersion(0L);
+
+        UpdateEntityTypeRequest request = new UpdateEntityTypeRequest("New Name", "New Desc", 0L);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(type));
+        when(entityTypeRepository.save(any(EntityType.class))).thenAnswer(i -> i.getArgument(0));
+
+        EntityTypeResponse result = metadataService.updateEntityType(1L, request);
+        assertNotNull(result);
+        assertEquals("New Name", result.name());
+        assertEquals("New Desc", result.description());
+        verify(entityTypeRepository).save(type);
+    }
+
+    @Test
+    void testUpdateEntityType_ConflictOnVersionMismatch() {
+        EntityType type = new EntityType();
+        type.setId(1L);
+        type.setVersion(1L);
+
+        UpdateEntityTypeRequest request = new UpdateEntityTypeRequest("New Name", "New Desc", 0L);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(type));
+
+        assertThrows(MetadataConflictException.class, () -> metadataService.updateEntityType(1L, request));
+        verify(entityTypeRepository, never()).save(any());
+    }
+
+    @Test
+    void testDeleteEntityType_CascadesSoftDelete() {
+        EntityType type = new EntityType();
+        type.setId(1L);
+
+        AttributeDefinition attr = new AttributeDefinition();
+        attr.setId(10L);
+
+        EntityRecord record = new EntityRecord();
+        record.setId(100L);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(type));
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(1L)).thenReturn(java.util.List.of(attr));
+        when(entityRecordRepository.findByEntityTypeIdAndDeletedDateIsNull(1L)).thenReturn(java.util.List.of(record));
+
+        metadataService.deleteEntityType(1L);
+
+        assertNotNull(type.getDeletedDate());
+        assertNotNull(attr.getDeletedDate());
+        assertNotNull(record.getDeletedDate());
+        verify(entityTypeRepository).save(type);
+        verify(attributeDefinitionRepository).save(attr);
+        verify(entityRecordRepository).save(record);
+    }
+
+    @Test
+    void testUpdateAttributeDefinition_Success() {
+        EntityType type = new EntityType();
+        type.setId(1L);
+
+        AttributeDefinition attr = new AttributeDefinition();
+        attr.setId(10L);
+        attr.setEntityType(type);
+        attr.setDataType("string");
+        attr.setUiComponent("text");
+        attr.setVersion(0L);
+
+        UpdateAttributeRequest request = new UpdateAttributeRequest("Full Name", "textarea", true, false, null, null, null, 0L);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(type));
+        when(attributeDefinitionRepository.findByEntityTypeIdAndIdAndDeletedDateIsNull(1L, 10L)).thenReturn(Optional.of(attr));
+        when(attributeDefinitionRepository.save(any(AttributeDefinition.class))).thenAnswer(i -> i.getArgument(0));
+
+        AttributeDefinitionResponse result = metadataService.updateAttributeDefinition(1L, 10L, request);
+        assertNotNull(result);
+        assertEquals("Full Name", result.name());
+        assertEquals("textarea", result.uiComponent());
+        verify(attributeDefinitionRepository).save(attr);
+        verify(eventPublisher).publishEvent(any(AttributeDefinitionUpdatedEvent.class));
+    }
+
+    @Test
+    void testDeleteAttributeDefinition_GuardedThrowsWhenValuesExist() {
+        EntityType type = new EntityType();
+        type.setId(1L);
+
+        AttributeDefinition attr = new AttributeDefinition();
+        attr.setId(10L);
+        attr.setSystemName("email");
+
+        EntityRecord record = new EntityRecord();
+        record.setAttributes(Map.of("email", "john@example.com"));
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(type));
+        when(attributeDefinitionRepository.findByEntityTypeIdAndIdAndDeletedDateIsNull(1L, 10L)).thenReturn(Optional.of(attr));
+        when(entityRecordRepository.findByEntityTypeIdAndDeletedDateIsNull(1L)).thenReturn(java.util.List.of(record));
+
+        assertThrows(MetadataConflictException.class, () -> metadataService.deleteAttributeDefinition(1L, 10L, false));
+        assertNull(attr.getDeletedDate());
+        verify(attributeDefinitionRepository, never()).save(any());
+    }
+
+    @Test
+    void testDeleteAttributeDefinition_ForceSuccess() {
+        EntityType type = new EntityType();
+        type.setId(1L);
+
+        AttributeDefinition attr = new AttributeDefinition();
+        attr.setId(10L);
+        attr.setSystemName("email");
+
+        EntityRecord record = new EntityRecord();
+        record.setAttributes(Map.of("email", "john@example.com"));
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(type));
+        when(attributeDefinitionRepository.findByEntityTypeIdAndIdAndDeletedDateIsNull(1L, 10L)).thenReturn(Optional.of(attr));
+
+        metadataService.deleteAttributeDefinition(1L, 10L, true);
+
+        assertNotNull(attr.getDeletedDate());
+        verify(attributeDefinitionRepository).save(attr);
+        verify(eventPublisher).publishEvent(any(AttributeDefinitionUpdatedEvent.class));
+    }
+
+    @Test
+    void testArchiveAndUnarchiveAttribute() {
+        EntityType type = new EntityType();
+        type.setId(1L);
+
+        AttributeDefinition attr = new AttributeDefinition();
+        attr.setId(10L);
+        attr.setIsArchived(false);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(type));
+        when(attributeDefinitionRepository.findByEntityTypeIdAndIdAndDeletedDateIsNull(1L, 10L)).thenReturn(Optional.of(attr));
+        when(attributeDefinitionRepository.save(any(AttributeDefinition.class))).thenAnswer(i -> i.getArgument(0));
+
+        metadataService.archiveAttributeDefinition(1L, 10L);
+        assertTrue(attr.getIsArchived());
+
+        metadataService.unarchiveAttributeDefinition(1L, 10L);
+        assertFalse(attr.getIsArchived());
+    }
+
+    @Test
+    void testReorderAttributes() {
+        EntityType type = new EntityType();
+        type.setId(1L);
+
+        AttributeDefinition attr1 = new AttributeDefinition();
+        attr1.setId(10L);
+        attr1.setDisplayOrder(0);
+
+        AttributeDefinition attr2 = new AttributeDefinition();
+        attr2.setId(20L);
+        attr2.setDisplayOrder(1);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(type));
+        when(attributeDefinitionRepository.findAllByIdInAndEntityTypeIdAndDeletedDateIsNull(java.util.List.of(20L, 10L), 1L)).thenReturn(java.util.List.of(attr1, attr2));
+
+        ReorderAttributesRequest request = new ReorderAttributesRequest(java.util.List.of(20L, 10L));
+        metadataService.reorderAttributes(1L, request);
+
+        assertEquals(0, attr2.getDisplayOrder());
+        assertEquals(1, attr1.getDisplayOrder());
+        verify(attributeDefinitionRepository).save(attr1);
+        verify(attributeDefinitionRepository).save(attr2);
+        verify(eventPublisher).publishEvent(any(AttributeDefinitionUpdatedEvent.class));
+    }
+
+    @Test
+    void testUpdateEntityRecord_Success() {
+        EntityType type = new EntityType();
+        type.setId(1L);
+        type.setSchemaVersion(2L);
+
+        EntityRecord record = new EntityRecord();
+        record.setId(100L);
+        record.setEntityType(type);
+        record.setAttributes(new HashMap<>(Map.of("name", "Old")));
+        record.setVersion(0L);
+
+        UpdateRecordRequest request = new UpdateRecordRequest(Map.of("name", "New"), 0L);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(type));
+        when(entityRecordRepository.findByEntityTypeIdAndIdAndDeletedDateIsNull(1L, 100L)).thenReturn(Optional.of(record));
+        when(entityRecordRepository.save(any(EntityRecord.class))).thenAnswer(i -> i.getArgument(0));
+
+        EntityRecordResponse result = metadataService.updateEntityRecord(1L, 100L, request);
+        assertNotNull(result);
+        assertEquals("New", result.attributes().get("name"));
+        assertEquals(2L, record.getSchemaVersion());
+        verify(schemaValidationService).validatePayload(1L, Map.of("name", "New"));
+    }
+
+    @Test
+    void testPatchEntityRecord_Success() {
+        EntityType type = new EntityType();
+        type.setId(1L);
+        type.setSchemaVersion(3L);
+
+        Map<String, Object> initial = new HashMap<>();
+        initial.put("first", "John");
+        initial.put("last", "Doe");
+
+        EntityRecord record = new EntityRecord();
+        record.setId(100L);
+        record.setEntityType(type);
+        record.setAttributes(initial);
+        record.setVersion(0L);
+
+        PatchRecordRequest request = new PatchRecordRequest(Map.of("last", "Smith"), 0L);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(type));
+        when(entityRecordRepository.findByEntityTypeIdAndIdAndDeletedDateIsNull(1L, 100L)).thenReturn(Optional.of(record));
+        when(entityRecordRepository.save(any(EntityRecord.class))).thenAnswer(i -> i.getArgument(0));
+
+        EntityRecordResponse result = metadataService.patchEntityRecord(1L, 100L, request);
+        assertNotNull(result);
+        assertEquals("John", result.attributes().get("first"));
+        assertEquals("Smith", result.attributes().get("last"));
+        assertEquals(3L, record.getSchemaVersion());
+    }
+
+    @Test
+    void testDeleteEntityRecord_SoftDelete() {
+        EntityType type = new EntityType();
+        type.setId(1L);
+
+        EntityRecord record = new EntityRecord();
+        record.setId(100L);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(type));
+        when(entityRecordRepository.findByEntityTypeIdAndIdAndDeletedDateIsNull(1L, 100L)).thenReturn(Optional.of(record));
+
+        metadataService.deleteEntityRecord(1L, 100L);
+        assertNotNull(record.getDeletedDate());
+        verify(entityRecordRepository).save(record);
+    }
 }
