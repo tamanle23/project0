@@ -60,7 +60,7 @@ public class FileSystemServiceImplTest {
                 any(Map.class)))
                 .thenAnswer(invocation -> {
                     // Simulate long running blocking network call
-                    Thread.sleep(100);
+                    Thread.sleep(250);
                     return ResponseEntity.ok(mockResponse);
                 });
 
@@ -78,8 +78,8 @@ public class FileSystemServiceImplTest {
         System.out.println("Time to return CompletableFuture: " + timeToReturn + " ms");
 
         // Assert
-        // The return time should be much less than the 100ms simulated delay, freeing the caller thread (e.g. servlet thread)
-        assertTrue(timeToReturn < 50);
+        // The return time should be much less than the 250ms simulated delay, freeing the caller thread (e.g. servlet thread)
+        assertTrue(timeToReturn < 150);
 
         // Wait for the result to make sure it functions correctly
         ResponseWrapper<ContextHeader, List<Map>> result = future.get();

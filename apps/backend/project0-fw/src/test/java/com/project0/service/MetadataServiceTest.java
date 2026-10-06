@@ -202,6 +202,25 @@ class MetadataServiceTest {
     }
 
     @Test
+    void testGetCompiledSchema_Success() {
+        EntityType type = new EntityType();
+        type.setId(1L);
+        type.setSchemaVersion(5L);
+
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        com.fasterxml.jackson.databind.JsonNode node = mapper.createObjectNode().put("type", "object");
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(1L)).thenReturn(Optional.of(type));
+        when(schemaValidationService.compileSchemaNode(1L)).thenReturn(node);
+
+        CompiledSchemaResponse result = metadataService.getCompiledSchema(1L);
+        assertNotNull(result);
+        assertEquals(1L, result.entityTypeId());
+        assertEquals(5L, result.schemaVersion());
+        assertEquals(node, result.schema());
+    }
+
+    @Test
     void testUpdateEntityType_Success() {
         EntityType type = new EntityType();
         type.setId(1L);

@@ -64,6 +64,13 @@ public class MetadataService {
         return MetadataDtoMapper.toResponse(entityType);
     }
 
+    public CompiledSchemaResponse getCompiledSchema(Long id) {
+        EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(id)
+                .orElseThrow(() -> new MetadataNotFoundException("EntityType not found with id: " + id));
+        com.fasterxml.jackson.databind.JsonNode schemaNode = schemaValidationService.compileSchemaNode(id);
+        return new CompiledSchemaResponse(id, entityType.getSchemaVersion(), schemaNode);
+    }
+
     @Transactional
     public EntityTypeResponse createEntityType(CreateEntityTypeRequest request) {
         if (entityTypeRepository.existsBySystemNameAndDeletedDateIsNull(request.systemName().trim())) {

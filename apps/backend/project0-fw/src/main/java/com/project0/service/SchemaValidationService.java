@@ -2,22 +2,28 @@ package com.project0.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
+import com.project0.core.io.Error;
 import com.project0.domain.metadata.AttributeDefinition;
+import com.project0.domain.metadata.EntityType;
 import com.project0.repository.jpa.AttributeDefinitionRepository;
+import com.project0.repository.jpa.EntityTypeRepository;
+import com.project0.service.exception.MetadataNotFoundException;
 import com.project0.service.exception.SchemaValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,99 +34,124 @@ public class SchemaValidationService {
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
     private final AttributeDefinitionRepository attributeDefinitionRepository;
+    private final EntityTypeRepository entityTypeRepository;
+    private final SchemaCompiler schemaCompiler;
     private final JsonSchemaFactory schemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
 
-    public void validatePayload(Long entityTypeId, Map<String, Object> payload) {
-        String cacheKey = "schema:" + entityTypeId;
-        String schemaJson = null;
+    // L1 in-memory cache holding parsed JsonSchema objects for maximum throughput
+    private final Map<String, JsonSchema> l1ParsedSchemaCache = new ConcurrentHashMap<>();
 
+    private String buildCacheKey(Long entityTypeId, Long schemaVersion) {
+        long version = schemaVersion != null ? schemaVersion : 1L;
+        return "schema:" + entityTypeId + ":v" + version;
+    }
+
+    public void invalidateL1Cache(Long entityTypeId) {
+        if (entityTypeId == null) {
+            l1ParsedSchemaCache.clear();
+            return;
+        }
+        String prefix = "schema:" + entityTypeId + ":";
+        l1ParsedSchemaCache.keySet().removeIf(k -> k.startsWith(prefix));
+    }
+
+    public JsonSchema getOrCompileJsonSchema(Long entityTypeId, Long schemaVersion) {
+        String cacheKey = buildCacheKey(entityTypeId, schemaVersion);
+
+        // 1. Check L1 in-memory parsed cache
+        JsonSchema l1Schema = l1ParsedSchemaCache.get(cacheKey);
+        if (l1Schema != null) {
+            return l1Schema;
+        }
+
+        // 2. Check L2 Redis cache
+        String schemaJson = null;
         try {
             if (redisTemplate != null) {
                 schemaJson = redisTemplate.opsForValue().get(cacheKey);
             }
         } catch (Exception e) {
-            log.warn("Failed to get schema from Redis cache for entityTypeId {}: {}", entityTypeId, e.getMessage());
+            log.warn("Redis L2 cache read failed for {}: {}", cacheKey, e.getMessage());
         }
 
+        // 3. Compile if cache miss
         if (schemaJson == null) {
             schemaJson = compileSchema(entityTypeId);
             try {
                 if (redisTemplate != null) {
-                    redisTemplate.opsForValue().set(cacheKey, schemaJson);
+                    redisTemplate.opsForValue().set(cacheKey, schemaJson, 1, TimeUnit.HOURS);
                 }
             } catch (Exception e) {
-                log.warn("Failed to set schema in Redis cache for entityTypeId {}: {}", entityTypeId, e.getMessage());
+                log.warn("Redis L2 cache write failed for {}: {}", cacheKey, e.getMessage());
             }
         }
 
+        // 4. Parse & store in L1
         try {
             JsonNode schemaNode = objectMapper.readTree(schemaJson);
-            JsonSchema schema = schemaFactory.getSchema(schemaNode);
-            JsonNode payloadNode = objectMapper.valueToTree(payload != null ? payload : Map.of());
+            JsonSchema compiledJsonSchema = schemaFactory.getSchema(schemaNode);
+            l1ParsedSchemaCache.put(cacheKey, compiledJsonSchema);
+            return compiledJsonSchema;
+        } catch (Exception e) {
+            log.error("Failed to parse compiled schema JSON into JsonSchema for entityTypeId {}", entityTypeId, e);
+            throw new RuntimeException("Failed to parse JSON schema: " + e.getMessage(), e);
+        }
+    }
 
+    public void validatePayload(Long entityTypeId, Map<String, Object> payload) {
+        EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId)
+                .orElse(null);
+        Long schemaVersion = entityType != null ? entityType.getSchemaVersion() : 1L;
+
+        JsonSchema schema = getOrCompileJsonSchema(entityTypeId, schemaVersion);
+
+        try {
+            JsonNode payloadNode = objectMapper.valueToTree(payload != null ? payload : Map.of());
             Set<ValidationMessage> validationResult = schema.validate(payloadNode);
+
             if (!validationResult.isEmpty()) {
-                String errors = validationResult.stream()
+                List<Error> errorList = new ArrayList<>();
+                for (ValidationMessage vm : validationResult) {
+                    String path = vm.getInstanceLocation() != null ? vm.getInstanceLocation().toString() : vm.getProperty();
+                    if (path != null && path.startsWith("$.")) {
+                        path = path.substring(2);
+                    }
+                    errorList.add(Error.builder()
+                            .code("VALIDATION_ERROR")
+                            .message(vm.getMessage())
+                            .detail(path)
+                            .build());
+                }
+
+                String combinedMsg = validationResult.stream()
                         .map(ValidationMessage::getMessage)
                         .collect(Collectors.joining(", "));
-                throw new SchemaValidationException("Payload validation failed: " + errors);
+
+                throw new SchemaValidationException(errorList.isEmpty() 
+                        ? List.of(Error.builder().code("VALIDATION_ERROR").message("Payload validation failed: " + combinedMsg).build())
+                        : errorList);
             }
         } catch (SchemaValidationException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error validating payload against schema", e);
+            log.error("Error validating payload against schema for entityTypeId {}", entityTypeId, e);
             throw new SchemaValidationException("Validation error: " + e.getMessage());
         }
     }
 
     public String compileSchema(Long entityTypeId) {
+        EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId)
+                .orElseThrow(() -> new MetadataNotFoundException("EntityType not found with id: " + entityTypeId));
+
         List<AttributeDefinition> attributes = attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId);
-        ObjectNode root = objectMapper.createObjectNode();
-        root.put("$schema", "http://json-schema.org/draft-07/schema#");
-        root.put("type", "object");
+        return schemaCompiler.compile(entityTypeId, entityType.getSchemaVersion(), attributes);
+    }
 
-        ObjectNode properties = objectMapper.createObjectNode();
+    public JsonNode compileSchemaNode(Long entityTypeId) {
+        EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId)
+                .orElseThrow(() -> new MetadataNotFoundException("EntityType not found with id: " + entityTypeId));
 
-        for (AttributeDefinition attr : attributes) {
-            if (Boolean.TRUE.equals(attr.getIsArchived())) {
-                continue;
-            }
-
-            ObjectNode prop = objectMapper.createObjectNode();
-            String uiComponent = attr.getUiComponent() != null ? attr.getUiComponent().toLowerCase() : "";
-            String dataType = attr.getDataType() != null ? attr.getDataType().toLowerCase() : "";
-
-            if ("switch".equals(uiComponent) || "boolean".equals(dataType)) {
-                prop.put("type", "boolean");
-            } else if ("number".equals(uiComponent) || "number".equals(dataType) || "integer".equals(dataType)) {
-                prop.put("type", "integer".equals(dataType) ? "integer" : "number");
-            } else if ("multiselect".equals(uiComponent) || "array".equals(dataType)) {
-                prop.put("type", "array");
-            } else if ("json_editor".equals(uiComponent) || "json".equals(dataType)) {
-                prop.put("type", "object");
-            } else {
-                prop.put("type", "string");
-            }
-
-            properties.set(attr.getSystemName(), prop);
-        }
-
-        root.set("properties", properties);
-
-        // Handle required fields (excluding archived)
-        List<String> requiredFields = attributes.stream()
-                .filter(attr -> Boolean.TRUE.equals(attr.getIsRequired()) && !Boolean.TRUE.equals(attr.getIsArchived()))
-                .map(AttributeDefinition::getSystemName)
-                .collect(Collectors.toList());
-
-        if (!requiredFields.isEmpty()) {
-            root.set("required", objectMapper.valueToTree(requiredFields));
-        }
-
-        try {
-            return objectMapper.writeValueAsString(root);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to compile JSON schema", e);
-        }
+        List<AttributeDefinition> attributes = attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId);
+        return schemaCompiler.compileNode(entityTypeId, entityType.getSchemaVersion(), attributes);
     }
 }

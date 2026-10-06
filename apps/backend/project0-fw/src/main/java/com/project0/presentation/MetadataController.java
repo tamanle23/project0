@@ -49,6 +49,13 @@ public class MetadataController {
         return responseBuilder.success(entityType);
     }
 
+    @GetMapping("/entity-types/{id}/schema")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_READ') or hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, CompiledSchemaResponse>> getCompiledSchema(@PathVariable Long id) {
+        CompiledSchemaResponse schema = metadataService.getCompiledSchema(id);
+        return responseBuilder.success(schema);
+    }
+
     @PutMapping("/entity-types/{id}")
     @PreAuthorize("hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
     public ResponseEntity<ResponseWrapper<ContextHeader, EntityTypeResponse>> updateEntityType(

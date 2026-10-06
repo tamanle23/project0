@@ -16,6 +16,9 @@ class MetadataCacheListenerTest {
     @Mock
     private RedisTemplate<String, String> redisTemplate;
 
+    @Mock
+    private SchemaValidationService schemaValidationService;
+
     @InjectMocks
     private MetadataCacheListener metadataCacheListener;
 
@@ -26,6 +29,7 @@ class MetadataCacheListenerTest {
 
         metadataCacheListener.handleAttributeDefinitionUpdate(event);
 
+        verify(schemaValidationService).invalidateL1Cache(1L);
         verify(redisTemplate).delete("schema:1");
     }
 }

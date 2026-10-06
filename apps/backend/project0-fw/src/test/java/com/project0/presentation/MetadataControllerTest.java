@@ -119,6 +119,20 @@ class MetadataControllerTest {
     }
 
     @Test
+    void testGetCompiledSchema() {
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        com.fasterxml.jackson.databind.JsonNode node = mapper.createObjectNode().put("type", "object");
+        CompiledSchemaResponse mockResponse = new CompiledSchemaResponse(1L, 2L, node);
+
+        when(metadataService.getCompiledSchema(1L)).thenReturn(mockResponse);
+
+        ResponseEntity<ResponseWrapper<ContextHeader, CompiledSchemaResponse>> response = metadataController.getCompiledSchema(1L);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockResponse, response.getBody().getBody());
+        verify(metadataService).getCompiledSchema(1L);
+    }
+
+    @Test
     void testUpdateEntityType() {
         UpdateEntityTypeRequest request = new UpdateEntityTypeRequest("New Name", "New Desc", 0L);
         EntityTypeResponse mockResponse = new EntityTypeResponse(1L, "cust-uid", "New Name", "cust", "New Desc", 1L, 0L, LocalDateTime.now(), LocalDateTime.now());
