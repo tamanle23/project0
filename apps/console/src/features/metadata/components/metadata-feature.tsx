@@ -143,9 +143,9 @@ export const MetadataFeature: React.FC = () => {
                   <Tabs
                     value={activeTab}
                     onValueChange={handleTabChange}
-                    className="w-full pt-1"
+                    className="w-full pt-1 flex flex-col sm:items-end"
                   >
-                    <TabsList className="w-full grid grid-cols-3 sm:w-auto sm:inline-flex items-center gap-1.5 p-1.5 h-auto rounded-xl bg-slate-200/50 dark:bg-slate-950/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-inner shadow-black/5">
+                    <TabsList className="w-full grid grid-cols-3 sm:w-auto sm:inline-flex sm:ml-auto items-center gap-1.5 p-1.5 h-auto rounded-xl bg-slate-200/50 dark:bg-slate-950/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-inner shadow-black/5">
                       {/* Schema Builder Tab */}
                       <TabsTrigger
                         value="schema"
