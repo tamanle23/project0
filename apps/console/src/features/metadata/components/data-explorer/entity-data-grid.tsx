@@ -265,7 +265,11 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
         <div className="flex items-center justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="liquid-glass-interactive h-7 w-7 p-0 rounded-lg border border-white/20 dark:border-white/10 text-muted-foreground hover:text-foreground active:scale-95 shadow-xs"
+              >
                 <MoreVertical className="h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>
@@ -416,7 +420,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
                         className={cn(
                           'p-3 font-semibold text-muted-foreground uppercase tracking-wider text-[11px] whitespace-nowrap',
                           isAction &&
-                            'sticky right-0 z-20 w-12 bg-white/90 dark:bg-slate-800/95 backdrop-blur-md shadow-[-4px_0_12px_rgba(0,0,0,0.06)] dark:shadow-[-4px_0_12px_rgba(0,0,0,0.3)]'
+                            'sticky right-0 z-20 w-12 bg-white/75 dark:bg-slate-900/80 backdrop-blur-xl border-l border-white/30 dark:border-white/10 shadow-[-8px_0_20px_-4px_rgba(0,0,0,0.08),inset_1px_0_1px_0_rgba(255,255,255,0.4)] dark:shadow-[-8px_0_20px_-4px_rgba(0,0,0,0.5),inset_1px_0_1px_0_rgba(255,255,255,0.08)]'
                         )}
                       >
                         {header.isPlaceholder
@@ -442,7 +446,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
                         className={cn(
                           'p-3 whitespace-nowrap',
                           isAction &&
-                            'sticky right-0 z-10 w-12 bg-white/90 dark:bg-slate-900/90 group-hover:bg-white/95 dark:group-hover:bg-slate-800/95 backdrop-blur-md shadow-[-4px_0_12px_rgba(0,0,0,0.06)] dark:shadow-[-4px_0_12px_rgba(0,0,0,0.3)]'
+                            'sticky right-0 z-10 w-12 bg-white/70 dark:bg-slate-900/75 group-hover:bg-white/85 dark:group-hover:bg-slate-800/85 backdrop-blur-xl border-l border-white/30 dark:border-white/10 shadow-[-8px_0_20px_-4px_rgba(0,0,0,0.08),inset_1px_0_1px_0_rgba(255,255,255,0.4)] dark:shadow-[-8px_0_20px_-4px_rgba(0,0,0,0.5),inset_1px_0_1px_0_rgba(255,255,255,0.08)] transition-[background-color,backdrop-filter] duration-150'
                         )}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
