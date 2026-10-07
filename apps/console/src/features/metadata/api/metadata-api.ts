@@ -21,6 +21,7 @@ import type {
   UpdateEntityTypeDto,
   UpdateRelationshipTypeDto,
   ValidateRecordResponse,
+  EntityFacetsResponse,
 } from './types';
 
 // ==========================================
@@ -249,6 +250,21 @@ export const useEntityRecord = (
       return metadataService.getEntityRecord(entityTypeId, recordId);
     },
     enabled: Boolean(entityTypeId && recordId),
+  });
+};
+
+export const useEntityFacets = (
+  entityTypeId: string | number | null,
+  params?: PageRequestParams
+) => {
+  return useQuery({
+    queryKey: ['metadata', 'facets', entityTypeId, params],
+    queryFn: (): Promise<EntityFacetsResponse | null> => {
+      if (!entityTypeId) return Promise.resolve(null);
+      return metadataService.getEntityFacets(entityTypeId, params);
+    },
+    enabled: Boolean(entityTypeId),
+    staleTime: 30 * 1000,
   });
 };
 

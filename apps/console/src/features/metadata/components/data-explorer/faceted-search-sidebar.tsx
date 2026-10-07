@@ -1,5 +1,5 @@
 import React from 'react';
-import type { AttributeDefinition, EntityRecord } from '../../api/types';
+import type { AttributeDefinition, EntityRecord, EntityFacetsResponse } from '../../api/types';
 import type { AttributeFilterClause } from '../../store/use-metadata-ui-store';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,7 @@ interface FacetedSearchSidebarProps {
   records: EntityRecord[];
   activeFilters: AttributeFilterClause[];
   onFilterChange: (filters: AttributeFilterClause[]) => void;
+  serverFacets?: EntityFacetsResponse | null;
   className?: string;
 }
 
@@ -49,6 +50,7 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
   records,
   activeFilters,
   onFilterChange,
+  serverFacets,
   className = '',
 }) => {
   const [collapsedGroups, setCollapsedGroups] = React.useState<Record<string, boolean>>({});
@@ -60,10 +62,22 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
     }));
   };
 
-  // Discover and compute facets for ALL supported data types
+  // Discover and compute facets for ALL supported data types (leveraging serverFacets if available, otherwise local records)
   const facetGroups: FacetGroup[] = React.useMemo(() => {
     const activeAttrs = attributes.filter((a) => !a.isArchived);
     const groups: FacetGroup[] = [];
+
+    // Helper map of server-side facet counts
+    const serverFacetMap = new Map<string, Record<string, number>>();
+    if (serverFacets?.facets) {
+      serverFacets.facets.forEach((g) => {
+        const counts: Record<string, number> = {};
+        g.buckets.forEach((b) => {
+          counts[b.value] = b.count;
+        });
+        serverFacetMap.set(g.field, counts);
+      });
+    }
 
     // 1. Region / Tenant facet (Multi-Region Distribution)
     const tenantCounts: Record<string, number> = {};
@@ -201,19 +215,28 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
 
       // C. CATEGORICAL, BOOLEAN, ENUM, RELATION, & AUTO-DETECTED LOW-CARDINALITY STRINGS
       const predefinedChoices = (attr.options?.choices as string[]) || [];
+      const serverCounts = serverFacetMap.get(field);
       const counts: Record<string, number> = {};
 
-      predefinedChoices.forEach((c) => {
-        counts[String(c)] = 0;
-      });
+      if (serverCounts) {
+        // Use global server-aggregated counts directly
+        Object.assign(counts, serverCounts);
+        predefinedChoices.forEach((c) => {
+          if (counts[String(c)] === undefined) counts[String(c)] = 0;
+        });
+      } else {
+        predefinedChoices.forEach((c) => {
+          counts[String(c)] = 0;
+        });
 
-      records.forEach((r) => {
-        const val = r.attributes?.[field];
-        if (val !== undefined && val !== null && val !== '') {
-          const strVal = String(val);
-          counts[strVal] = (counts[strVal] || 0) + 1;
-        }
-      });
+        records.forEach((r) => {
+          const val = r.attributes?.[field];
+          if (val !== undefined && val !== null && val !== '') {
+            const strVal = String(val);
+            counts[strVal] = (counts[strVal] || 0) + 1;
+          }
+        });
+      }
 
       const distinctKeys = Object.keys(counts);
 
@@ -263,7 +286,7 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
     });
 
     return groups;
-  }, [attributes, records]);
+  }, [attributes, records, serverFacets]);
 
   // Handle checking/unchecking any facet bucket (Discrete, Numeric Range, Date Interval)
   const handleToggleFacet = (group: FacetGroup, bucket: FacetBucket) => {

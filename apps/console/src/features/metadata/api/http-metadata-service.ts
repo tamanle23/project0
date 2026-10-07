@@ -21,6 +21,7 @@ import type {
   UpdateEntityTypeDto,
   UpdateRelationshipTypeDto,
   ValidateRecordResponse,
+  EntityFacetsResponse,
 } from './types';
 
 const BASE_URL = '/v1/metadata';
@@ -275,6 +276,33 @@ export class HttpMetadataService implements MetadataDataSource {
       `${BASE_URL}/entity-types/${entityTypeId}/records/${recordId}`
     );
     return true;
+  }
+
+  async getEntityFacets(
+    entityTypeId: string | number,
+    params?: PageRequestParams
+  ): Promise<EntityFacetsResponse> {
+    const queryParams: Record<string, unknown> = {
+      tenantId: params?.tenantId,
+    };
+
+    if (params?.filters) {
+      Object.entries(params.filters).forEach(([field, filterVal]) => {
+        if (typeof filterVal === 'object' && filterVal !== null) {
+          Object.entries(filterVal).forEach(([op, val]) => {
+            queryParams[`filter[${field}][${op}]`] = val;
+          });
+        } else if (filterVal !== undefined && filterVal !== '') {
+          queryParams[`filter[${field}]`] = filterVal;
+        }
+      });
+    }
+
+    const res = await springApiClient.get(
+      `${BASE_URL}/entity-types/${entityTypeId}/facets`,
+      { params: queryParams }
+    );
+    return unwrapResponse(res.data);
   }
 
   async validateEntityRecord(

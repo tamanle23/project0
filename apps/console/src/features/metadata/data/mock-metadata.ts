@@ -20,6 +20,8 @@ import type {
   UpdateEntityTypeDto,
   UpdateRelationshipTypeDto,
   ValidateRecordResponse,
+  EntityFacetsResponse,
+  FacetGroupDto,
   ValidationErrorDetail,
 } from '../api/types';
 
@@ -1012,6 +1014,54 @@ export class MockMetadataService implements MetadataDataSource {
     const beforeCount = list.length;
     this.records[strId] = list.filter((r) => String(r.id) !== String(recordId));
     return this.records[strId].length < beforeCount;
+  }
+
+  async getEntityFacets(
+    entityTypeId: string | number,
+    _params?: PageRequestParams
+  ): Promise<EntityFacetsResponse> {
+    const strId = String(entityTypeId);
+    const records: EntityRecord[] = this.records[strId] || [];
+    const attrs: AttributeDefinition[] = (this.attributes[strId] || []).filter((a) => !a.isArchived);
+    const facets: FacetGroupDto[] = [];
+
+    // Tenant distribution facet
+    const tenantCounts: Record<string, number> = {};
+    records.forEach((r) => {
+      if (r.tenantId) tenantCounts[r.tenantId] = (tenantCounts[r.tenantId] || 0) + 1;
+    });
+    if (Object.keys(tenantCounts).length > 0) {
+      facets.push({
+        field: 'tenantId',
+        dataType: 'STRING',
+        buckets: Object.entries(tenantCounts).map(([value, count]) => ({ value, count })),
+      });
+    }
+
+    // Attributes facets
+    attrs.forEach((attr) => {
+      const counts: Record<string, number> = {};
+      records.forEach((r) => {
+        const val = r.attributes?.[attr.systemName];
+        if (val !== undefined && val !== null && val !== '') {
+          const s = String(val);
+          counts[s] = (counts[s] || 0) + 1;
+        }
+      });
+      if (Object.keys(counts).length > 0) {
+        facets.push({
+          field: attr.systemName,
+          dataType: attr.dataType,
+          buckets: Object.entries(counts).map(([value, count]) => ({ value, count })),
+        });
+      }
+    });
+
+    return {
+      entityTypeId,
+      totalRecords: records.length,
+      facets,
+    };
   }
 
   async validateEntityRecord(

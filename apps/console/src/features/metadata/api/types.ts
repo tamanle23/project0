@@ -182,3 +182,21 @@ export interface SchemaBackfillExecutionResponse {
   failedRecords: number;
   failures: BackfillFailureDetail[];
 }
+
+export interface FacetBucketDto {
+  value: string;
+  label?: string;
+  count: number;
+}
+
+export interface FacetGroupDto {
+  field: string;
+  dataType: string;
+  buckets: FacetBucketDto[];
+}
+
+export interface EntityFacetsResponse {
+  entityTypeId: string | number;
+  totalRecords: number;
+  facets: FacetGroupDto[];
+}

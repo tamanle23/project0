@@ -5,6 +5,7 @@ import {
   useEntityType,
   useSchemaDriftAnalysis,
   useExecuteSchemaBackfill,
+  useEntityFacets,
 } from '../../api/metadata-api';
 import { useMetadataUiStore, type AttributeFilterClause } from '../../store/use-metadata-ui-store';
 import type { AttributeDefinition, EntityRecord } from '../../api/types';
@@ -269,6 +270,12 @@ export const EntityDataGrid: React.FC<Props> = ({
   const { data: recordsResponse, isLoading: recordsLoading } = useEntityRecords(
     entityTypeId,
     queryParams
+  );
+
+  // Fetch server-aggregated facet counts if enabled/available
+  const { data: serverFacets } = useEntityFacets(
+    isFacetOpen ? entityTypeId : null,
+    { tenantId: queryParams.tenantId }
   );
 
   const records = useMemo(() => {
@@ -667,6 +674,7 @@ export const EntityDataGrid: React.FC<Props> = ({
             records={records}
             activeFilters={attributeFilters}
             onFilterChange={handleAttributeFiltersChange}
+            serverFacets={serverFacets}
             className="w-full lg:w-72 shrink-0 animate-in fade-in slide-in-from-left-2 duration-200"
           />
         )}

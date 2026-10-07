@@ -19,6 +19,7 @@ import type {
   UpdateEntityTypeDto,
   UpdateRelationshipTypeDto,
   ValidateRecordResponse,
+  EntityFacetsResponse,
 } from './types';
 
 export interface MetadataDataSource {
@@ -95,6 +96,10 @@ export interface MetadataDataSource {
     entityTypeId: string | number,
     recordId: string | number
   ): Promise<boolean>;
+  getEntityFacets(
+    entityTypeId: string | number,
+    params?: PageRequestParams
+  ): Promise<EntityFacetsResponse>;
   validateEntityRecord(
     entityTypeId: string | number,
     dto: CreateEntityRecordDto
