@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import {
   Select,
   SelectContent,
@@ -397,26 +398,33 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
         </div>
       </div>
 
-      {/* Table Canvas */}
+      {/* Table Canvas with Horizontal Overflow & Sticky Action Column */}
       <div className="rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto relative">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr
                   key={headerGroup.id}
-                  className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border-b border-border"
+                  className="bg-white/70 dark:bg-slate-800/80 backdrop-blur-md border-b border-border"
                 >
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      className="p-3 font-semibold text-muted-foreground uppercase tracking-wider text-[11px]"
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
-                  ))}
+                  {headerGroup.headers.map((header) => {
+                    const isAction = header.column.id === 'actions';
+                    return (
+                      <th
+                        key={header.id}
+                        className={cn(
+                          'p-3 font-semibold text-muted-foreground uppercase tracking-wider text-[11px] whitespace-nowrap',
+                          isAction &&
+                            'sticky right-0 z-20 w-12 bg-white/90 dark:bg-slate-800/95 backdrop-blur-md shadow-[-4px_0_12px_rgba(0,0,0,0.06)] dark:shadow-[-4px_0_12px_rgba(0,0,0,0.3)]'
+                        )}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    );
+                  })}
                 </tr>
               ))}
             </thead>
@@ -424,13 +432,23 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
               {table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="border-b border-white/10 hover:bg-white/40 dark:hover:bg-white/5 transition-colors"
+                  className="group border-b border-white/10 hover:bg-white/40 dark:hover:bg-white/5 transition-colors"
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="p-3">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const isAction = cell.column.id === 'actions';
+                    return (
+                      <td
+                        key={cell.id}
+                        className={cn(
+                          'p-3 whitespace-nowrap',
+                          isAction &&
+                            'sticky right-0 z-10 w-12 bg-white/90 dark:bg-slate-900/90 group-hover:bg-white/95 dark:group-hover:bg-slate-800/95 backdrop-blur-md shadow-[-4px_0_12px_rgba(0,0,0,0.06)] dark:shadow-[-4px_0_12px_rgba(0,0,0,0.3)]'
+                        )}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
               {table.getRowModel().rows.length === 0 && (
