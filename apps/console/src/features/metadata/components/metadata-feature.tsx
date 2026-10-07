@@ -117,8 +117,8 @@ export const MetadataFeature: React.FC = () => {
             {selectedEntityTypeId && activeEntity ? (
               <div className="space-y-4">
                 {/* Active Model Banner & Segmented Frosted Glass Rail (Option A) */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 md:p-5 rounded-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
-                  <div className="space-y-1 min-w-0">
+                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 md:p-5 rounded-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
+                  <div className="space-y-1.5 min-w-0 flex-1">
                     <div className="flex items-center gap-2.5 flex-wrap">
                       <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20 shrink-0">
                         <Cpu className="h-4 w-4" />
@@ -131,7 +131,7 @@ export const MetadataFeature: React.FC = () => {
                       </code>
                     </div>
                     {activeEntity.description && (
-                      <p className="text-xs text-muted-foreground max-w-xl pl-0 sm:pl-9 line-clamp-2">
+                      <p className="text-xs text-muted-foreground leading-relaxed pl-0 sm:pl-9">
                         {activeEntity.description}
                       </p>
                     )}
@@ -141,15 +141,15 @@ export const MetadataFeature: React.FC = () => {
                   <Tabs
                     value={activeTab}
                     onValueChange={handleTabChange}
-                    className="w-full sm:w-auto shrink-0 min-w-0"
+                    className="w-full xl:w-auto shrink-0 min-w-0"
                   >
-                    <div className="w-full sm:w-auto overflow-x-auto no-scrollbar py-0.5">
-                      <TabsList className="flex w-full sm:w-auto min-w-full sm:min-w-0 sm:inline-flex sm:ml-auto items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 h-auto rounded-xl bg-slate-200/50 dark:bg-slate-950/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-inner shadow-black/5">
+                    <div className="w-full xl:w-auto overflow-x-auto no-scrollbar py-0.5">
+                      <TabsList className="flex w-full xl:w-auto min-w-0 items-center justify-between sm:justify-start xl:justify-end gap-1 sm:gap-1.5 p-1 sm:p-1.5 h-auto rounded-xl bg-slate-200/50 dark:bg-slate-950/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-inner shadow-black/5">
                         {/* Schema Builder Tab */}
                         <TabsTrigger
                           value="schema"
                           className={cn(
-                            'relative flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-2.5 sm:px-3 text-xs font-medium rounded-lg transition-all duration-200 min-w-0 whitespace-nowrap',
+                            'relative flex-1 xl:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-2.5 sm:px-3 text-xs font-medium rounded-lg transition-all duration-200 min-w-0 whitespace-nowrap',
                             'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5',
                             'data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:text-foreground data-[state=active]:font-semibold',
                             'data-[state=active]:shadow-md data-[state=active]:shadow-black/10 data-[state=active]:border data-[state=active]:border-white/60 dark:data-[state=active]:border-white/10'
@@ -173,7 +173,7 @@ export const MetadataFeature: React.FC = () => {
                         <TabsTrigger
                           value="data"
                           className={cn(
-                            'relative flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-2.5 sm:px-3 text-xs font-medium rounded-lg transition-all duration-200 min-w-0 whitespace-nowrap',
+                            'relative flex-1 xl:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-2.5 sm:px-3 text-xs font-medium rounded-lg transition-all duration-200 min-w-0 whitespace-nowrap',
                             'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5',
                             'data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:text-foreground data-[state=active]:font-semibold',
                             'data-[state=active]:shadow-md data-[state=active]:shadow-black/10 data-[state=active]:border data-[state=active]:border-white/60 dark:data-[state=active]:border-white/10'
@@ -197,7 +197,7 @@ export const MetadataFeature: React.FC = () => {
                         <TabsTrigger
                           value="relationships"
                           className={cn(
-                            'relative flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-2.5 sm:px-3 text-xs font-medium rounded-lg transition-all duration-200 min-w-0 whitespace-nowrap',
+                            'relative flex-1 xl:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-2.5 sm:px-3 text-xs font-medium rounded-lg transition-all duration-200 min-w-0 whitespace-nowrap',
                             'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5',
                             'data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:text-foreground data-[state=active]:font-semibold',
                             'data-[state=active]:shadow-md data-[state=active]:shadow-black/10 data-[state=active]:border data-[state=active]:border-white/60 dark:data-[state=active]:border-white/10'
