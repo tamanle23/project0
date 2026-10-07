@@ -246,102 +246,132 @@ export const initialMockAttributes: Record<string, AttributeDefinition[]> = {
   ],
 };
 
-export const initialMockRecords: Record<string, EntityRecord[]> = {
-  '1': [
-    {
-      id: '1001',
+const generateInitialRecords = (): Record<string, EntityRecord[]> => {
+  const customerTiers = ['Starter', 'Professional', 'Enterprise', 'Strategic'];
+  const regions = [
+    'tenant-us-east-1',
+    'tenant-us-west-2',
+    'tenant-eu-central-1',
+    'tenant-eu-west-1',
+    'tenant-ap-southeast-1',
+    'tenant-ap-northeast-1',
+  ];
+  const companyPrefixes = [
+    'Acme', 'Apex', 'Aegis', 'Atlas', 'Beacon', 'BlueShift', 'Centauri', 'CloudScale',
+    'CyberWave', 'Delta', 'Echo', 'Falcon', 'Flux', 'Genesis', 'Helios', 'Hyperion',
+    'Infinity', 'Ironclad', 'Krypton', 'Luminary', 'Matrix', 'Nebula', 'Nexus', 'Nova',
+    'Omni', 'Orion', 'Pulse', 'Quantum', 'Radiant', 'Solstice', 'Starlight', 'Strata',
+    'Synapse', 'Titan', 'Vanguard', 'Velocity', 'Vertex', 'Zenith', 'Zephyr',
+  ];
+  const companySuffixes = [
+    'Corp', 'Technologies', 'Systems', 'Networks', 'Labs', 'Solutions', 'Global',
+    'Enterprises', 'Holdings', 'Data', 'Dynamics', 'Logistics', 'Services', 'Software',
+    'Robotics', 'Aerospace', 'Health', 'Finance', 'Media', 'Ventures',
+  ];
+  const domainExtensions = ['io', 'com', 'ai', 'net', 'tech', 'org', 'cloud', 'dev'];
+
+  const customerRecords: EntityRecord[] = [];
+  // Generate 250 Customer Account records
+  for (let i = 1; i <= 250; i++) {
+    const id = String(1000 + i);
+    const prefix = companyPrefixes[i % companyPrefixes.length];
+    const suffix = companySuffixes[(i * 3) % companySuffixes.length];
+    const legalName = `${prefix} ${suffix} ${i > 40 ? `(${i})` : ''}`.trim();
+    const domain = `${prefix.toLowerCase()}-${suffix.toLowerCase()}.${domainExtensions[i % domainExtensions.length]}`;
+    const emailPrefix = ['ops', 'admin', 'infra', 'billing', 'support', 'engineering'][i % 6];
+    const contactEmail = `${emailPrefix}@${domain}`;
+    const tier = customerTiers[i % customerTiers.length];
+    const vcpuQuota = [32, 64, 128, 256, 512, 1024, 2048][i % 7];
+    const isMultiRegion = i % 3 !== 0;
+    const day = (i % 28) + 1;
+    const month = (i % 12) + 1;
+    const effectiveDate = `2026-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const tenantId = regions[i % regions.length];
+
+    customerRecords.push({
+      id,
       entityTypeId: '1',
-      tenantId: 'tenant-us-east-1',
+      tenantId,
       version: 1,
       attributes: {
-        legal_name: 'Acme Cloud Services Ltd',
-        contact_email: 'ops@acme-cloud.io',
-        subscription_tier: 'Strategic',
-        max_vcpu_quota: 512,
-        is_multi_region_ha: true,
-        contract_effective_date: '2026-01-01',
-        operational_notes: 'Dedicated direct-connect interconnect via Ashburn DC.',
+        legal_name: legalName,
+        contact_email: contactEmail,
+        subscription_tier: tier,
+        max_vcpu_quota: vcpuQuota,
+        is_multi_region_ha: isMultiRegion,
+        contract_effective_date: effectiveDate,
+        operational_notes:
+          i % 4 === 0
+            ? `Dedicated SLA tier-1 interconnect. Region failover primary: ${tenantId}.`
+            : i % 2 === 0
+            ? `Standard enterprise support plan. Automated backup verified.`
+            : `Active billing cycle renewal on quarterly schedule.`,
       },
-      createdDate: new Date('2026-01-12').toISOString(),
-      updatedDate: new Date('2026-03-01').toISOString(),
-    },
-    {
-      id: '1002',
-      entityTypeId: '1',
-      tenantId: 'tenant-eu-central-1',
-      version: 1,
-      attributes: {
-        legal_name: 'Starlight Telemetry GmbH',
-        contact_email: 'infra@starlight.de',
-        subscription_tier: 'Enterprise',
-        max_vcpu_quota: 256,
-        is_multi_region_ha: true,
-        contract_effective_date: '2026-02-15',
-        operational_notes: 'GDPR strict data locality in Frankfurt zone.',
-      },
-      createdDate: new Date('2026-02-16').toISOString(),
-      updatedDate: new Date('2026-02-20').toISOString(),
-    },
-    {
-      id: '1003',
-      entityTypeId: '1',
-      tenantId: 'tenant-ap-southeast-1',
-      version: 1,
-      attributes: {
-        legal_name: 'CyberWave Logistics Pte',
-        contact_email: 'support@cyberwave.sg',
-        subscription_tier: 'Professional',
-        max_vcpu_quota: 64,
-        is_multi_region_ha: false,
-        contract_effective_date: '2026-03-01',
-        operational_notes: 'Trial sandbox environment awaiting billing conversion.',
-      },
-      createdDate: new Date('2026-03-02').toISOString(),
-      updatedDate: new Date('2026-03-02').toISOString(),
-    },
-  ],
-  '2': [
-    {
-      id: '2001',
+      createdDate: new Date(2026, 0, (i % 60) + 1, 10, i % 60).toISOString(),
+      updatedDate: new Date(2026, 2, (i % 25) + 1, 14, i % 60).toISOString(),
+    });
+  }
+
+  // Generate 80 Cloud Resource Specification records
+  const architectures = ['arm64', 'x86_64', 'riscv64'];
+  const resourceFamilies = ['c3-compute', 'm4-general', 'r5-highmem', 'g4-gpu', 'i3-storage', 't4-nano'];
+  const resourceRecords: EntityRecord[] = [];
+  for (let i = 1; i <= 80; i++) {
+    const id = String(2000 + i);
+    const family = resourceFamilies[i % resourceFamilies.length];
+    const vcpu = [2, 4, 8, 16, 32, 48, 64, 96, 128][i % 9];
+    const ram = vcpu * (family.includes('highmem') ? 8 : family.includes('gpu') ? 6 : 4);
+    const isGpu = family.includes('gpu');
+    const arch = isGpu ? 'x86_64' : architectures[i % architectures.length];
+    const code = `${family}-${vcpu}c-${ram}g-${arch}${i > 20 ? `-v${Math.floor(i / 10)}` : ''}`;
+
+    resourceRecords.push({
+      id,
       entityTypeId: '2',
       version: 1,
       attributes: {
-        resource_code: 'c3-standard-16',
-        vcpu_cores: 16,
-        ram_gib: 64,
-        gpu_enabled: false,
-        architecture: 'arm64',
+        resource_code: code,
+        vcpu_cores: vcpu,
+        ram_gib: ram,
+        gpu_enabled: isGpu,
+        architecture: arch,
       },
-      createdDate: new Date('2026-01-20').toISOString(),
-    },
-    {
-      id: '2002',
-      entityTypeId: '2',
-      version: 1,
-      attributes: {
-        resource_code: 'g4-gpu-h100-8x',
-        vcpu_cores: 96,
-        ram_gib: 768,
-        gpu_enabled: true,
-        architecture: 'x86_64',
-      },
-      createdDate: new Date('2026-01-22').toISOString(),
-    },
-  ],
-  '3': [
-    {
-      id: '3001',
+      createdDate: new Date(2026, 0, (i % 30) + 1).toISOString(),
+      updatedDate: new Date(2026, 1, (i % 28) + 1).toISOString(),
+    });
+  }
+
+  // Generate 50 Deployment Policy records
+  const rolloutStrategies = ['Canary', 'Rolling', 'Blue-Green', 'Recreate'];
+  const policyRecords: EntityRecord[] = [];
+  for (let i = 1; i <= 50; i++) {
+    const id = String(3000 + i);
+    const strategy = rolloutStrategies[i % rolloutStrategies.length];
+    const strictZeroDowntime = strategy !== 'Recreate';
+    const policyId = `POL-${strategy.toUpperCase().slice(0, 4)}-${String(i).padStart(3, '0')}`;
+
+    policyRecords.push({
+      id,
       entityTypeId: '3',
       version: 1,
       attributes: {
-        policy_id: 'POL-PROD-STRICT-001',
-        rollout_strategy: 'Canary',
-        strict_zero_downtime: true,
+        policy_id: policyId,
+        rollout_strategy: strategy,
+        strict_zero_downtime: strictZeroDowntime,
       },
-      createdDate: new Date('2026-02-05').toISOString(),
-    },
-  ],
+      createdDate: new Date(2026, 1, (i % 25) + 1).toISOString(),
+      updatedDate: new Date(2026, 2, (i % 20) + 1).toISOString(),
+    });
+  }
+
+  return {
+    '1': customerRecords,
+    '2': resourceRecords,
+    '3': policyRecords,
+  };
 };
+
+export const initialMockRecords: Record<string, EntityRecord[]> = generateInitialRecords();
 
 export const initialMockRelationshipTypes: RelationshipType[] = [
   {
