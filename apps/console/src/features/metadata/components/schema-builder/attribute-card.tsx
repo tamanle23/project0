@@ -2,8 +2,12 @@ import React from 'react';
 import type { AttributeDefinition } from '../../api/types';
 import { FIELD_TYPE_REGISTRY } from '../../data/field-types';
 import { useMetadataUiStore } from '../../store/use-metadata-ui-store';
-import { useCreateAttributeDefinition } from '../../api/metadata-api';
-import { Edit2, Trash2, Copy } from 'lucide-react';
+import {
+  useCreateAttributeDefinition,
+  useArchiveAttributeDefinition,
+  useUnarchiveAttributeDefinition,
+} from '../../api/metadata-api';
+import { Edit2, Trash2, Copy, Archive, ArchiveRestore } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -15,6 +19,18 @@ interface Props {
 export const AttributeCard: React.FC<Props> = ({ attribute, entityTypeId }) => {
   const { openEditAttributeDialog, openDeleteAttributeDialog } = useMetadataUiStore();
   const createAttributeMutation = useCreateAttributeDefinition(entityTypeId);
+  const archiveMutation = useArchiveAttributeDefinition(entityTypeId);
+  const unarchiveMutation = useUnarchiveAttributeDefinition(entityTypeId);
+
+  const isArchiving = archiveMutation.isPending || unarchiveMutation.isPending;
+
+  const handleToggleArchive = () => {
+    if (attribute.isArchived) {
+      unarchiveMutation.mutate(attribute.id);
+    } else {
+      archiveMutation.mutate(attribute.id);
+    }
+  };
 
   const fieldMeta = FIELD_TYPE_REGISTRY[attribute.uiComponent] || FIELD_TYPE_REGISTRY.text;
   const IconComponent = fieldMeta.icon;
@@ -32,15 +48,23 @@ export const AttributeCard: React.FC<Props> = ({ attribute, entityTypeId }) => {
   };
 
   return (
-    <div className="group relative flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-sm hover:shadow-md hover:border-white/50 transition-all">
+    <div className={`group relative flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl backdrop-blur-xl border transition-all ${
+      attribute.isArchived
+        ? 'bg-white/20 dark:bg-slate-900/25 border-dashed border-amber-500/30 opacity-75'
+        : 'bg-white/45 dark:bg-slate-900/45 border-white/30 dark:border-white/10 shadow-sm hover:shadow-md hover:border-white/50'
+    }`}>
       <div className="flex items-start md:items-center gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20 shadow-inner">
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border shadow-inner ${
+          attribute.isArchived
+            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+            : 'bg-primary/10 text-primary border-primary/20'
+        }`}>
           <IconComponent className="h-5 w-5" />
         </div>
 
         <div className="flex flex-col gap-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-semibold text-foreground text-sm md:text-base">
+            <span className={`font-semibold text-sm md:text-base ${attribute.isArchived ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
               {attribute.name}
             </span>
             <code className="text-xs font-mono text-muted-foreground bg-muted/60 dark:bg-white/5 px-2 py-0.5 rounded border border-white/20">
@@ -56,7 +80,7 @@ export const AttributeCard: React.FC<Props> = ({ attribute, entityTypeId }) => {
               </Badge>
             )}
             {attribute.isArchived && (
-              <Badge variant="outline" className="text-[10px] text-amber-500 border-amber-500/30">
+              <Badge variant="outline" className="text-[10px] text-amber-600 dark:text-amber-400 border-amber-500/30 bg-amber-500/10">
                 Archived
               </Badge>
             )}
@@ -83,6 +107,25 @@ export const AttributeCard: React.FC<Props> = ({ attribute, entityTypeId }) => {
       </div>
 
       <div className="flex items-center gap-1 self-end md:self-center">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleToggleArchive}
+          disabled={isArchiving}
+          className={`h-8 px-2 transition-colors ${
+            attribute.isArchived
+              ? 'text-amber-600 dark:text-amber-400 hover:bg-amber-500/10'
+              : 'text-muted-foreground hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-500/10'
+          }`}
+          title={attribute.isArchived ? 'Restore / Unarchive attribute' : 'Archive attribute'}
+        >
+          {attribute.isArchived ? (
+            <ArchiveRestore className="h-4 w-4" />
+          ) : (
+            <Archive className="h-4 w-4" />
+          )}
+        </Button>
+
         <Button
           variant="ghost"
           size="sm"
