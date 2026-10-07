@@ -21,10 +21,13 @@ export class UnifiedSandboxManager {
   }
 
   /**
-   * Check if sandbox mode is currently enabled in store (strictly false in production)
+   * Check if sandbox mode is currently enabled in store (strictly false in production or when disabled)
    */
   public isEnabled(): boolean {
     if (!import.meta.env.DEV) {
+      return false;
+    }
+    if (import.meta.env.VITE_ENABLE_SANDBOX === 'false') {
       return false;
     }
     return useSandboxStore.getState().enabled;

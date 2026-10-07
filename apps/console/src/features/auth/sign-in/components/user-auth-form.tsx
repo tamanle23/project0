@@ -165,7 +165,7 @@ export function UserAuthForm({
           Sign in
         </Button>
 
-        {import.meta.env.DEV && (
+        {import.meta.env.DEV && import.meta.env.VITE_ENABLE_SANDBOX !== 'false' && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

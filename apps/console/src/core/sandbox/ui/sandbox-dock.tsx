@@ -113,8 +113,8 @@ export function SandboxDock() {
     'tenant-ap-northeast-1',
   ];
 
-  // Sandbox Dock is strictly unavailable in production builds
-  if (!import.meta.env.DEV) {
+  // Sandbox Dock is strictly unavailable in production builds or when disabled
+  if (!import.meta.env.DEV || import.meta.env.VITE_ENABLE_SANDBOX === 'false') {
     return null;
   }
 

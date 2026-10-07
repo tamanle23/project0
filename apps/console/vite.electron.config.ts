@@ -18,6 +18,15 @@ export default defineConfig(({ mode }) => {
     process.env.VITE_ENABLE_THEME_SETTINGS === 'true' ||
     mode === 'theme-settings'
 
+  // Sandbox mode flag: enabled by default in dev unless --no-sandbox or VITE_ENABLE_SANDBOX=false
+  const isSandboxExplicitOff =
+    process.argv.includes('--no-sandbox') ||
+    process.argv.includes('--disable-sandbox') ||
+    process.env.VITE_ENABLE_SANDBOX === 'false' ||
+    mode === 'no-sandbox'
+
+  const enableSandbox = !isSandboxExplicitOff
+
   return {
     base: './',
     build: {
@@ -29,6 +38,9 @@ export default defineConfig(({ mode }) => {
       ),
       'import.meta.env.VITE_ENABLE_THEME_SETTINGS': JSON.stringify(
         enableThemeSettings ? 'true' : 'false'
+      ),
+      'import.meta.env.VITE_ENABLE_SANDBOX': JSON.stringify(
+        enableSandbox ? 'true' : 'false'
       ),
     },
   plugins: [
