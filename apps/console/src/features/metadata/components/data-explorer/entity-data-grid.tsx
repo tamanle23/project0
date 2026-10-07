@@ -299,7 +299,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
                 onClick={() => openRecordRelationshipsInspector(row.original)}
                 className="gap-2 text-primary focus:text-primary"
               >
-                <GitFork className="h-3.5 w-3.5" /> View Relationships
+                <GitFork className="h-3.5 w-3.5" /> Connected Edges
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setInspectingRecord(row.original)}

@@ -94,7 +94,7 @@ export const MetadataFeature: React.FC = () => {
                       </TabsTrigger>
                       <TabsTrigger value="relationships" className="gap-1.5 text-xs">
                         <GitFork className="h-3.5 w-3.5" />
-                        <span>{t('metadata.tabs.relationships', 'Relationships')}</span>
+                        <span>{t('metadata.tabs.relationships', 'Connected Edges')}</span>
                       </TabsTrigger>
                     </TabsList>
                   </Tabs>

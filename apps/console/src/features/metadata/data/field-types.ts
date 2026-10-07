@@ -105,8 +105,8 @@ export const FIELD_TYPE_REGISTRY: Record<UiComponentType, FieldTypeDefinition> =
   },
   relation_picker: {
     type: 'relation_picker',
-    label: 'Entity Relationship',
-    description: 'Foreign link referencing another entity record.',
+    label: 'Entity Reference',
+    description: 'Foreign reference field pointing to a target entity record.',
     icon: Link2,
     defaultDataType: 'RELATIONSHIP',
     compatibleDataTypes: ['RELATIONSHIP', 'STRING', 'INTEGER'],

@@ -124,10 +124,10 @@ export const RecordRelationshipsInspector: React.FC = () => {
         <DialogHeader className="mb-2">
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <GitFork className="h-5 w-5 text-primary" />
-            Record Relationships
+            Connected Edges
           </DialogTitle>
           <DialogDescription>
-            Inspect and manage connected entity records for Record #{record?.id}.
+            Inspect and manage connected entity edges for Record #{record?.id}.
           </DialogDescription>
         </DialogHeader>
 

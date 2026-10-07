@@ -136,7 +136,7 @@
     "tabs": {
       "schema": "Schema Builder",
       "data": "Data Explorer",
-      "relationships": "Relationships"
+      "relationships": "Connected Edges"
     }
   }
 }
