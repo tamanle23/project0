@@ -15,6 +15,8 @@ import {
   ToggleLeft,
   Globe2,
   CheckCircle2,
+  Hash,
+  Calendar,
 } from 'lucide-react';
 
 interface FacetedSearchSidebarProps {
@@ -25,15 +27,21 @@ interface FacetedSearchSidebarProps {
   className?: string;
 }
 
+interface FacetBucket {
+  value: string;
+  label: string;
+  count: number;
+  operator?: 'eq' | 'gte' | 'lte' | 'gt' | 'lt';
+  minVal?: string;
+  maxVal?: string;
+}
+
 interface FacetGroup {
   field: string;
   name: string;
   dataType: string;
-  buckets: Array<{
-    value: string;
-    label: string;
-    count: number;
-  }>;
+  type: 'discrete' | 'numeric_range' | 'date_range';
+  buckets: FacetBucket[];
 }
 
 export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
@@ -52,21 +60,12 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
     }));
   };
 
-  // Discover categorical & selectable attributes to compute distribution facets
+  // Discover and compute facets for ALL supported data types
   const facetGroups: FacetGroup[] = React.useMemo(() => {
-    const categoricalAttrs = attributes.filter(
-      (a) =>
-        !a.isArchived &&
-        (a.dataType === 'BOOLEAN' ||
-          a.uiComponent === 'select' ||
-          a.uiComponent === 'multiselect' ||
-          a.uiComponent === 'switch' ||
-          Boolean((a.options?.choices as string[])?.length))
-    );
-
+    const activeAttrs = attributes.filter((a) => !a.isArchived);
     const groups: FacetGroup[] = [];
 
-    // 1. Region / Tenant facet (Enterprise Multi-Region Distribution)
+    // 1. Region / Tenant facet (Multi-Region Distribution)
     const tenantCounts: Record<string, number> = {};
     records.forEach((r) => {
       if (r.tenantId) {
@@ -79,6 +78,7 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
         field: 'tenantId',
         name: 'Deployment Region / Tenant',
         dataType: 'STRING',
+        type: 'discrete',
         buckets: Object.entries(tenantCounts)
           .map(([val, count]) => ({
             value: val,
@@ -89,74 +89,275 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
       });
     }
 
-    // 2. Attribute-level facets
-    categoricalAttrs.forEach((attr) => {
-      const counts: Record<string, number> = {};
-      const predefinedChoices = (attr.options?.choices as string[]) || [];
+    // 2. Process all attributes by data type
+    activeAttrs.forEach((attr) => {
+      const field = attr.systemName;
+      const dataType = attr.dataType;
 
-      // Initialize choices with 0 counts
+      // A. NUMERIC FIELDS (INTEGER, DECIMAL) -> Smart Range Buckets
+      if (dataType === 'INTEGER' || dataType === 'DECIMAL' || attr.uiComponent === 'number') {
+        const nums: number[] = [];
+        records.forEach((r) => {
+          const raw = r.attributes?.[field];
+          if (raw !== undefined && raw !== null && raw !== '') {
+            const n = Number(raw);
+            if (!isNaN(n)) nums.push(n);
+          }
+        });
+
+        if (nums.length > 0) {
+          const min = Math.min(...nums);
+          const max = Math.max(...nums);
+
+          // If min and max differ, build range buckets
+          if (max > min) {
+            const range = max - min;
+            const step = Math.ceil(range / 3);
+            const b1End = min + step;
+            const b2End = min + step * 2;
+
+            const b1 = nums.filter((n) => n <= b1End).length;
+            const b2 = nums.filter((n) => n > b1End && n <= b2End).length;
+            const b3 = nums.filter((n) => n > b2End).length;
+
+            groups.push({
+              field,
+              name: attr.name,
+              dataType,
+              type: 'numeric_range',
+              buckets: [
+                {
+                  value: `${min}..${b1End}`,
+                  label: `${min} – ${b1End}`,
+                  count: b1,
+                  minVal: String(min),
+                  maxVal: String(b1End),
+                },
+                {
+                  value: `${b1End + 1}..${b2End}`,
+                  label: `${b1End + 1} – ${b2End}`,
+                  count: b2,
+                  minVal: String(b1End + 1),
+                  maxVal: String(b2End),
+                },
+                {
+                  value: `>${b2End}`,
+                  label: `> ${b2End}`,
+                  count: b3,
+                  minVal: String(b2End + 1),
+                },
+              ].filter((b) => b.count > 0),
+            });
+            return;
+          }
+        }
+      }
+
+      // B. DATE & DATETIME FIELDS -> Recency & Interval Buckets
+      if (dataType === 'DATE' || dataType === 'DATETIME' || attr.uiComponent === 'datepicker') {
+        const dates: Date[] = [];
+        records.forEach((r) => {
+          const raw = r.attributes?.[field];
+          if (raw !== undefined && raw !== null && raw !== '') {
+            const d = new Date(raw as string | number);
+            if (!isNaN(d.getTime())) dates.push(d);
+          }
+        });
+
+        if (dates.length > 0) {
+          const now = Date.now();
+          const d30 = 30 * 24 * 60 * 60 * 1000;
+          const d90 = 90 * 24 * 60 * 60 * 1000;
+          const d365 = 365 * 24 * 60 * 60 * 1000;
+
+          const recent = dates.filter((d) => now - d.getTime() <= d30).length;
+          const quarterly = dates.filter(
+            (d) => now - d.getTime() > d30 && now - d.getTime() <= d90
+          ).length;
+          const thisYear = dates.filter(
+            (d) => now - d.getTime() > d90 && now - d.getTime() <= d365
+          ).length;
+          const older = dates.filter((d) => now - d.getTime() > d365).length;
+
+          const dateBuckets: FacetBucket[] = [
+            { value: 'last_30_days', label: 'Last 30 Days', count: recent },
+            { value: 'last_90_days', label: '1 – 3 Months Ago', count: quarterly },
+            { value: 'last_year', label: '3 – 12 Months Ago', count: thisYear },
+            { value: 'older_than_year', label: 'Older than 1 Year', count: older },
+          ].filter((b) => b.count > 0);
+
+          if (dateBuckets.length > 0) {
+            groups.push({
+              field,
+              name: attr.name,
+              dataType,
+              type: 'date_range',
+              buckets: dateBuckets,
+            });
+            return;
+          }
+        }
+      }
+
+      // C. CATEGORICAL, BOOLEAN, ENUM, RELATION, & AUTO-DETECTED LOW-CARDINALITY STRINGS
+      const predefinedChoices = (attr.options?.choices as string[]) || [];
+      const counts: Record<string, number> = {};
+
       predefinedChoices.forEach((c) => {
         counts[String(c)] = 0;
       });
 
       records.forEach((r) => {
-        const val = r.attributes?.[attr.systemName];
+        const val = r.attributes?.[field];
         if (val !== undefined && val !== null && val !== '') {
           const strVal = String(val);
           counts[strVal] = (counts[strVal] || 0) + 1;
         }
       });
 
-      const buckets = Object.entries(counts)
-        .map(([val, count]) => {
-          let label = val;
-          if (attr.dataType === 'BOOLEAN') {
-            const isTrue = val === 'true' || val === '1';
-            label = isTrue
-              ? (attr.options?.trueLabel as string) || 'Yes / Enabled'
-              : (attr.options?.falseLabel as string) || 'No / Disabled';
-          }
+      const distinctKeys = Object.keys(counts);
 
-          return {
-            value: val,
-            label,
-            count,
-          };
-        })
-        .filter((b) => b.count > 0 || predefinedChoices.includes(b.value))
-        .sort((a, b) => b.count - a.count);
+      // Include if it's explicitly selectable, boolean, relation, or auto-detected low cardinality (<= 10 distinct values)
+      const isSelectable =
+        dataType === 'BOOLEAN' ||
+        dataType === 'RELATIONSHIP' ||
+        attr.uiComponent === 'select' ||
+        attr.uiComponent === 'multiselect' ||
+        attr.uiComponent === 'switch' ||
+        attr.uiComponent === 'relation_picker' ||
+        predefinedChoices.length > 0;
 
-      if (buckets.length > 0) {
-        groups.push({
-          field: attr.systemName,
-          name: attr.name,
-          dataType: attr.dataType,
-          buckets,
-        });
+      const isLowCardinalityString =
+        dataType === 'STRING' && distinctKeys.length >= 1 && distinctKeys.length <= 10;
+
+      if (isSelectable || isLowCardinalityString) {
+        const buckets = Object.entries(counts)
+          .map(([val, count]) => {
+            let label = val;
+            if (dataType === 'BOOLEAN') {
+              const isTrue = val === 'true' || val === '1';
+              label = isTrue
+                ? (attr.options?.trueLabel as string) || 'Yes / Enabled'
+                : (attr.options?.falseLabel as string) || 'No / Disabled';
+            }
+
+            return {
+              value: val,
+              label,
+              count,
+            };
+          })
+          .filter((b) => b.count > 0 || predefinedChoices.includes(b.value))
+          .sort((a, b) => b.count - a.count);
+
+        if (buckets.length > 0) {
+          groups.push({
+            field,
+            name: attr.name,
+            dataType,
+            type: 'discrete',
+            buckets,
+          });
+        }
       }
     });
 
     return groups;
   }, [attributes, records]);
 
-  // Handle checking/unchecking a facet bucket
-  const handleToggleFacet = (field: string, value: string) => {
-    // Check if this exact filter already exists
+  // Handle checking/unchecking any facet bucket (Discrete, Numeric Range, Date Interval)
+  const handleToggleFacet = (group: FacetGroup, bucket: FacetBucket) => {
+    const { field, type } = group;
+
+    // 1. Numeric Range Facet
+    if (type === 'numeric_range') {
+      const existingMinIdx = activeFilters.findIndex(
+        (f) => f.field === field && f.operator === 'gte' && f.value === bucket.minVal
+      );
+
+      if (existingMinIdx >= 0) {
+        // Remove range filters for this field
+        const updated = activeFilters.filter((f) => f.field !== field);
+        onFilterChange(updated);
+      } else {
+        const newFilters: AttributeFilterClause[] = activeFilters.filter((f) => f.field !== field);
+        if (bucket.minVal !== undefined) {
+          newFilters.push({
+            id: `facet-range-min-${field}-${bucket.value}`,
+            field,
+            operator: 'gte',
+            value: bucket.minVal,
+          });
+        }
+        if (bucket.maxVal !== undefined) {
+          newFilters.push({
+            id: `facet-range-max-${field}-${bucket.value}`,
+            field,
+            operator: 'lte',
+            value: bucket.maxVal,
+          });
+        }
+        onFilterChange(newFilters);
+      }
+      return;
+    }
+
+    // 2. Date Range Facet
+    if (type === 'date_range') {
+      const existingDateFilter = activeFilters.find((f) => f.id.startsWith(`facet-date-${field}-`));
+      if (existingDateFilter && existingDateFilter.value === bucket.value) {
+        onFilterChange(activeFilters.filter((f) => !f.id.startsWith(`facet-date-${field}-`)));
+      } else {
+        const cleaned = activeFilters.filter((f) => !f.id.startsWith(`facet-date-${field}-`));
+        const now = Date.now();
+        const d = (days: number) => new Date(now - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+        const dateClauses: AttributeFilterClause[] = [];
+        if (bucket.value === 'last_30_days') {
+          dateClauses.push({
+            id: `facet-date-${field}-${bucket.value}`,
+            field,
+            operator: 'gte',
+            value: d(30),
+          });
+        } else if (bucket.value === 'last_90_days') {
+          dateClauses.push(
+            { id: `facet-date-${field}-min`, field, operator: 'gte', value: d(90) },
+            { id: `facet-date-${field}-${bucket.value}`, field, operator: 'lte', value: d(30) }
+          );
+        } else if (bucket.value === 'last_year') {
+          dateClauses.push(
+            { id: `facet-date-${field}-min`, field, operator: 'gte', value: d(365) },
+            { id: `facet-date-${field}-${bucket.value}`, field, operator: 'lte', value: d(90) }
+          );
+        } else if (bucket.value === 'older_than_year') {
+          dateClauses.push({
+            id: `facet-date-${field}-${bucket.value}`,
+            field,
+            operator: 'lt',
+            value: d(365),
+          });
+        }
+
+        onFilterChange([...cleaned, ...dateClauses]);
+      }
+      return;
+    }
+
+    // 3. Discrete (eq) Facet
     const existingIndex = activeFilters.findIndex(
-      (f) => f.field === field && f.operator === 'eq' && f.value === value
+      (f) => f.field === field && f.operator === 'eq' && f.value === bucket.value
     );
 
     if (existingIndex >= 0) {
-      // Uncheck
       const updated = activeFilters.filter((_, idx) => idx !== existingIndex);
       onFilterChange(updated);
     } else {
-      // Check
       const newFilter: AttributeFilterClause = {
-        id: `facet-${field}-${value}-${Date.now()}`,
+        id: `facet-${field}-${bucket.value}-${Date.now()}`,
         field,
         operator: 'eq',
-        value,
+        value: bucket.value,
       };
       onFilterChange([...activeFilters, newFilter]);
     }
@@ -219,9 +420,13 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
                 <div className="flex items-center gap-1.5 truncate">
                   {group.field === 'tenantId' ? (
                     <Globe2 className="h-3.5 w-3.5 text-sky-500 shrink-0" />
+                  ) : group.type === 'numeric_range' || group.dataType === 'INTEGER' || group.dataType === 'DECIMAL' ? (
+                    <Hash className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+                  ) : group.type === 'date_range' || group.dataType === 'DATE' || group.dataType === 'DATETIME' ? (
+                    <Calendar className="h-3.5 w-3.5 text-rose-500 shrink-0" />
                   ) : group.dataType === 'BOOLEAN' ? (
                     <ToggleLeft className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                  ) : group.dataType === 'RELATION' ? (
+                  ) : group.dataType === 'RELATION' || group.dataType === 'RELATIONSHIP' ? (
                     <Layers className="h-3.5 w-3.5 text-violet-500 shrink-0" />
                   ) : (
                     <Tag className="h-3.5 w-3.5 text-amber-500 shrink-0" />
@@ -245,17 +450,28 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
               {!isCollapsed && (
                 <div className="mt-2 space-y-1.5 pl-1">
                   {group.buckets.map((bucket) => {
-                    const isChecked = activeFilters.some(
-                      (f) =>
-                        f.field === group.field &&
-                        f.operator === 'eq' &&
-                        f.value === bucket.value
-                    );
+                    let isChecked = false;
+                    if (group.type === 'numeric_range') {
+                      isChecked = activeFilters.some(
+                        (f) => f.field === group.field && f.operator === 'gte' && f.value === bucket.minVal
+                      );
+                    } else if (group.type === 'date_range') {
+                      isChecked = activeFilters.some(
+                        (f) => f.id.startsWith(`facet-date-${group.field}-`) && f.value === bucket.value
+                      );
+                    } else {
+                      isChecked = activeFilters.some(
+                        (f) =>
+                          f.field === group.field &&
+                          f.operator === 'eq' &&
+                          f.value === bucket.value
+                      );
+                    }
 
                     return (
                       <label
                         key={bucket.value}
-                        onClick={() => handleToggleFacet(group.field, bucket.value)}
+                        onClick={() => handleToggleFacet(group, bucket)}
                         className={`flex items-center justify-between text-xs px-2 py-1.5 rounded-lg cursor-pointer transition-all select-none ${
                           isChecked
                             ? 'bg-primary/15 text-primary font-medium border border-primary/20'
@@ -265,7 +481,7 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
                         <div className="flex items-center gap-2 truncate">
                           <Checkbox
                             checked={isChecked}
-                            onCheckedChange={() => handleToggleFacet(group.field, bucket.value)}
+                            onCheckedChange={() => handleToggleFacet(group, bucket)}
                             className="h-3.5 w-3.5 pointer-events-none"
                           />
                           <span className="truncate">{bucket.label}</span>
