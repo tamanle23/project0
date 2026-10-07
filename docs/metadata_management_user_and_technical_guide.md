@@ -193,7 +193,19 @@ The **Data Explorer** tab provides an enterprise-grade datatable for record CRUD
 - **Column Header Sorting**: Click any column header to toggle ascending (`▲`) or descending (`▼`) sorting. The server re-queries with `sort=<field>,<dir>`.
 - **Pagination**: Use the bottom pagination rail (`< Previous`, `Next >`, and items-per-page selector) for server-side page navigation.
 
-#### 4. Exporting Records
+#### 4. Schema Drift Detection & Interactive Backfill Modal
+- **Schema Drift Alert Banner**: When attributes are added, reordered, or modified, existing entity records may reside on an earlier schema version. An amber banner appears at the top of the Data Explorer displaying:
+  - Total outdated records vs. total records.
+  - Active compiled schema target version (e.g., `v2`).
+- **Run Backfill Confirmation & Impact Preview**:
+  - Clicking **`Run Backfill`** opens the **Schema Evolution Backfill Preview** modal rather than immediately mutating records.
+  - **Version Differential**: Displays the target schema version bump (e.g. `Legacy ──► v2`).
+  - **Injected Default Values**: Clearly enumerates every new active attribute with its system name, data type, and the exact default value configured that will be injected into records missing this attribute.
+  - **Batch Size Configuration**: Selectable chunk sizes (`25`, `50`, `100`, `250`, `500`) to tune performance and transactional overhead.
+  - **Transactional Safety**: Explains that records will be validated against server-authoritative schema constraints, stamped with the new schema version, and any validation anomalies will be isolated in the execution summary.
+  - Clicking **`Confirm & Run Backfill`** executes the asynchronous batch migration with live spinner and status feedback.
+
+#### 5. Exporting Records
 - Click **Export JSON** to export the currently loaded records into a formatted JSON file for offline analysis or auditing.
 
 ---

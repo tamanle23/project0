@@ -13,6 +13,7 @@ import { RecordDeleteDialog } from './record-delete-dialog';
 import { RawJsonDialog } from './raw-json-dialog';
 import { AdvancedFilterPopover } from './advanced-filter-popover';
 import { FacetedSearchSidebar } from './faceted-search-sidebar';
+import { SchemaBackfillDialog } from './schema-backfill-dialog';
 import {
   createColumnHelper,
   flexRender,
@@ -117,15 +118,16 @@ export const EntityDataGrid: React.FC<Props> = ({
   const { data: driftAnalysis } = useSchemaDriftAnalysis(entityTypeId);
   const backfillMutation = useExecuteSchemaBackfill(entityTypeId);
   const [backfillFeedback, setBackfillFeedback] = useState<string | null>(null);
+  const [isBackfillDialogOpen, setIsBackfillDialogOpen] = useState<boolean>(false);
 
   const attributes = useMemo(() => {
     return attributesResponse?.content || [];
   }, [attributesResponse]);
 
-  const handleRunBackfill = async () => {
+  const handleConfirmBackfill = async (batchSize: number) => {
     setBackfillFeedback(null);
     try {
-      const res = await backfillMutation.mutateAsync(100);
+      const res = await backfillMutation.mutateAsync(batchSize);
       setBackfillFeedback(
         `Successfully backfilled ${res.migratedRecords} record(s) to Schema v${res.targetSchemaVersion}.`
       );
@@ -490,10 +492,10 @@ export const EntityDataGrid: React.FC<Props> = ({
             <Button
               size="sm"
               variant="outline"
-              onClick={handleRunBackfill}
+              onClick={() => setIsBackfillDialogOpen(true)}
               disabled={backfillMutation.isPending}
               className="h-7 px-2.5 text-xs gap-1.5 border-amber-500/30 hover:bg-amber-500/20 text-amber-900 dark:text-amber-200"
-              title="Apply attribute defaults and migrate records to current schema version"
+              title="Review potential changes and migrate records to current schema version"
             >
               <RefreshCw className={cn('h-3.5 w-3.5', backfillMutation.isPending && 'animate-spin')} />
               <span>{backfillMutation.isPending ? 'Migrating...' : 'Run Backfill'}</span>
@@ -780,6 +782,15 @@ export const EntityDataGrid: React.FC<Props> = ({
         record={inspectingRecord}
         open={Boolean(inspectingRecord)}
         onOpenChange={(open) => !open && setInspectingRecord(null)}
+      />
+      <SchemaBackfillDialog
+        open={isBackfillDialogOpen}
+        onOpenChange={setIsBackfillDialogOpen}
+        entityType={entityType}
+        driftAnalysis={driftAnalysis}
+        attributes={attributes}
+        onConfirm={handleConfirmBackfill}
+        isPending={backfillMutation.isPending}
       />
     </div>
   );
