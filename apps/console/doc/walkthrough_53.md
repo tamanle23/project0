@@ -64,3 +64,18 @@ Implemented the **Strategy Pattern** for the Metadata Management module in `@uni
 
 ### Verification
 - `pnpm --filter @unipost/console build`: **BUILD SUCCESS** (TypeScript and Vite build cleanly verified).
+
+## Phase 5: Structured 400 Error Mapping & Inline Field Validation
+
+### Enhancements
+- **Backend Error Mapping**:
+  - Aligned client error parsing with backend Spring `ResponseWrapper` and `SchemaValidationService` format: `{ errors: [{ code: "VALIDATION_ERROR", detail: "<fieldKey>", message: "..." }] }`.
+  - Strip leading `attributes.` or `$.` prefixes from error detail/field paths in [`record-editor-dialog.tsx`](file:///C:/Users/Admin/workspace/git/unipost/apps/console/src/features/metadata/components/data-explorer/record-editor-dialog.tsx).
+  - Populates inline field errors alongside a high-level summary alert banner.
+- **Dynamic Field Component Visual Cues**:
+  - Enhanced [`dynamic-field-renderer.tsx`](file:///C:/Users/Admin/workspace/git/unipost/apps/console/src/features/metadata/components/dynamic-fields/dynamic-field-renderer.tsx) to attach active error styling (`border-destructive/80 focus-visible:ring-destructive/40 focus:border-destructive shadow-[0_0_8px_rgba(239,68,68,0.25)]`) across text, textarea, number, select, multiselect, datepicker, json_editor, and relation_picker controls when validation errors are present.
+- **Form Interactivity**:
+  - Clears individual field errors immediately when the user edits or corrects that field value.
+
+### Verification
+- `pnpm --filter @unipost/console build`: **BUILD SUCCESS** (verified clean build in 550ms).

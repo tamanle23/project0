@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 
@@ -29,6 +30,10 @@ export const DynamicFieldRenderer: React.FC<Props> = ({
 }) => {
   const { name, systemName, uiComponent, isRequired, options } = attribute;
 
+  const errorClass = error
+    ? 'border-destructive/80 focus-visible:ring-destructive/40 focus:border-destructive shadow-[0_0_8px_rgba(239,68,68,0.25)]'
+    : 'border-white/20';
+
   const renderControl = () => {
     switch (uiComponent) {
       case 'text':
@@ -39,7 +44,7 @@ export const DynamicFieldRenderer: React.FC<Props> = ({
             value={typeof value === 'string' || typeof value === 'number' ? value : ''}
             onChange={(e) => onChange(e.target.value)}
             placeholder={options?.placeholder || `Enter ${name.toLowerCase()}...`}
-            className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-white/20"
+            className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm', errorClass)}
           />
         );
 
@@ -51,7 +56,7 @@ export const DynamicFieldRenderer: React.FC<Props> = ({
             onChange={(e) => onChange(e.target.value)}
             placeholder={options?.placeholder || `Enter ${name.toLowerCase()}...`}
             rows={3}
-            className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-white/20"
+            className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm', errorClass)}
           />
         );
 
@@ -68,7 +73,7 @@ export const DynamicFieldRenderer: React.FC<Props> = ({
             min={options?.min}
             max={options?.max}
             placeholder={options?.placeholder || '0'}
-            className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-white/20"
+            className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm', errorClass)}
           />
         );
 
@@ -94,7 +99,7 @@ export const DynamicFieldRenderer: React.FC<Props> = ({
           >
             <SelectTrigger
               id={systemName}
-              className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-white/20"
+              className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm', errorClass)}
             >
               <SelectValue placeholder={options?.placeholder || `Select ${name}...`} />
             </SelectTrigger>
@@ -122,7 +127,12 @@ export const DynamicFieldRenderer: React.FC<Props> = ({
 
         return (
           <div className="space-y-2">
-            <div className="flex flex-wrap gap-1.5 min-h-[38px] p-2 rounded-lg border border-white/20 bg-white/40 dark:bg-slate-800/40">
+            <div
+              className={cn(
+                'flex flex-wrap gap-1.5 min-h-[38px] p-2 rounded-lg border bg-white/40 dark:bg-slate-800/40',
+                errorClass
+              )}
+            >
               {selectedList.length === 0 ? (
                 <span className="text-xs text-muted-foreground self-center">
                   None selected
@@ -179,7 +189,7 @@ export const DynamicFieldRenderer: React.FC<Props> = ({
             type="date"
             value={typeof value === 'string' ? value.split('T')[0] : ''}
             onChange={(e) => onChange(e.target.value)}
-            className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-white/20 font-mono text-xs"
+            className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm font-mono text-xs', errorClass)}
           />
         );
 
@@ -204,7 +214,7 @@ export const DynamicFieldRenderer: React.FC<Props> = ({
               }
             }}
             rows={4}
-            className="font-mono text-xs bg-slate-950/80 text-emerald-400 border-white/20"
+            className={cn('font-mono text-xs bg-slate-950/80 text-emerald-400', errorClass)}
             placeholder="{}"
           />
         );
@@ -217,7 +227,7 @@ export const DynamicFieldRenderer: React.FC<Props> = ({
             value={typeof value === 'string' || typeof value === 'number' ? value : ''}
             onChange={(e) => onChange(e.target.value)}
             placeholder={options?.placeholder || 'Target Entity Record ID...'}
-            className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-white/20 font-mono text-xs"
+            className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm font-mono text-xs', errorClass)}
           />
         );
 
@@ -227,7 +237,7 @@ export const DynamicFieldRenderer: React.FC<Props> = ({
             id={systemName}
             value={typeof value === 'string' ? value : ''}
             onChange={(e) => onChange(e.target.value)}
-            className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-white/20"
+            className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm', errorClass)}
           />
         );
     }

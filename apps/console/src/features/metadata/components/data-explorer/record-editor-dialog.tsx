@@ -110,6 +110,24 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
     setGlobalError(null);
   };
 
+  const parseValidationErrors = (err: unknown): Record<string, string> | null => {
+    const res = (err as any)?.response?.data;
+    const errList = res?.errors || (err as any)?.errors;
+    if (Array.isArray(errList) && errList.length > 0) {
+      const mapped: Record<string, string> = {};
+      errList.forEach((e: any) => {
+        let field = e.detail || e.field || e.property;
+        if (field && typeof field === 'string') {
+          if (field.startsWith('attributes.')) field = field.replace('attributes.', '');
+          if (field.startsWith('$.')) field = field.replace('$.', '');
+          mapped[field] = e.message || 'Validation error';
+        }
+      });
+      return Object.keys(mapped).length > 0 ? mapped : null;
+    }
+    return null;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setGlobalError(null);
@@ -149,7 +167,13 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
               setIsConflict(true);
               return;
             }
-            setGlobalError(err instanceof Error ? err.message : 'Failed to update record.');
+            const fieldErrors = parseValidationErrors(err);
+            if (fieldErrors) {
+              setErrors(fieldErrors);
+              setGlobalError('Please correct the highlighted field errors below.');
+            } else {
+              setGlobalError(err instanceof Error ? err.message : 'Failed to update record.');
+            }
           },
         }
       );
@@ -162,7 +186,13 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
         {
           onSuccess: () => closeRecordEditorDialog(),
           onError: (err: unknown) => {
-            setGlobalError(err instanceof Error ? err.message : 'Failed to create record.');
+            const fieldErrors = parseValidationErrors(err);
+            if (fieldErrors) {
+              setErrors(fieldErrors);
+              setGlobalError('Please correct the highlighted field errors below.');
+            } else {
+              setGlobalError(err instanceof Error ? err.message : 'Failed to create record.');
+            }
           },
         }
       );
