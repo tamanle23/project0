@@ -2,17 +2,28 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useSpringAuthStore } from '../store';
 import { springApiClient } from '../api-client';
-import { ShieldAlert, Zap, LogOut, Database, TestTube2 } from 'lucide-react';
+import { ShieldAlert, Zap, LogOut, Database, TestTube2, Minus, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 export function SandboxPanel() {
   const { isAuthenticated, isSandbox, user, expireAccessToken, expireRefreshToken, clearTokens } = useSpringAuthStore();
   const [dashboardData, setDashboardData] = useState<Record<string, unknown> | null>(null);
+  const [isMinimized, setIsMinimized] = useState(() => {
+    return localStorage.getItem('unipost_auth_sandbox_minimized') === 'true';
+  });
 
   if (!isAuthenticated || !isSandbox) {
     return null;
   }
+
+  const toggleMinimized = () => {
+    setIsMinimized((prev) => {
+      const next = !prev;
+      localStorage.setItem('unipost_auth_sandbox_minimized', String(next));
+      return next;
+    });
+  };
 
   const handleTestDashboard = async () => {
     try {
@@ -37,11 +48,45 @@ export function SandboxPanel() {
     }
   };
 
+  if (isMinimized) {
+    return (
+      <div className="fixed bottom-4 right-4 z-50">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={toggleMinimized}
+          className="flex items-center gap-2 h-9 px-3 rounded-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-emerald-500/40 shadow-lg shadow-black/10 dark:shadow-black/40 hover:bg-emerald-500/10 transition-all text-xs font-medium"
+          title="Open Auth Sandbox Engine"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <TestTube2 className="size-3.5 text-emerald-500" />
+          <span>Sandbox Engine</span>
+          <Maximize2 className="size-3 text-muted-foreground ml-1" />
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-80 rounded-2xl bg-white/65 dark:bg-slate-900/65 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/30 p-4">
-      <div className="flex items-center gap-2 mb-3 border-b border-border/50 pb-2">
-        <TestTube2 className="size-5 text-emerald-500" />
-        <h3 className="font-semibold text-sm">Auth Sandbox Engine</h3>
+    <div className="fixed bottom-4 right-4 z-50 w-80 rounded-2xl bg-white/65 dark:bg-slate-900/65 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/30 p-4 transition-all">
+      <div className="flex items-center justify-between mb-3 border-b border-border/50 pb-2">
+        <div className="flex items-center gap-2">
+          <TestTube2 className="size-5 text-emerald-500" />
+          <h3 className="font-semibold text-sm">Auth Sandbox Engine</h3>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleMinimized}
+          className="h-6 w-6 rounded-md hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground"
+          title="Minimize panel"
+        >
+          <Minus className="size-3.5" />
+          <span className="sr-only">Minimize</span>
+        </Button>
       </div>
 
       <div className="space-y-3">
