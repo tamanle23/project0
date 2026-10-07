@@ -111,18 +111,40 @@ When an administrator adds a new mandatory attribute with a `defaultValue` (e.g.
 The Data Explorer currently features a single search input that queries the first detected string attribute. Users managing complex data (e.g. products, customers, policies) require compound filtering (e.g. `Status = Active AND Price >= 100 AND Category IN [Electronics, Hardware]`).
 
 ### Proposed Solution
-1. **Advanced Filter Popover**:
-   - Add a "Filter" button on the [`EntityDataGrid`](file:///C:/Users/Admin/workspace/git/unipost/apps/console/src/features/metadata/components/data-explorer/entity-data-grid.tsx) toolbar with an interactive rule builder:
-     - Field selector (populates from active model `AttributeDefinition` list).
-     - Operator selector (`equals`, `contains`, `greater than`, `less than`, `in list`).
-     - Value input (renders dynamic input matching the attribute's data type).
-2. **Query Serialization**:
+1. **Advanced Filter Popover & Rule Builder**:
+   - Add a "Filter" button with active filter counter badge on the [`EntityDataGrid`](file:///C:/Users/Admin/workspace/git/unipost/apps/console/src/features/metadata/components/data-explorer/entity-data-grid.tsx) toolbar.
+   - Interactive rule builder component (`FilterRuleBuilder` / `AdvancedFilterPopover`):
+     - Field selector (populates from active model `AttributeDefinition` list with data type indicators).
+     - Operator selector adapted to attribute type:
+       - String: `equals`, `contains`, `not equals`, `in list`
+       - Number/Decimal: `equals`, `greater than`, `greater or equal`, `less than`, `less or equal`, `not equals`
+       - Boolean: `equals` (`true`/`false`)
+       - Date/Timestamp: `equals`, `greater than`, `less than`
+     - Value input: Renders dynamic input matching data type (text, number, switch/toggle, or select choices).
+     - Removable rule rows with "Add Condition" and "Clear All" actions.
+2. **Faceted Search Integration & Architecture Readiness**:
+   - **Unified Filter State Model**: Define a composable filter clause schema:
+     ```ts
+     export interface AttributeFilterClause {
+       id: string;
+       field: string;
+       operator: 'eq' | 'ne' | 'contains' | 'gt' | 'gte' | 'lt' | 'lte' | 'in';
+       value: string;
+     }
+     ```
+   - **Dual-Mode Adapter (Filter Builder + Faceted Search)**:
+     - The filter structure serializes to both the backend query format (`filter[attr][op]=val`) and a canonical filter clause array.
+     - Designed to connect seamlessly with future Faceted Search sidebars (aggregating counts per facet like `Category: Electronics (42), Furniture (18)`) where clicking a facet simply toggles an `AttributeFilterClause` in the same state store.
+3. **Query Serialization & Persistence**:
    - Seamlessly serializes to the backend's existing query format:
      `filter[status][eq]=active&filter[price][gte]=100`.
-   - Preserved in URL search params and `useMetadataUiStore` so filter state is retained across tab switches.
+   - Stored in `useMetadataUiStore.gridStateByModel` per model, ensuring filter state is preserved when switching models or tabs.
+   - Renders active filter pills above the table with single-click dismiss.
 
 ### Verification & Value
 - Empowers non-technical users to filter through complex JSONB record datasets without writing code or raw queries.
+- Future-proofed for instant integration with dedicated entity data explorers and faceted search bars.
+- **Status**: [COMPLETED] Implemented `AdvancedFilterPopover` with type-adapted operators, unified `AttributeFilterClause` state model in `useMetadataUiStore`, compound query serialization in `entity-data-grid.tsx`, active filter chip dismissals, and verified clean `@unipost/console` build.
 
 ---
 

@@ -6,8 +6,16 @@ import type {
   RelationshipType,
 } from '../api/types';
 
+export interface AttributeFilterClause {
+  id: string;
+  field: string;
+  operator: 'eq' | 'ne' | 'contains' | 'gt' | 'gte' | 'lt' | 'lte' | 'in';
+  value: string;
+}
+
 export interface GridState {
   searchFilter: string;
+  attributeFilters?: AttributeFilterClause[];
   page: number;
   pageSize: number;
   sortField: string | null;
@@ -102,6 +110,7 @@ export const useMetadataUiStore = create<MetadataUiState>((set, get) => ({
       const key = String(modelId);
       const current = state.gridStateByModel[key] || {
         searchFilter: '',
+        attributeFilters: [],
         page: 1,
         pageSize: 10,
         sortField: null,
@@ -119,6 +128,7 @@ export const useMetadataUiStore = create<MetadataUiState>((set, get) => ({
     return (
       get().gridStateByModel[key] || {
         searchFilter: '',
+        attributeFilters: [],
         page: 1,
         pageSize: 10,
         sortField: null,

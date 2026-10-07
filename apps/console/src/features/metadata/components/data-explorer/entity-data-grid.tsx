@@ -4,11 +4,12 @@ import {
   useAttributeDefinitions,
   useEntityType,
 } from '../../api/metadata-api';
-import { useMetadataUiStore } from '../../store/use-metadata-ui-store';
+import { useMetadataUiStore, type AttributeFilterClause } from '../../store/use-metadata-ui-store';
 import type { AttributeDefinition, EntityRecord } from '../../api/types';
 import { RecordEditorDialog } from './record-editor-dialog';
 import { RecordDeleteDialog } from './record-delete-dialog';
 import { RawJsonDialog } from './raw-json-dialog';
+import { AdvancedFilterPopover } from './advanced-filter-popover';
 import {
   createColumnHelper,
   flexRender,
@@ -70,6 +71,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
   // Read current model's grid state or fallback to defaults
   const currentGridState = gridStateByModel[String(entityTypeId)] || {
     searchFilter: '',
+    attributeFilters: [],
     page: 1,
     pageSize: 10,
     sortField: null,
@@ -79,6 +81,10 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
   const page = currentGridState.page;
   const pageSize = currentGridState.pageSize;
   const searchFilter = currentGridState.searchFilter;
+  const attributeFilters = useMemo(
+    () => currentGridState.attributeFilters || [],
+    [currentGridState.attributeFilters]
+  );
   const sortField = currentGridState.sortField;
   const sortDirection = currentGridState.sortDirection;
 
@@ -105,6 +111,15 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
     setGridState(entityTypeId, { searchFilter: val, page: 1 });
   };
 
+  const handleAttributeFiltersChange = (newFilters: AttributeFilterClause[]) => {
+    setGridState(entityTypeId, { attributeFilters: newFilters, page: 1 });
+  };
+
+  const handleRemoveAttributeFilter = (filterId: string) => {
+    const updated = attributeFilters.filter((f) => f.id !== filterId);
+    setGridState(entityTypeId, { attributeFilters: updated, page: 1 });
+  };
+
   const handlePageChange = (newPage: number) => {
     setGridState(entityTypeId, { page: newPage });
   };
@@ -129,30 +144,46 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
       params.sort = `${sortField},${sortDirection}`;
     }
 
+    const filtersObj: Record<string, Record<string, string>> = {};
+
+    // 1. Incorporate compound attribute filters
+    attributeFilters.forEach((clause) => {
+      if (!clause.field || clause.value === undefined || clause.value === '') return;
+      if (!filtersObj[clause.field]) {
+        filtersObj[clause.field] = {};
+      }
+      filtersObj[clause.field][clause.operator] = clause.value;
+    });
+
+    // 2. Incorporate quick search filter
     if (debouncedSearch) {
       // Find searchable string attributes to apply server filter
       const stringAttrs = attributes.filter(
         (a) => !a.isArchived && (a.dataType === 'STRING' || a.uiComponent === 'text')
       );
       if (stringAttrs.length > 0) {
-        // Query the first prominent string attribute with contains, or legal_name/name/systemName
         const targetAttr =
           stringAttrs.find((a) =>
             ['name', 'legal_name', 'title', 'code', 'label'].includes(a.systemName.toLowerCase())
           ) || stringAttrs[0];
-        params.filters = {
-          [targetAttr.systemName]: { contains: debouncedSearch },
-        };
+        if (!filtersObj[targetAttr.systemName]) {
+          filtersObj[targetAttr.systemName] = {};
+        }
+        filtersObj[targetAttr.systemName].contains = debouncedSearch;
       } else {
-        // Fallback filter
-        params.filters = {
-          id: { eq: debouncedSearch },
-        };
+        if (!filtersObj.id) {
+          filtersObj.id = {};
+        }
+        filtersObj.id.eq = debouncedSearch;
       }
     }
 
+    if (Object.keys(filtersObj).length > 0) {
+      params.filters = filtersObj;
+    }
+
     return params;
-  }, [page, pageSize, sortField, sortDirection, debouncedSearch, attributes]);
+  }, [page, pageSize, sortField, sortDirection, debouncedSearch, attributeFilters, attributes]);
 
   const { data: recordsResponse, isLoading: recordsLoading } = useEntityRecords(
     entityTypeId,
@@ -385,7 +416,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
             <Input
               value={searchFilter}
               onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder="Search records (server-side)..."
+              placeholder="Quick search..."
               className="pl-8 pr-8 h-9 text-xs bg-white/50 dark:bg-white/5 border-white/20"
             />
             {searchFilter && (
@@ -398,6 +429,14 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
               </button>
             )}
           </div>
+
+          {/* Advanced Multi-Attribute Compound Filter Popover */}
+          <AdvancedFilterPopover
+            attributes={attributes}
+            filters={attributeFilters}
+            onChange={handleAttributeFiltersChange}
+          />
+
           <Badge variant="secondary" className="text-xs">
             {totalRecords} {totalRecords === 1 ? 'Record' : 'Records'}
           </Badge>
@@ -444,6 +483,44 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
           </Button>
         </div>
       </div>
+
+      {/* Active Filter Chips / Pills */}
+      {attributeFilters.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 px-1">
+          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+            Active Filters:
+          </span>
+          {attributeFilters.map((clause) => {
+            const attr = attributes.find((a) => a.systemName === clause.field);
+            return (
+              <Badge
+                key={clause.id}
+                variant="secondary"
+                className="gap-1.5 py-1 px-2.5 text-xs bg-primary/10 text-primary border-primary/20 shadow-xs"
+              >
+                <span className="font-semibold">{attr?.name || clause.field}</span>
+                <span className="text-[10px] opacity-75 font-mono">[{clause.operator}]</span>
+                <span className="font-mono text-foreground">{clause.value}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveAttributeFilter(clause.id)}
+                  className="ml-1 hover:text-destructive transition-colors"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            );
+          })}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleAttributeFiltersChange([])}
+            className="h-6 px-2 text-[11px] text-muted-foreground hover:text-destructive"
+          >
+            Clear all
+          </Button>
+        </div>
+      )}
 
       {/* Table Canvas with Horizontal Overflow & Sticky Action Column */}
       <div className="rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 overflow-hidden w-full min-w-0">
