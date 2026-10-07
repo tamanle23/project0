@@ -10,8 +10,9 @@ import {
   ChevronRight,
   RotateCcw,
   Sparkles,
-  Building2,
-  Cpu,
+  Tag,
+  Layers,
+  ToggleLeft,
   Globe2,
   CheckCircle2,
 } from 'lucide-react';
@@ -56,13 +57,11 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
     const categoricalAttrs = attributes.filter(
       (a) =>
         !a.isArchived &&
-        (a.uiComponent === 'select' ||
+        (a.dataType === 'BOOLEAN' ||
+          a.uiComponent === 'select' ||
           a.uiComponent === 'multiselect' ||
           a.uiComponent === 'switch' ||
-          a.dataType === 'BOOLEAN' ||
-          ['subscription_tier', 'architecture', 'is_multi_region_ha', 'tenant_id', 'status'].includes(
-            a.systemName.toLowerCase()
-          ))
+          Boolean((a.options?.choices as string[])?.length))
     );
 
     const groups: FacetGroup[] = [];
@@ -78,12 +77,12 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
     if (Object.keys(tenantCounts).length > 1) {
       groups.push({
         field: 'tenantId',
-        name: 'Deployment Region (Tenant)',
+        name: 'Deployment Region / Tenant',
         dataType: 'STRING',
         buckets: Object.entries(tenantCounts)
           .map(([val, count]) => ({
             value: val,
-            label: val.replace('tenant-', '').toUpperCase(),
+            label: val.startsWith('tenant-') ? val.replace('tenant-', '').toUpperCase() : val,
             count,
           }))
           .sort((a, b) => b.count - a.count),
@@ -109,16 +108,21 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
       });
 
       const buckets = Object.entries(counts)
-        .map(([val, count]) => ({
-          value: val,
-          label:
-            attr.dataType === 'BOOLEAN'
-              ? val === 'true'
-                ? 'Enabled (Multi-Region)'
-                : 'Single Region'
-              : val,
-          count,
-        }))
+        .map(([val, count]) => {
+          let label = val;
+          if (attr.dataType === 'BOOLEAN') {
+            const isTrue = val === 'true' || val === '1';
+            label = isTrue
+              ? (attr.options?.trueLabel as string) || 'Yes / Enabled'
+              : (attr.options?.falseLabel as string) || 'No / Disabled';
+          }
+
+          return {
+            value: val,
+            label,
+            count,
+          };
+        })
         .filter((b) => b.count > 0 || predefinedChoices.includes(b.value))
         .sort((a, b) => b.count - a.count);
 
@@ -215,10 +219,12 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
                 <div className="flex items-center gap-1.5 truncate">
                   {group.field === 'tenantId' ? (
                     <Globe2 className="h-3.5 w-3.5 text-sky-500 shrink-0" />
-                  ) : group.field === 'subscription_tier' ? (
-                    <Building2 className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                  ) : group.dataType === 'BOOLEAN' ? (
+                    <ToggleLeft className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                  ) : group.dataType === 'RELATION' ? (
+                    <Layers className="h-3.5 w-3.5 text-violet-500 shrink-0" />
                   ) : (
-                    <Cpu className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                    <Tag className="h-3.5 w-3.5 text-amber-500 shrink-0" />
                   )}
                   <span className="truncate">{group.name}</span>
                 </div>
