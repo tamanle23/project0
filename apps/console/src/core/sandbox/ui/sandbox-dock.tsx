@@ -113,6 +113,15 @@ export function SandboxDock() {
     'tenant-ap-northeast-1',
   ];
 
+  const hasSandboxUrlParam =
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('sandbox') === 'true';
+
+  // Only display the dock if the user is authenticated in Sandbox mode OR ?sandbox=true was explicitly passed
+  if (!hasSandboxUrlParam && (!isAuthenticated || !isSandbox)) {
+    return null;
+  }
+
   // Minimized floating trigger pill
   if (isMinimized) {
     return (
