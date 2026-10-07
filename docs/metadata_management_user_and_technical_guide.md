@@ -293,12 +293,29 @@ metadata/
 - **`UNIPOST_RELATIONSHIP_TYPES`**: Edge definitions (`source_entity_type_id`, `target_entity_type_id`, `cardinality`).
 - **`UNIPOST_ENTITY_RELATIONSHIPS`**: Edge junction table linking source and target records with `ON DELETE CASCADE` and `edge_metadata` JSONB.
 
-### 2. Embedded Hazelcast Caching Engine (`unipost-fw`)
-- Stores compiled Draft-07 schemas in distributed memory: `schema:{entityTypeId}`.
-- Replaces external Redis dependencies with an in-process, clustered Hazelcast `IMap`.
-- Listens to Spring Application Events (`AttributeDefinitionUpdatedEvent`) using `@TransactionalEventListener(phase = AFTER_COMMIT)` and `@Async` to invalidate cached schemas across all cluster nodes.
+### 2. Embedded Hazelcast Caching Engine & Lock-Free Atomic L1 (`unipost-fw`)
+- **Two-Tier Cache Hierarchy (L1 In-Memory + L2 Hazelcast IMap)**:
+  - **L1 In-Memory Cache**: Stores parsed, immutable `JsonSchema` instances (`ConcurrentHashMap<String, JsonSchema>`) for sub-millisecond payload validations.
+  - **L2 Hazelcast Distributed Map**: `metadata_schemas` distributes compiled JSON Schema strings across the cluster with a 1-hour TTL.
+- **Cache Stampede & Thundering Herd Mitigation**:
+  - `SchemaValidationService.getOrCompileJsonSchema` uses atomic `computeIfAbsent(cacheKey, ...)` on the L1 cache.
+  - When a cold start or cache invalidation occurs, 20+ concurrent requests for the same schema wait on a single thread's compilation. Redundant DB schema compilation runs exactly **once**.
+  - Distributed writes use Hazelcast `putIfAbsent` to ensure cluster-wide double-check safety without race conditions.
+- **Cluster Invalidation**:
+  - Listens to Spring Application Events (`AttributeDefinitionUpdatedEvent`) using `@TransactionalEventListener(phase = AFTER_COMMIT)` and `@Async` to invalidate cached schemas across all cluster nodes.
 
-### 3. REST API Contract Reference
+### 3. Native PostgreSQL JSONB Containment Optimization (`@>`)
+- Exact-match equality (`eq`) queries on attributes compile directly into a composite JSONB document and execute via the PostgreSQL containment operator:
+  ```sql
+  SELECT * FROM UNIPOST_ENTITIES
+  WHERE entity_type_id = ?
+    AND deleted_date IS NULL
+    AND attributes @> '{"tier": "Strategic"}'::jsonb;
+  ```
+- Directly leverages the PostgreSQL Generalized Inverted Index `idx_entities_attributes_gin` (`attributes jsonb_path_ops`), yielding sub-millisecond lookups on multi-million row tables.
+- Range (`gt`, `lt`), negation (`ne`), and substring (`contains`) filters cleanly fallback to `jsonb_extract_path_text`.
+
+### 4. REST API Contract Reference
 - `GET /v1/metadata/entity-types`: List all entity types.
 - `GET /v1/metadata/entity-types/{id}/schema`: Fetch authoritative compiled Draft-07 JSON Schema with `schemaVersion`.
 - `GET /v1/metadata/entity-types/{id}/attributes`: List attributes (sorted by `displayOrder`).

@@ -97,7 +97,7 @@ class SchemaValidationServiceTest {
 
         assertDoesNotThrow(() -> schemaValidationService.validatePayload(entityTypeId, payload));
 
-        verify(schemaMap).set(eq("schema:1:v1"), anyString(), eq(1L), eq(TimeUnit.HOURS));
+        verify(schemaMap).putIfAbsent(eq("schema:1:v1"), anyString(), eq(1L), eq(TimeUnit.HOURS));
     }
 
     @Test
@@ -161,4 +161,54 @@ class SchemaValidationServiceTest {
         assertEquals("object", schemaNode.get("type").asText());
         assertNotNull(schemaNode.get("properties").get("code"));
     }
+
+    @Test
+    void testConcurrentGetOrCompileJsonSchema_StampedeMitigated() throws InterruptedException {
+        Long entityTypeId = 1L;
+        AttributeDefinition attr = new AttributeDefinition();
+        attr.setSystemName("tier");
+        attr.setUiComponent("text");
+        attr.setDataType("string");
+
+        when(schemaMap.get("schema:1:v1")).thenReturn(null);
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId))
+                .thenReturn(List.of(attr));
+
+        int threadCount = 20;
+        java.util.concurrent.ExecutorService executor = java.util.concurrent.Executors.newFixedThreadPool(threadCount);
+        java.util.concurrent.CountDownLatch readyLatch = new java.util.concurrent.CountDownLatch(threadCount);
+        java.util.concurrent.CountDownLatch startLatch = new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.CountDownLatch doneLatch = new java.util.concurrent.CountDownLatch(threadCount);
+        java.util.List<com.networknt.schema.JsonSchema> results = Collections.synchronizedList(new java.util.ArrayList<>());
+
+        for (int i = 0; i < threadCount; i++) {
+            executor.submit(() -> {
+                readyLatch.countDown();
+                try {
+                    startLatch.await();
+                    results.add(schemaValidationService.getOrCompileJsonSchema(entityTypeId, 1L));
+                } catch (Exception e) {
+                    fail("Concurrent getOrCompileJsonSchema failed: " + e.getMessage());
+                } finally {
+                    doneLatch.countDown();
+                }
+            });
+        }
+
+        readyLatch.await(5, TimeUnit.SECONDS);
+        startLatch.countDown(); // Fire all 20 threads simultaneously
+        doneLatch.await(5, TimeUnit.SECONDS);
+        executor.shutdown();
+
+        assertEquals(threadCount, results.size(), "All threads should have received a compiled schema");
+        com.networknt.schema.JsonSchema first = results.get(0);
+        for (com.networknt.schema.JsonSchema schema : results) {
+            assertSame(first, schema, "All threads must share the exact same atomic L1 cached JsonSchema instance");
+        }
+
+        // DB attribute repository findByEntityTypeId must only be invoked exactly ONCE
+        verify(attributeDefinitionRepository, times(1)).findByEntityTypeIdAndDeletedDateIsNull(entityTypeId);
+        verify(schemaMap, times(1)).putIfAbsent(eq("schema:1:v1"), anyString(), eq(1L), eq(TimeUnit.HOURS));
+    }
 }
+

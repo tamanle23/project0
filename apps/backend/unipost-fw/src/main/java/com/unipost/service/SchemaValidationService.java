@@ -67,46 +67,50 @@ public class SchemaValidationService {
     public JsonSchema getOrCompileJsonSchema(Long entityTypeId, Long schemaVersion) {
         String cacheKey = buildCacheKey(entityTypeId, schemaVersion);
 
-        // 1. Check L1 in-memory parsed cache
+        // Fast path: L1 parsed schema cache hit
         JsonSchema l1Schema = l1ParsedSchemaCache.get(cacheKey);
         if (l1Schema != null) {
             return l1Schema;
         }
 
-        // 2. Check L2 Hazelcast cache
-        String schemaJson = null;
-        try {
-            IMap<String, String> schemaMap = getHazelcastSchemaMap();
-            if (schemaMap != null) {
-                schemaJson = schemaMap.get(cacheKey);
-            }
-        } catch (Exception e) {
-            log.warn("Hazelcast L2 cache read failed for {}: {}", cacheKey, e.getMessage());
-        }
-
-        // 3. Compile if cache miss
-        if (schemaJson == null) {
-            schemaJson = compileSchema(entityTypeId);
+        // Lock-free atomic L1 computeIfAbsent prevents cache stampede / thundering herd
+        // across multiple concurrent request threads on the same JVM
+        return l1ParsedSchemaCache.computeIfAbsent(cacheKey, key -> {
+            // 1. Check L2 Hazelcast distributed cache
+            String schemaJson = null;
             try {
                 IMap<String, String> schemaMap = getHazelcastSchemaMap();
                 if (schemaMap != null) {
-                    schemaMap.set(cacheKey, schemaJson, 1, TimeUnit.HOURS);
+                    schemaJson = schemaMap.get(key);
                 }
             } catch (Exception e) {
-                log.warn("Hazelcast L2 cache write failed for {}: {}", cacheKey, e.getMessage());
+                log.warn("Hazelcast L2 cache read failed for {}: {}", key, e.getMessage());
             }
-        }
 
-        // 4. Parse & store in L1
-        try {
-            JsonNode schemaNode = objectMapper.readTree(schemaJson);
-            JsonSchema compiledJsonSchema = schemaFactory.getSchema(schemaNode);
-            l1ParsedSchemaCache.put(cacheKey, compiledJsonSchema);
-            return compiledJsonSchema;
-        } catch (Exception e) {
-            log.error("Failed to parse compiled schema JSON into JsonSchema for entityTypeId {}", entityTypeId, e);
-            throw new RuntimeException("Failed to parse JSON schema: " + e.getMessage(), e);
-        }
+            // 2. Distributed double-check / compile on cache miss
+            if (schemaJson == null) {
+                log.debug("L1/L2 schema cache miss for {}. Compiling from DB rules...", key);
+                schemaJson = compileSchema(entityTypeId);
+                try {
+                    IMap<String, String> schemaMap = getHazelcastSchemaMap();
+                    if (schemaMap != null) {
+                        // putIfAbsent prevents concurrent cluster nodes from overwriting compiled schema
+                        schemaMap.putIfAbsent(key, schemaJson, 1, TimeUnit.HOURS);
+                    }
+                } catch (Exception e) {
+                    log.warn("Hazelcast L2 cache write failed for {}: {}", key, e.getMessage());
+                }
+            }
+
+            // 3. Parse and compile into immutable JsonSchema instance
+            try {
+                JsonNode schemaNode = objectMapper.readTree(schemaJson);
+                return schemaFactory.getSchema(schemaNode);
+            } catch (Exception e) {
+                log.error("Failed to parse compiled schema JSON into JsonSchema for entityTypeId {}", entityTypeId, e);
+                throw new IllegalStateException("Failed to parse JSON schema: " + e.getMessage(), e);
+            }
+        });
     }
 
     public void validatePayload(Long entityTypeId, Map<String, Object> payload) {
