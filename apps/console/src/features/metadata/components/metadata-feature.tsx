@@ -1,7 +1,12 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMetadataUiStore } from '../store/use-metadata-ui-store';
-import { useEntityType } from '../api/metadata-api';
+import {
+  useEntityType,
+  useAttributeDefinitions,
+  useEntityRecords,
+  useRelationshipTypes,
+} from '../api/metadata-api';
 import { EntityTypeSidebar } from './entity-type';
 import { SchemaBuilder } from './schema-builder';
 import { EntityDataGrid } from './data-explorer';
@@ -16,7 +21,8 @@ import { ConfigDrawer } from '@/components/config-drawer';
 import { ProfileDropdown } from '@/components/profile-dropdown';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getRouteApi } from '@tanstack/react-router';
-import { Layers, Database, Sparkles, GitFork } from 'lucide-react';
+import { Layers, Database, Sparkles, GitFork, Cpu } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const route = getRouteApi('/_authenticated/metadata/');
 
@@ -57,6 +63,22 @@ export const MetadataFeature: React.FC = () => {
 
   const { data: activeEntity } = useEntityType(selectedEntityTypeId);
 
+  // Live Metric Counts for High-Affordance Badges
+  const { data: attributesResponse } = useAttributeDefinitions(selectedEntityTypeId, { size: 1 });
+  const { data: recordsResponse } = useEntityRecords(selectedEntityTypeId, { size: 1 });
+  const { data: relTypesResponse } = useRelationshipTypes();
+
+  const attributeCount = attributesResponse?.totalElements ?? 0;
+  const recordCount = recordsResponse?.totalElements ?? 0;
+  const relCount = React.useMemo(() => {
+    if (!selectedEntityTypeId || !relTypesResponse?.content) return 0;
+    return relTypesResponse.content.filter(
+      (r) =>
+        String(r.sourceEntityTypeId) === String(selectedEntityTypeId) ||
+        String(r.targetEntityTypeId) === String(selectedEntityTypeId)
+    ).length;
+  }, [selectedEntityTypeId, relTypesResponse]);
+
   return (
     <>
       <Header fixed>
@@ -94,12 +116,15 @@ export const MetadataFeature: React.FC = () => {
           <div className="flex-1 w-full min-w-0 space-y-4">
             {selectedEntityTypeId && activeEntity ? (
               <div className="space-y-4">
-                {/* Active Model Banner & Responsive Tabs Layout */}
-                <div className="flex flex-col gap-3 p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
+                {/* Active Model Banner & Segmented Frosted Glass Rail (Option A) */}
+                <div className="flex flex-col gap-4 p-4 md:p-5 rounded-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-base md:text-lg text-foreground">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20 shrink-0">
+                          <Cpu className="h-4 w-4" />
+                        </div>
+                        <span className="font-bold text-base md:text-lg text-foreground tracking-tight">
                           {activeEntity.name}
                         </span>
                         <code className="text-xs font-mono text-muted-foreground bg-muted/60 dark:bg-white/5 px-2 py-0.5 rounded border border-white/20">
@@ -107,31 +132,90 @@ export const MetadataFeature: React.FC = () => {
                         </code>
                       </div>
                       {activeEntity.description && (
-                        <p className="text-xs text-muted-foreground max-w-2xl">
+                        <p className="text-xs text-muted-foreground max-w-2xl pl-9">
                           {activeEntity.description}
                         </p>
                       )}
                     </div>
                   </div>
 
-                  {/* Adaptive Tab Selector: auto-balancing full width on mobile, inline pill on desktop */}
+                  {/* High-Affordance Segmented Tab Navigation Rail */}
                   <Tabs
                     value={activeTab}
                     onValueChange={handleTabChange}
                     className="w-full pt-1"
                   >
-                    <TabsList className="w-full grid grid-cols-3 sm:w-auto sm:inline-flex bg-white/50 dark:bg-white/5 border border-white/20 p-1">
-                      <TabsTrigger value="schema" className="gap-1.5 text-xs sm:flex-initial">
-                        <Layers className="h-3.5 w-3.5 shrink-0" />
+                    <TabsList className="w-full grid grid-cols-3 sm:w-auto sm:inline-flex items-center gap-1.5 p-1.5 h-auto rounded-xl bg-slate-200/50 dark:bg-slate-950/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-inner shadow-black/5">
+                      {/* Schema Builder Tab */}
+                      <TabsTrigger
+                        value="schema"
+                        className={cn(
+                          'relative flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium rounded-lg transition-all duration-200 sm:flex-initial',
+                          'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5',
+                          'data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:text-foreground data-[state=active]:font-semibold',
+                          'data-[state=active]:shadow-md data-[state=active]:shadow-black/10 data-[state=active]:border data-[state=active]:border-white/60 dark:data-[state=active]:border-white/10'
+                        )}
+                      >
+                        <Layers className="h-3.5 w-3.5 shrink-0 text-sky-500" />
                         <span className="truncate">{t('metadata.tabs.schema', 'Schema Builder')}</span>
+                        <span
+                          className={cn(
+                            'hidden sm:inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-mono font-medium transition-colors',
+                            activeTab === 'schema'
+                              ? 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/20'
+                              : 'bg-muted/80 text-muted-foreground'
+                          )}
+                        >
+                          {attributeCount}
+                        </span>
                       </TabsTrigger>
-                      <TabsTrigger value="data" className="gap-1.5 text-xs sm:flex-initial">
-                        <Database className="h-3.5 w-3.5 shrink-0" />
+
+                      {/* Data Explorer Tab */}
+                      <TabsTrigger
+                        value="data"
+                        className={cn(
+                          'relative flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium rounded-lg transition-all duration-200 sm:flex-initial',
+                          'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5',
+                          'data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:text-foreground data-[state=active]:font-semibold',
+                          'data-[state=active]:shadow-md data-[state=active]:shadow-black/10 data-[state=active]:border data-[state=active]:border-white/60 dark:data-[state=active]:border-white/10'
+                        )}
+                      >
+                        <Database className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
                         <span className="truncate">{t('metadata.tabs.data', 'Data Explorer')}</span>
+                        <span
+                          className={cn(
+                            'hidden sm:inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-mono font-medium transition-colors',
+                            activeTab === 'data'
+                              ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20'
+                              : 'bg-muted/80 text-muted-foreground'
+                          )}
+                        >
+                          {recordCount}
+                        </span>
                       </TabsTrigger>
-                      <TabsTrigger value="relationships" className="gap-1.5 text-xs sm:flex-initial">
-                        <GitFork className="h-3.5 w-3.5 shrink-0" />
+
+                      {/* Connected Edges Tab */}
+                      <TabsTrigger
+                        value="relationships"
+                        className={cn(
+                          'relative flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium rounded-lg transition-all duration-200 sm:flex-initial',
+                          'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5',
+                          'data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:text-foreground data-[state=active]:font-semibold',
+                          'data-[state=active]:shadow-md data-[state=active]:shadow-black/10 data-[state=active]:border data-[state=active]:border-white/60 dark:data-[state=active]:border-white/10'
+                        )}
+                      >
+                        <GitFork className="h-3.5 w-3.5 shrink-0 text-violet-500" />
                         <span className="truncate">{t('metadata.tabs.relationships', 'Connected Edges')}</span>
+                        <span
+                          className={cn(
+                            'hidden sm:inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-mono font-medium transition-colors',
+                            activeTab === 'relationships'
+                              ? 'bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/20'
+                              : 'bg-muted/80 text-muted-foreground'
+                          )}
+                        >
+                          {relCount}
+                        </span>
                       </TabsTrigger>
                     </TabsList>
                   </Tabs>
