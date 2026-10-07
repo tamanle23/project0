@@ -21,9 +21,12 @@ export class UnifiedSandboxManager {
   }
 
   /**
-   * Check if sandbox mode is currently enabled in store
+   * Check if sandbox mode is currently enabled in store (strictly false in production)
    */
   public isEnabled(): boolean {
+    if (!import.meta.env.DEV) {
+      return false;
+    }
     return useSandboxStore.getState().enabled;
   }
 
@@ -84,11 +87,11 @@ export class UnifiedSandboxManager {
   public async handleRequest(
     req: SandboxRequest
   ): Promise<SandboxResponse | null> {
-    const state = useSandboxStore.getState();
-    if (!state.enabled) {
+    if (!this.isEnabled()) {
       return null;
     }
 
+    const state = useSandboxStore.getState();
     const headers: Record<string, string> = {};
     if (req.headers) {
       for (const [key, val] of Object.entries(req.headers)) {

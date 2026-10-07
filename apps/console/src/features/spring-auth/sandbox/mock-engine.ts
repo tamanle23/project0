@@ -10,6 +10,9 @@ sandboxRegistry.register(authSandboxHandler);
  * Adapts incoming Axios requests to the Unified Auth Sandbox handler.
  */
 export function enableSandboxMockEngine(apiClient: AxiosInstance) {
+  if (!import.meta.env.DEV) {
+    return;
+  }
   apiClient.interceptors.request.use((config) => {
     const url = config.url || '';
     const method = config.method?.toUpperCase() || 'GET';

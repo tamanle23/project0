@@ -113,6 +113,11 @@ export function SandboxDock() {
     'tenant-ap-northeast-1',
   ];
 
+  // Sandbox Dock is strictly unavailable in production builds
+  if (!import.meta.env.DEV) {
+    return null;
+  }
+
   const hasSandboxUrlParam =
     typeof window !== 'undefined' &&
     new URLSearchParams(window.location.search).get('sandbox') === 'true';

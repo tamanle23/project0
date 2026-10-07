@@ -8,6 +8,11 @@ import { sandboxManager } from '../manager/sandbox-manager';
  * the real network without modification.
  */
 export function attachSandboxAxiosInterceptor(apiClient: AxiosInstance): void {
+  // Never intercept requests in production builds
+  if (!import.meta.env.DEV) {
+    return;
+  }
+
   apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
     if (!sandboxManager.isEnabled()) {
       return config;

@@ -8,6 +8,12 @@ class MetadataServiceStrategy implements MetadataDataSource {
   private currentMode: MetadataMode;
 
   constructor() {
+    // In production, strictly enforce http mode
+    if (!import.meta.env.DEV) {
+      this.currentMode = 'http';
+      return;
+    }
+
     // Default to mock if VITE_METADATA_MOCK is explicitly true or fallback
     const isMock =
       import.meta.env.VITE_METADATA_MOCK === 'true' ||
@@ -17,6 +23,9 @@ class MetadataServiceStrategy implements MetadataDataSource {
   }
 
   public setMode(mode: MetadataMode) {
+    if (!import.meta.env.DEV && mode === 'mock') {
+      return;
+    }
     this.currentMode = mode;
   }
 
