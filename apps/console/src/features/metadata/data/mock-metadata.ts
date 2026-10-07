@@ -140,6 +140,21 @@ export const initialMockAttributes: Record<string, AttributeDefinition[]> = {
       version: 1,
       options: { placeholder: 'Special routing rules or custom SLA requirements...' },
     },
+    {
+      id: '108',
+      entityTypeId: '1',
+      name: 'Default Deployment Policy',
+      systemName: 'default_policy_id',
+      dataType: 'RELATIONSHIP',
+      uiComponent: 'relation_picker',
+      isRequired: false,
+      displayOrder: 8,
+      version: 1,
+      options: {
+        targetEntityTypeId: '3',
+        placeholder: 'Select bound deployment policy...',
+      },
+    },
   ],
   '2': [
     {

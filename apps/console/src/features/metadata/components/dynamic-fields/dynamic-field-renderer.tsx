@@ -34,49 +34,72 @@ const RelationPickerControl: React.FC<RelationPickerControlProps> = ({
   errorClass,
 }) => {
   const { data: recordsResponse } = useEntityRecords(targetEntityTypeId || '', {
-    size: 50,
+    size: 100,
   });
   const records = recordsResponse?.content || [];
 
-  if (targetEntityTypeId && records.length > 0) {
+  const selectedRecord = records.find(
+    (r) => String(r.id) === String(value)
+  );
+
+  const formatLabel = (r: (typeof records)[0]) => {
     return (
-      <Select
-        value={typeof value === 'string' || typeof value === 'number' ? String(value) : ''}
-        onValueChange={(val) => onChange(val)}
-      >
-        <SelectTrigger
-          id={id}
-          className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm', errorClass)}
-        >
-          <SelectValue placeholder={placeholder || 'Select Target Entity Record...'} />
-        </SelectTrigger>
-        <SelectContent>
-          {records.map((r) => {
-            const label =
-              (r.attributes?.legal_name as string) ||
-              (r.attributes?.resource_code as string) ||
-              (r.attributes?.policy_id as string) ||
-              `Record #${r.id}`;
-            return (
-              <SelectItem key={r.id} value={String(r.id)}>
-                #{r.id} - {label}
-              </SelectItem>
-            );
-          })}
-        </SelectContent>
-      </Select>
+      (r.attributes?.legal_name as string) ||
+      (r.attributes?.resource_code as string) ||
+      (r.attributes?.policy_id as string) ||
+      `Record #${r.id}`
     );
-  }
+  };
 
   return (
-    <Input
-      id={id}
-      type="text"
-      value={typeof value === 'string' || typeof value === 'number' ? value : ''}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder || 'Target Entity Record ID...'}
-      className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm font-mono text-xs', errorClass)}
-    />
+    <div className="space-y-2">
+      {targetEntityTypeId && records.length > 0 ? (
+        <Select
+          value={typeof value === 'string' || typeof value === 'number' ? String(value) : ''}
+          onValueChange={(val) => onChange(val)}
+        >
+          <SelectTrigger
+            id={id}
+            className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm', errorClass)}
+          >
+            <SelectValue placeholder={placeholder || 'Select Target Entity Record...'} />
+          </SelectTrigger>
+          <SelectContent>
+            {records.map((r) => (
+              <SelectItem key={r.id} value={String(r.id)}>
+                #{r.id} - {formatLabel(r)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : (
+        <Input
+          id={id}
+          type="text"
+          value={typeof value === 'string' || typeof value === 'number' ? value : ''}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder || 'Target Entity Record ID...'}
+          className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm font-mono text-xs', errorClass)}
+        />
+      )}
+
+      {/* Target Record Live Preview Card */}
+      {selectedRecord && (
+        <div className="flex items-center gap-2 p-2 rounded-lg bg-primary/5 border border-primary/20 text-xs">
+          <Badge variant="secondary" className="font-mono text-[10px] px-1.5 py-0 bg-primary/10 text-primary">
+            #{selectedRecord.id}
+          </Badge>
+          <span className="font-semibold text-foreground truncate">
+            {formatLabel(selectedRecord)}
+          </span>
+          {selectedRecord.tenantId && (
+            <span className="text-[10px] text-muted-foreground ml-auto font-mono">
+              {selectedRecord.tenantId}
+            </span>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 

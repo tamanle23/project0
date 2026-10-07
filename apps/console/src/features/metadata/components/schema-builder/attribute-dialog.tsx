@@ -3,6 +3,7 @@ import { useMetadataUiStore } from '../../store/use-metadata-ui-store';
 import {
   useCreateAttributeDefinition,
   useUpdateAttributeDefinition,
+  useEntityTypes,
 } from '../../api/metadata-api';
 import { metadataService } from '../../api/metadata-service';
 import { ConflictBanner, isConflictError } from '../conflict-banner';
@@ -63,6 +64,10 @@ export const AttributeDialog: React.FC<Props> = ({ entityTypeId }) => {
   const [maxVal, setMaxVal] = useState<string>('');
   const [placeholder, setPlaceholder] = useState('');
   const [pattern, setPattern] = useState('');
+  const [targetEntityTypeId, setTargetEntityTypeId] = useState<string>('');
+
+  const { data: entityTypesResponse } = useEntityTypes();
+  const entityTypes = entityTypesResponse?.content || [];
 
   // Auto-slug helper
   const slugify = (text: string) => {
@@ -96,6 +101,11 @@ export const AttributeDialog: React.FC<Props> = ({ entityTypeId }) => {
       );
       setPlaceholder(editingAttribute.options?.placeholder || '');
       setPattern(editingAttribute.options?.pattern || '');
+      setTargetEntityTypeId(
+        editingAttribute.options?.targetEntityTypeId !== undefined
+          ? String(editingAttribute.options.targetEntityTypeId)
+          : ''
+      );
     } else {
       setName('');
       setSystemName('');
@@ -110,6 +120,7 @@ export const AttributeDialog: React.FC<Props> = ({ entityTypeId }) => {
       setMaxVal('');
       setPlaceholder('');
       setPattern('');
+      setTargetEntityTypeId('');
     }
   }, [editingAttribute, isAttributeDialogOpen]);
 
@@ -190,6 +201,9 @@ export const AttributeDialog: React.FC<Props> = ({ entityTypeId }) => {
     if (maxVal !== '') options.max = Number(maxVal);
     if (placeholder.trim()) options.placeholder = placeholder.trim();
     if (pattern.trim()) options.pattern = pattern.trim();
+    if (uiComponent === 'relation_picker' && targetEntityTypeId) {
+      options.targetEntityTypeId = targetEntityTypeId;
+    }
 
     if (isEditMode && editingAttribute) {
       updateMutation.mutate(
@@ -437,7 +451,31 @@ export const AttributeDialog: React.FC<Props> = ({ entityTypeId }) => {
                 </div>
               )}
 
-              {currentMeta.supportsOptions && !currentMeta.hasChoices && (
+              {uiComponent === 'relation_picker' && (
+                <div className="space-y-2">
+                  <Label htmlFor="attr-target-entity">Target Entity Model</Label>
+                  <Select
+                    value={targetEntityTypeId}
+                    onValueChange={setTargetEntityTypeId}
+                  >
+                    <SelectTrigger id="attr-target-entity" className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm">
+                      <SelectValue placeholder="Select Target Entity Model..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {entityTypes.map((et) => (
+                        <SelectItem key={et.id} value={String(et.id)}>
+                          {et.name} ({et.systemName})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Specifies which entity model records are referenced by this relationship lookup field.
+                  </p>
+                </div>
+              )}
+
+              {currentMeta.supportsOptions && !currentMeta.hasChoices && uiComponent !== 'relation_picker' && (
                 <div className="space-y-2">
                   <Label htmlFor="attr-placeholder">Input Placeholder</Label>
                   <Input
