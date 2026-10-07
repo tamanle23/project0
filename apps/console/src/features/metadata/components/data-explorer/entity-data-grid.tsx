@@ -32,6 +32,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
   Plus,
   Search,
   Download,
@@ -42,6 +45,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Database,
+  X,
 } from 'lucide-react';
 
 interface Props {
@@ -54,15 +58,73 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchFilter, setSearchFilter] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [inspectingRecord, setInspectingRecord] = useState<EntityRecord | null>(null);
 
-  const { data: recordsResponse, isLoading: recordsLoading } = useEntityRecords(
-    entityTypeId,
-    { number: page, size: pageSize }
-  );
   const { data: attributesResponse, isLoading: schemaLoading } =
     useAttributeDefinitions(entityTypeId);
   const { data: entityType } = useEntityType(entityTypeId);
+
+  const attributes = useMemo(() => {
+    return attributesResponse?.content || [];
+  }, [attributesResponse]);
+
+  // Debounce search filter input (300ms)
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchFilter.trim());
+      setPage(1); // Reset to page 1 on search change
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchFilter]);
+
+  // Construct server-side filters & sort
+  const queryParams = useMemo(() => {
+    const params: {
+      number: number;
+      size: number;
+      sort?: string;
+      filters?: Record<string, string | Record<string, string>>;
+    } = {
+      number: page,
+      size: pageSize,
+    };
+
+    if (sortField) {
+      params.sort = `${sortField},${sortDirection}`;
+    }
+
+    if (debouncedSearch) {
+      // Find searchable string attributes to apply server filter
+      const stringAttrs = attributes.filter(
+        (a) => !a.isArchived && (a.dataType === 'STRING' || a.uiComponent === 'text')
+      );
+      if (stringAttrs.length > 0) {
+        // Query the first prominent string attribute with contains, or legal_name/name/systemName
+        const targetAttr =
+          stringAttrs.find((a) =>
+            ['name', 'legal_name', 'title', 'code', 'label'].includes(a.systemName.toLowerCase())
+          ) || stringAttrs[0];
+        params.filters = {
+          [targetAttr.systemName]: { contains: debouncedSearch },
+        };
+      } else {
+        // Fallback filter
+        params.filters = {
+          id: { eq: debouncedSearch },
+        };
+      }
+    }
+
+    return params;
+  }, [page, pageSize, sortField, sortDirection, debouncedSearch, attributes]);
+
+  const { data: recordsResponse, isLoading: recordsLoading } = useEntityRecords(
+    entityTypeId,
+    queryParams
+  );
 
   const {
     openCreateRecordDialog,
@@ -70,31 +132,46 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
     openDeleteRecordDialog,
   } = useMetadataUiStore();
 
-  const attributes = useMemo(() => {
-    return attributesResponse?.content || [];
-  }, [attributesResponse]);
-
-  const rawRecords = useMemo(() => {
+  const records = useMemo(() => {
     return recordsResponse?.content || [];
   }, [recordsResponse]);
 
-  // Client-side text filter over currently loaded records
-  const filteredRecords = useMemo(() => {
-    if (!searchFilter.trim()) return rawRecords;
-    const query = searchFilter.toLowerCase();
-    return rawRecords.filter((record) => {
-      if (String(record.id).toLowerCase().includes(query)) return true;
-      if (record.tenantId && record.tenantId.toLowerCase().includes(query)) return true;
-      return Object.values(record.attributes || {}).some((val) =>
-        String(val).toLowerCase().includes(query)
-      );
-    });
-  }, [rawRecords, searchFilter]);
+  const handleSortToggle = (field: string) => {
+    if (sortField === field) {
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else {
+        setSortField(null);
+        setSortDirection('asc');
+      }
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    setPage(1);
+  };
 
   const columns = useMemo(() => {
     const baseCols = [
       columnHelper.accessor('id', {
-        header: 'ID',
+        header: () => (
+          <button
+            type="button"
+            onClick={() => handleSortToggle('id')}
+            className="flex items-center gap-1.5 font-semibold text-muted-foreground uppercase tracking-wider text-[11px] hover:text-foreground transition-colors group"
+          >
+            <span>ID</span>
+            {sortField === 'id' ? (
+              sortDirection === 'asc' ? (
+                <ArrowUp className="h-3 w-3 text-primary" />
+              ) : (
+                <ArrowDown className="h-3 w-3 text-primary" />
+              )
+            ) : (
+              <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-60 transition-opacity" />
+            )}
+          </button>
+        ),
         cell: (info) => (
           <code className="font-mono text-xs text-muted-foreground bg-muted/60 dark:bg-white/5 px-1.5 py-0.5 rounded">
             #{String(info.getValue())}
@@ -110,7 +187,24 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
           (row) => row.attributes?.[attr.systemName],
           {
             id: attr.systemName,
-            header: attr.name,
+            header: () => (
+              <button
+                type="button"
+                onClick={() => handleSortToggle(attr.systemName)}
+                className="flex items-center gap-1.5 font-semibold text-muted-foreground uppercase tracking-wider text-[11px] hover:text-foreground transition-colors group"
+              >
+                <span>{attr.name}</span>
+                {sortField === attr.systemName ? (
+                  sortDirection === 'asc' ? (
+                    <ArrowUp className="h-3 w-3 text-primary" />
+                  ) : (
+                    <ArrowDown className="h-3 w-3 text-primary" />
+                  )
+                ) : (
+                  <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-60 transition-opacity" />
+                )}
+              </button>
+            ),
             cell: (info) => {
               const val = info.getValue();
               if (val === null || val === undefined || val === '') {
@@ -165,7 +259,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
 
     const actionCol = columnHelper.display({
       id: 'actions',
-      header: 'Actions',
+      header: () => <span className="sr-only">Actions</span>,
       cell: ({ row }) => (
         <div className="flex items-center justify-end">
           <DropdownMenu>
@@ -200,10 +294,10 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
     });
 
     return [...baseCols, ...dynamicCols, actionCol];
-  }, [attributes, openEditRecordDialog, openDeleteRecordDialog]);
+  }, [attributes, sortField, sortDirection, openEditRecordDialog, openDeleteRecordDialog]);
 
   const table = useReactTable({
-    data: filteredRecords,
+    data: records,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -211,7 +305,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
   const handleExportJson = () => {
     const dataStr =
       'data:text/json;charset=utf-8,' +
-      encodeURIComponent(JSON.stringify(rawRecords, null, 2));
+      encodeURIComponent(JSON.stringify(records, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
     downloadAnchor.setAttribute(
@@ -223,7 +317,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
     downloadAnchor.remove();
   };
 
-  const totalRecords = recordsResponse?.totalElements ?? rawRecords.length;
+  const totalRecords = recordsResponse?.totalElements ?? records.length;
   const totalPages = recordsResponse?.totalPages ?? (Math.ceil(totalRecords / pageSize) || 1);
 
   if (recordsLoading || schemaLoading) {
@@ -245,13 +339,39 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
             <Input
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
-              placeholder="Search records..."
-              className="pl-8 h-9 text-xs bg-white/50 dark:bg-white/5 border-white/20"
+              placeholder="Search records (server-side)..."
+              className="pl-8 pr-8 h-9 text-xs bg-white/50 dark:bg-white/5 border-white/20"
             />
+            {searchFilter && (
+              <button
+                type="button"
+                onClick={() => setSearchFilter('')}
+                className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
           <Badge variant="secondary" className="text-xs">
             {totalRecords} {totalRecords === 1 ? 'Record' : 'Records'}
           </Badge>
+          {sortField && (
+            <Badge variant="outline" className="text-xs gap-1 font-mono">
+              <span>sort: {sortField}</span>
+              <span>({sortDirection})</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setSortField(null);
+                  setSortDirection('asc');
+                  setPage(1);
+                }}
+                className="ml-1 hover:text-destructive"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -259,7 +379,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
             variant="outline"
             size="sm"
             onClick={handleExportJson}
-            disabled={rawRecords.length === 0}
+            disabled={records.length === 0}
             className="h-9 gap-1.5 text-xs bg-white/40 dark:bg-white/5 border-white/20"
           >
             <Download className="h-4 w-4" />

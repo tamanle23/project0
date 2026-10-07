@@ -46,3 +46,21 @@ Implemented the **Strategy Pattern** for the Metadata Management module in `@uni
 
 ### Verification
 - `pnpm --filter @unipost/console build`: success.
+
+## Phase 4: Server-Side Record Filtering & Sorting
+
+### Enhancements
+- **Server-side Search & Filtering**:
+  - Implemented 300ms debounced search in [`entity-data-grid.tsx`](file:///C:/Users/Admin/workspace/git/unipost/apps/console/src/features/metadata/components/data-explorer/entity-data-grid.tsx) targeting active schema attributes (`filter[<attr>][contains]=<query>`).
+  - Added clear button (`X`) to quickly reset the filter input and reset to page 1.
+  - Expanded filter operators in [`mock-metadata.ts`](file:///C:/Users/Admin/workspace/git/unipost/apps/console/src/features/metadata/data/mock-metadata.ts) to handle `contains`, `like`, `ne`, and `in` identically to Spring Data JPA `EntityRecordSpecifications`.
+- **Column Header Sorting**:
+  - Connected table column header clicks to toggle server sorting through `sort=field,asc|desc`.
+  - Added visual sort direction indicators (`ArrowUp`, `ArrowDown`, and hover `ArrowUpDown`).
+  - Added active sort badge with quick-clear button to reset sort state.
+- **Strict Server Pagination**:
+  - Configured `useReactTable` to render server records directly without client-side slicing.
+  - Bound pagination controls to `recordsResponse.totalElements` and `recordsResponse.totalPages`.
+
+### Verification
+- `pnpm --filter @unipost/console build`: **BUILD SUCCESS** (TypeScript and Vite build cleanly verified).

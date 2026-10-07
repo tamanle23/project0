@@ -718,7 +718,12 @@ export class MockMetadataService implements MetadataDataSource {
               recs = recs.filter((r) => {
                 const attrVal = r.attributes?.[field];
                 if (op === 'eq') return String(attrVal) === String(val);
-                if (op === 'like') return String(attrVal || '').toLowerCase().includes(String(val).toLowerCase());
+                if (op === 'ne') return String(attrVal) !== String(val);
+                if (op === 'like' || op === 'contains') return String(attrVal ?? '').toLowerCase().includes(String(val).toLowerCase());
+                if (op === 'in') {
+                  const parts = String(val).split(',').map((p) => p.trim().toLowerCase());
+                  return parts.includes(String(attrVal ?? '').toLowerCase());
+                }
                 if (op === 'gt') return Number(attrVal) > Number(val);
                 if (op === 'lt') return Number(attrVal) < Number(val);
                 if (op === 'gte') return Number(attrVal) >= Number(val);
