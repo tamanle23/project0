@@ -1,42 +1,43 @@
 import type { AxiosInstance } from 'axios';
-import { decodeJwt } from '../utils/jwt';
+import { authSandboxHandler } from '../../../core/sandbox/handlers/auth-sandbox-handler';
+import { sandboxRegistry } from '../../../core/sandbox/manager/sandbox-registry';
 
-// Helper to base64 encode without padding/symbols standard for JWTs
-const b64 = (str: string) => btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+// Ensure the auth handler is registered in the Unified Sandbox Registry
+sandboxRegistry.register(authSandboxHandler);
 
-const createMockJwt = (payload: Record<string, unknown>) => {
-  const header = b64(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-  const body = b64(JSON.stringify(payload));
-  const signature = b64('mock_signature');
-  return `${header}.${body}.${signature}`;
-};
-
-const getHeader = (headers: any, key: string): string | null => {
-  if (!headers) return null;
-  if (typeof headers.get === 'function') {
-    const val = headers.get(key);
-    return val ? String(val) : null;
-  }
-  return (headers[key] || headers[key.toLowerCase()]) as string | null;
-};
-
+/**
+ * Backward-compatible bridge for existing consumers of enableSandboxMockEngine.
+ * Adapts incoming Axios requests to the Unified Auth Sandbox handler.
+ */
 export function enableSandboxMockEngine(apiClient: AxiosInstance) {
   apiClient.interceptors.request.use((config) => {
     const url = config.url || '';
-    const method = config.method?.toUpperCase();
+    const method = config.method?.toUpperCase() || 'GET';
 
-    // Determine if this specific request should be mocked
+    const getHeader = (headers: any, key: string): string | null => {
+      if (!headers) return null;
+      if (typeof headers.get === 'function') {
+        const val = headers.get(key);
+        return val ? String(val) : null;
+      }
+      return (headers[key] || headers[key.toLowerCase()]) as string | null;
+    };
+
     const isMockRequest = getHeader(config.headers, 'X-Sandbox-Mock') === 'true';
     const authHeader = getHeader(config.headers, 'Authorization');
-    const isMockToken = authHeader && authHeader.includes('mock_signature');
+    const isMockToken = Boolean(
+      authHeader &&
+        (authHeader.includes('mock_signature') || authHeader.includes('bW9ja19zaWduYXR1cmU'))
+    );
 
     let body: Record<string, any> = {};
     try {
       body = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
     } catch {
-      /* ignore */
+      body = config.data || {};
     }
-    const isMockRefresh = body.refreshToken && String(body.refreshToken).startsWith('mock_refresh_token_');
+    const isMockRefresh =
+      body.refreshToken && String(body.refreshToken).startsWith('mock_refresh_token_');
 
     const shouldMock =
       (url === '/auth/token' && method === 'POST' && isMockRequest) ||
@@ -45,96 +46,51 @@ export function enableSandboxMockEngine(apiClient: AxiosInstance) {
       (url === '/admin/dashboard' && method === 'GET' && isMockToken);
 
     if (shouldMock) {
-      // Apply mock adapter only for this specific request
       config.adapter = async (mockConfig) => {
-        // 1. Mock Login
-        if (url === '/auth/token') {
-          const sandboxUsers: Record<string, string[]> = {
-            'admin_bypass': ['ROLE_USER', 'ROLE_ADMIN'],
-            'creator_bypass': ['ROLE_USER', 'ROLE_CREATOR'],
-            'user_bypass': ['ROLE_USER']
-          };
-
-          if (body.username in sandboxUsers && body.password === 'bypass') {
-            const roles = sandboxUsers[body.username];
-            const sub = body.username.split('_')[0];
-
-            const token = createMockJwt({
-              sub,
-              roles,
-              isSandbox: true,
-              iat: Math.floor(Date.now() / 1000),
-              exp: Math.floor(Date.now() / 1000) + 60 * 15
-            });
-
-            return {
-              data: { accessToken: token, refreshToken: `mock_refresh_token_${sub}` },
-              status: 200, statusText: 'OK', headers: {}, config: mockConfig, request: {}
-            };
-          }
-          return Promise.reject({ response: { data: { message: 'Bad credentials' }, status: 401, statusText: 'Unauthorized' }, config: mockConfig });
+        const headers: Record<string, string> = {};
+        if (config.headers) {
+          Object.entries(config.headers).forEach(([k, v]) => {
+            if (v !== undefined && v !== null) {
+              headers[k.toLowerCase()] = String(v);
+            }
+          });
         }
 
-        // 2. Mock Refresh
-        if (url === '/auth/refresh') {
-          const refreshTokens: Record<string, string[]> = {
-            'mock_refresh_token_admin': ['ROLE_USER', 'ROLE_ADMIN'],
-            'mock_refresh_token_creator': ['ROLE_USER', 'ROLE_CREATOR'],
-            'mock_refresh_token_user': ['ROLE_USER']
-          };
-
-          if (body.refreshToken in refreshTokens) {
-            const roles = refreshTokens[body.refreshToken];
-            const sub = body.refreshToken.split('_').pop();
-
-            const token = createMockJwt({
-              sub,
-              roles,
-              isSandbox: true,
-              iat: Math.floor(Date.now() / 1000),
-              exp: Math.floor(Date.now() / 1000) + 60 * 15
-            });
-
-            return {
-              data: { accessToken: token, refreshToken: body.refreshToken },
-              status: 200, statusText: 'OK', headers: {}, config: mockConfig, request: {}
-            };
+        const res = await authSandboxHandler.handler(
+          {
+            url,
+            method,
+            data: config.data,
+            headers,
+          },
+          {
+            url,
+            method,
+            headers,
+            pathname: url.split('?')[0],
+            searchParams: new URLSearchParams(url.split('?')[1] || ''),
           }
-          return Promise.reject({ response: { data: { message: 'Invalid refresh token' }, status: 401, statusText: 'Unauthorized' }, config: mockConfig });
-        }
+        );
 
-        // 3. Mock Logout
-        if (url === '/auth/logout') {
+        if (res.status >= 200 && res.status < 300) {
           return {
-            data: { message: 'Successfully logged out' },
-            status: 200, statusText: 'OK', headers: {}, config: mockConfig, request: {}
+            data: res.data,
+            status: res.status,
+            statusText: res.statusText || 'OK',
+            headers: res.headers || {},
+            config: mockConfig,
+            request: {},
           };
         }
 
-        // 4. Mock Protected Endpoint
-        if (url === '/admin/dashboard') {
-          if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return Promise.reject({ response: { data: { message: 'Missing token' }, status: 401, statusText: 'Unauthorized' }, config: mockConfig });
-          }
-
-          const token = authHeader.split(' ')[1];
-          const decoded = decodeJwt(token);
-
-          if (!decoded || (decoded.exp * 1000) < Date.now()) {
-            return Promise.reject({ response: { data: { message: 'Token expired' }, status: 401, statusText: 'Unauthorized' }, config: mockConfig });
-          }
-
-          if (!decoded.roles.includes('ROLE_ADMIN')) {
-            return Promise.reject({ response: { data: { message: 'Forbidden' }, status: 403, statusText: 'Forbidden' }, config: mockConfig });
-          }
-
-          return {
-            data: { message: 'Welcome to the Secure Admin Dashboard', stats: { users: 124, revenue: 8430 } },
-            status: 200, statusText: 'OK', headers: {}, config: mockConfig, request: {}
-          };
-        }
-
-        throw new Error('Unmatched mock route');
+        return Promise.reject({
+          response: {
+            data: res.data,
+            status: res.status,
+            statusText: res.statusText || 'Error',
+          },
+          config: mockConfig,
+        });
       };
     }
 

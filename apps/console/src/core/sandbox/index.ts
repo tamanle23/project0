@@ -3,3 +3,22 @@ export * from './store/sandbox-store';
 export * from './manager/sandbox-registry';
 export * from './manager/sandbox-manager';
 export * from './manager/simulation-decorator';
+
+// Handlers & Adapters
+export * from './handlers/auth-sandbox-handler';
+export * from './handlers/metadata-sandbox-adapter';
+export * from './handlers/users-sandbox-handler';
+export * from './handlers/tasks-sandbox-handler';
+export * from './adapters/axios-sandbox-adapter';
+
+// Auto-register built-in domain handlers into the Unified Registry
+import { sandboxRegistry } from './manager/sandbox-registry';
+import { authSandboxHandler } from './handlers/auth-sandbox-handler';
+import { metadataSandboxAdapter } from './handlers/metadata-sandbox-adapter';
+import { usersSandboxHandler } from './handlers/users-sandbox-handler';
+import { tasksSandboxHandler } from './handlers/tasks-sandbox-handler';
+
+sandboxRegistry.register(authSandboxHandler);
+sandboxRegistry.register(metadataSandboxAdapter);
+sandboxRegistry.register(usersSandboxHandler);
+sandboxRegistry.register(tasksSandboxHandler);

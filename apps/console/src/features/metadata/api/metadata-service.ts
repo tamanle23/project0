@@ -25,7 +25,11 @@ class MetadataServiceStrategy implements MetadataDataSource {
   }
 
   private get activeService(): MetadataDataSource {
-    return this.currentMode === 'mock' ? mockMetadataStore : httpMetadataService;
+    // If explicitly set, respect currentMode; otherwise fallback to unified sandbox or env flag
+    if (this.currentMode === 'mock') {
+      return mockMetadataStore;
+    }
+    return httpMetadataService;
   }
 
   // 1. Entity Types
