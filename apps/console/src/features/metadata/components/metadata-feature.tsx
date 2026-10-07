@@ -117,33 +117,31 @@ export const MetadataFeature: React.FC = () => {
             {selectedEntityTypeId && activeEntity ? (
               <div className="space-y-4">
                 {/* Active Model Banner & Segmented Frosted Glass Rail (Option A) */}
-                <div className="flex flex-col gap-4 p-4 md:p-5 rounded-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2.5">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20 shrink-0">
-                          <Cpu className="h-4 w-4" />
-                        </div>
-                        <span className="font-bold text-base md:text-lg text-foreground tracking-tight">
-                          {activeEntity.name}
-                        </span>
-                        <code className="text-xs font-mono text-muted-foreground bg-muted/60 dark:bg-white/5 px-2 py-0.5 rounded border border-white/20">
-                          {activeEntity.systemName}
-                        </code>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 md:p-5 rounded-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20 shrink-0">
+                        <Cpu className="h-4 w-4" />
                       </div>
-                      {activeEntity.description && (
-                        <p className="text-xs text-muted-foreground max-w-2xl pl-9">
-                          {activeEntity.description}
-                        </p>
-                      )}
+                      <span className="font-bold text-base md:text-lg text-foreground tracking-tight truncate">
+                        {activeEntity.name}
+                      </span>
+                      <code className="text-xs font-mono text-muted-foreground bg-muted/60 dark:bg-white/5 px-2 py-0.5 rounded border border-white/20">
+                        {activeEntity.systemName}
+                      </code>
                     </div>
+                    {activeEntity.description && (
+                      <p className="text-xs text-muted-foreground max-w-xl pl-0 sm:pl-9 line-clamp-2">
+                        {activeEntity.description}
+                      </p>
+                    )}
                   </div>
 
                   {/* High-Affordance Segmented Tab Navigation Rail */}
                   <Tabs
                     value={activeTab}
                     onValueChange={handleTabChange}
-                    className="w-full min-w-0 pt-1 flex flex-col sm:items-end"
+                    className="w-full sm:w-auto shrink-0 min-w-0"
                   >
                     <div className="w-full sm:w-auto overflow-x-auto no-scrollbar py-0.5">
                       <TabsList className="flex w-full sm:w-auto min-w-full sm:min-w-0 sm:inline-flex sm:ml-auto items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 h-auto rounded-xl bg-slate-200/50 dark:bg-slate-950/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-inner shadow-black/5">
