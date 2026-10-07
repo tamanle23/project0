@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react'
 import { fonts } from '@/config/fonts'
 import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
 
@@ -33,18 +33,29 @@ export function FontProvider({ children }: { children: React.ReactNode }) {
     applyFont(font)
   }, [font])
 
-  const setFont = (font: Font) => {
+  const setFont = useCallback((font: Font) => {
     setCookie(FONT_COOKIE_NAME, font, FONT_COOKIE_MAX_AGE)
     _setFont(font)
-  }
+  }, [])
 
-  const resetFont = () => {
+  const resetFont = useCallback(() => {
     removeCookie(FONT_COOKIE_NAME)
     _setFont(fonts[0])
-  }
+  }, [])
+
+  // Optimization: Memoize context value to preserve referential equality and prevent
+  // unnecessary re-renders of consumer components when FontProvider re-renders.
+  const contextValue = useMemo<FontContextType>(
+    () => ({
+      font,
+      setFont,
+      resetFont,
+    }),
+    [font, setFont, resetFont]
+  )
 
   return (
-    <FontContext value={{ font, setFont, resetFont }}>{children}</FontContext>
+    <FontContext value={contextValue}>{children}</FontContext>
   )
 }
 
