@@ -485,7 +485,12 @@ export const EntityDataGrid: React.FC<Props> = ({
               variant={isFacetOpen ? 'default' : 'outline'}
               size="sm"
               onClick={() => setIsFacetOpen(!isFacetOpen)}
-              className="h-9 gap-1.5 text-xs bg-white/40 dark:bg-white/5 border-white/20 transition-all"
+              className={cn(
+                'h-9 gap-1.5 text-xs transition-all font-medium',
+                isFacetOpen
+                  ? 'bg-primary text-primary-foreground shadow-md shadow-primary/25 hover:bg-primary/90'
+                  : 'bg-white/40 dark:bg-white/5 border-white/20 text-muted-foreground hover:text-foreground'
+              )}
               title="Toggle Faceted Search sidebar"
             >
               <SlidersHorizontal className="h-3.5 w-3.5" />

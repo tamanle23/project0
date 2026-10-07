@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '@/lib/utils';
 import type { AttributeDefinition } from '../../api/types';
 import type { AttributeFilterClause } from '../../store/use-metadata-ui-store';
 import { Button } from '@/components/ui/button';
@@ -131,12 +132,17 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
         <Button
           variant={activeCount > 0 ? 'default' : 'outline'}
           size="sm"
-          className="h-9 gap-1.5 text-xs bg-white/40 dark:bg-white/5 border-white/20 transition-all relative"
+          className={cn(
+            'h-9 gap-1.5 text-xs transition-all relative font-medium',
+            activeCount > 0
+              ? 'bg-primary text-primary-foreground shadow-md shadow-primary/25 hover:bg-primary/90'
+              : 'bg-white/40 dark:bg-white/5 border-white/20 text-muted-foreground hover:text-foreground'
+          )}
         >
           <Filter className="h-3.5 w-3.5" />
           <span>Filters</span>
           {activeCount > 0 && (
-            <span className="ml-0.5 px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-primary-foreground text-primary leading-none">
+            <span className="ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-white text-primary dark:bg-slate-900 dark:text-primary leading-none shadow-xs">
               {activeCount}
             </span>
           )}
