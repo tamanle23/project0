@@ -121,15 +121,15 @@ export const MetadataFeature: React.FC = () => {
                     className="w-full pt-1"
                   >
                     <TabsList className="w-full grid grid-cols-3 sm:w-auto sm:inline-flex bg-white/50 dark:bg-white/5 border border-white/20 p-1">
-                      <TabsTrigger value="schema" className="gap-1.5 text-xs">
+                      <TabsTrigger value="schema" className="gap-1.5 text-xs sm:flex-initial">
                         <Layers className="h-3.5 w-3.5 shrink-0" />
                         <span className="truncate">{t('metadata.tabs.schema', 'Schema Builder')}</span>
                       </TabsTrigger>
-                      <TabsTrigger value="data" className="gap-1.5 text-xs">
+                      <TabsTrigger value="data" className="gap-1.5 text-xs sm:flex-initial">
                         <Database className="h-3.5 w-3.5 shrink-0" />
                         <span className="truncate">{t('metadata.tabs.data', 'Data Explorer')}</span>
                       </TabsTrigger>
-                      <TabsTrigger value="relationships" className="gap-1.5 text-xs">
+                      <TabsTrigger value="relationships" className="gap-1.5 text-xs sm:flex-initial">
                         <GitFork className="h-3.5 w-3.5 shrink-0" />
                         <span className="truncate">{t('metadata.tabs.relationships', 'Connected Edges')}</span>
                       </TabsTrigger>
