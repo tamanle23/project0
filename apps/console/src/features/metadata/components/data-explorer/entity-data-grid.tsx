@@ -88,8 +88,15 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
   const sortField = currentGridState.sortField;
   const sortDirection = currentGridState.sortDirection;
 
+  // Local immediate input state to prevent typing lag and rapid re-renders
+  const [localSearchInput, setLocalSearchInput] = useState(searchFilter);
   const [debouncedSearch, setDebouncedSearch] = useState(searchFilter);
   const [inspectingRecord, setInspectingRecord] = useState<EntityRecord | null>(null);
+
+  // Keep local search input synchronized if searchFilter changes externally
+  React.useEffect(() => {
+    setLocalSearchInput(searchFilter);
+  }, [searchFilter]);
 
   const { data: attributesResponse, isLoading: schemaLoading } =
     useAttributeDefinitions(entityTypeId);
@@ -99,16 +106,35 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
     return attributesResponse?.content || [];
   }, [attributesResponse]);
 
-  // Debounce search filter input (300ms)
+  // Debounce search filter input (600ms comfortable cadence)
   React.useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedSearch(searchFilter.trim());
-    }, 300);
+      const trimmed = localSearchInput.trim();
+      setDebouncedSearch(trimmed);
+      if (trimmed !== searchFilter) {
+        setGridState(entityTypeId, { searchFilter: trimmed, page: 1 });
+      }
+    }, 600);
     return () => clearTimeout(handler);
-  }, [searchFilter]);
+  }, [localSearchInput, searchFilter, entityTypeId, setGridState]);
 
   const handleSearchChange = (val: string) => {
-    setGridState(entityTypeId, { searchFilter: val, page: 1 });
+    setLocalSearchInput(val);
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const trimmed = localSearchInput.trim();
+      setDebouncedSearch(trimmed);
+      setGridState(entityTypeId, { searchFilter: trimmed, page: 1 });
+    }
+  };
+
+  const handleClearSearch = () => {
+    setLocalSearchInput('');
+    setDebouncedSearch('');
+    setGridState(entityTypeId, { searchFilter: '', page: 1 });
   };
 
   const handleAttributeFiltersChange = (newFilters: AttributeFilterClause[]) => {
@@ -414,16 +440,18 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
           <div className="relative w-full sm:w-64">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              value={searchFilter}
+              value={localSearchInput}
               onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder="Quick search..."
+              onKeyDown={handleSearchKeyDown}
+              placeholder="Search (type or press Enter)..."
               className="pl-8 pr-8 h-9 text-xs bg-white/50 dark:bg-white/5 border-white/20"
             />
-            {searchFilter && (
+            {localSearchInput && (
               <button
                 type="button"
-                onClick={() => handleSearchChange('')}
+                onClick={handleClearSearch}
                 className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground transition-colors"
+                title="Clear search"
               >
                 <X className="h-4 w-4" />
               </button>
