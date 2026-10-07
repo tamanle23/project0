@@ -203,17 +203,37 @@ export const EntityDataGrid: React.FC<Props> = ({
 
     const filtersObj: Record<string, Record<string, string>> = {};
 
-    // 1. Incorporate compound attribute filters
+    // 1. Incorporate compound attribute filters & facets
+    const fieldValuesMap: Record<string, { eqValues: string[]; otherOps: Record<string, string> }> = {};
+
     attributeFilters.forEach((clause) => {
       if (!clause.field || clause.value === undefined || clause.value === '') return;
       if (clause.field === 'tenantId') {
         params.tenantId = clause.value;
       } else {
-        if (!filtersObj[clause.field]) {
-          filtersObj[clause.field] = {};
+        if (!fieldValuesMap[clause.field]) {
+          fieldValuesMap[clause.field] = { eqValues: [], otherOps: {} };
         }
-        filtersObj[clause.field][clause.operator] = clause.value;
+        if (clause.operator === 'eq') {
+          fieldValuesMap[clause.field].eqValues.push(clause.value);
+        } else {
+          fieldValuesMap[clause.field].otherOps[clause.operator] = clause.value;
+        }
       }
+    });
+
+    Object.entries(fieldValuesMap).forEach(([field, { eqValues, otherOps }]) => {
+      if (!filtersObj[field]) {
+        filtersObj[field] = {};
+      }
+      if (eqValues.length === 1) {
+        filtersObj[field].eq = eqValues[0];
+      } else if (eqValues.length > 1) {
+        filtersObj[field].in = eqValues.join(',');
+      }
+      Object.entries(otherOps).forEach(([op, val]) => {
+        filtersObj[field][op] = val;
+      });
     });
 
     // 2. Incorporate quick search filter

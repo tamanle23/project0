@@ -29,8 +29,8 @@ export const initialMockEntityTypes: EntityType[] = [
     name: 'Customer Account',
     systemName: 'customer_account',
     description: 'Profiles, corporate identities, and billing configurations for enterprise customers.',
-    schemaVersion: 1,
-    version: 1,
+    schemaVersion: 2,
+    version: 2,
     createdDate: new Date('2026-01-10').toISOString(),
     updatedDate: new Date('2026-03-15').toISOString(),
   },
@@ -157,6 +157,21 @@ export const initialMockAttributes: Record<string, AttributeDefinition[]> = {
       options: {
         targetEntityTypeId: '3',
         placeholder: 'Select bound deployment policy...',
+      },
+    },
+    {
+      id: '109',
+      entityTypeId: '1',
+      name: 'Security Compliance Tier',
+      systemName: 'compliance_tier',
+      dataType: 'STRING',
+      uiComponent: 'select',
+      isRequired: false,
+      displayOrder: 9,
+      version: 1,
+      defaultValue: 'SOC2_TYPE_II',
+      options: {
+        choices: ['SOC2_TYPE_II', 'HIPAA', 'PCI_DSS', 'FEDRAMP_MODERATE', 'ISO_27001'],
       },
     },
   ],
@@ -301,7 +316,7 @@ const generateInitialRecords = (): Record<string, EntityRecord[]> => {
     const contactEmail = `${emailPrefix}@${domain}`;
     const tier = customerTiers[i % customerTiers.length];
     const vcpuQuota = [32, 64, 128, 256, 512, 1024, 2048][i % 7];
-    const isMultiRegion = i % 3 !== 0;
+    const isMultiRegion = i % 2 === 0;
     const day = (i % 28) + 1;
     const month = (i % 12) + 1;
     const effectiveDate = `2026-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -447,6 +462,20 @@ export class MockMetadataService implements MetadataDataSource {
   private relationshipTypes: RelationshipType[] = [...initialMockRelationshipTypes];
   private relationships: EntityRelationship[] = [...initialMockEntityRelationships];
 
+  // Two-Tier Simulated Cache Hierarchy (L1 In-Memory + L2 Hazelcast simulation)
+  private l1SchemaCache: Map<string, CompiledSchema> = new Map();
+  private l2DistributedCache: Map<string, string> = new Map();
+
+  resetToInitialState(): void {
+    this.entityTypes = JSON.parse(JSON.stringify(initialMockEntityTypes));
+    this.attributes = JSON.parse(JSON.stringify(initialMockAttributes));
+    this.records = JSON.parse(JSON.stringify(initialMockRecords));
+    this.relationshipTypes = JSON.parse(JSON.stringify(initialMockRelationshipTypes));
+    this.relationships = JSON.parse(JSON.stringify(initialMockEntityRelationships));
+    this.l1SchemaCache.clear();
+    this.l2DistributedCache.clear();
+  }
+
   // ==========================================
   // 1. Entity Types
   // ==========================================
@@ -522,12 +551,29 @@ export class MockMetadataService implements MetadataDataSource {
   }
 
   async getCompiledSchema(id: string | number): Promise<CompiledSchema> {
-    const entityType = await this.getEntityTypeById(id);
+    const strId = String(id);
+    const entityType = await this.getEntityTypeById(strId);
     if (!entityType) {
       throw new Error(`EntityType ${id} not found`);
     }
 
-    const attrs = this.attributes[String(id)] || [];
+    const version = entityType.schemaVersion || 1;
+    const cacheKey = `schema:${strId}:v${version}`;
+
+    // 1. Check L1 in-memory cache
+    if (this.l1SchemaCache.has(cacheKey)) {
+      return this.l1SchemaCache.get(cacheKey)!;
+    }
+
+    // 2. Check simulated L2 distributed cache
+    if (this.l2DistributedCache.has(cacheKey)) {
+      const parsed = JSON.parse(this.l2DistributedCache.get(cacheKey)!);
+      this.l1SchemaCache.set(cacheKey, parsed);
+      return parsed;
+    }
+
+    // 3. Lock-free single compilation simulation
+    const attrs = this.attributes[strId] || [];
     const activeAttrs = attrs.filter((a) => !a.isArchived);
 
     const properties: Record<string, unknown> = {};
@@ -586,12 +632,18 @@ export class MockMetadataService implements MetadataDataSource {
       additionalProperties: false,
     };
 
-    return {
+    const compiled: CompiledSchema = {
       entityTypeId: id,
-      schemaVersion: entityType.schemaVersion || 1,
+      schemaVersion: version,
       jsonSchema,
       updatedDate: entityType.updatedDate,
     };
+
+    // Populate L1 & L2 caches
+    this.l1SchemaCache.set(cacheKey, compiled);
+    this.l2DistributedCache.set(cacheKey, JSON.stringify(compiled));
+
+    return compiled;
   }
 
   async getSchemaDriftAnalysis(id: string | number): Promise<SchemaDriftAnalysisResponse> {
@@ -622,26 +674,31 @@ export class MockMetadataService implements MetadataDataSource {
     const targetVersion = entityType?.schemaVersion || 1;
     const records = this.records[strId] || [];
     const attrs = this.attributes[strId] || [];
+    const outdatedRecords = records.filter(
+      (r) => !r.version || (r.version < targetVersion)
+    );
+    const toProcess = outdatedRecords.slice(0, batchSize);
 
     let migrated = 0;
-    records.slice(0, batchSize).forEach((r) => {
+    toProcess.forEach((r) => {
       // Backfill default values
       attrs.forEach((attr) => {
         if (!attr.isArchived && attr.defaultValue !== undefined && attr.defaultValue !== '') {
           if (!r.attributes) r.attributes = {};
-          if (r.attributes[attr.systemName] === undefined) {
+          if (r.attributes[attr.systemName] === undefined || r.attributes[attr.systemName] === null || r.attributes[attr.systemName] === '') {
             r.attributes[attr.systemName] = attr.defaultValue;
           }
         }
       });
       r.version = targetVersion;
+      r.updatedDate = new Date().toISOString();
       migrated++;
     });
 
     return {
       entityTypeId: id,
       targetSchemaVersion: targetVersion,
-      processedRecords: Math.min(records.length, batchSize),
+      processedRecords: toProcess.length,
       migratedRecords: migrated,
       failedRecords: 0,
       failures: [],
@@ -995,6 +1052,56 @@ export class MockMetadataService implements MetadataDataSource {
           }
         }
 
+        // Pattern regex validation
+        if (attr.options?.pattern) {
+          try {
+            const regex = new RegExp(attr.options.pattern);
+            if (!regex.test(String(val))) {
+              errors.push({
+                field: attr.systemName,
+                message: `${attr.name} format is invalid.`,
+                code: 'PATTERN_MISMATCH',
+              });
+            }
+          } catch {
+            // Ignore bad regex in mock
+          }
+        }
+
+        // Numeric min/max validation
+        if (attr.dataType === 'INTEGER' || attr.dataType === 'DECIMAL') {
+          const numVal = Number(val);
+          if (isNaN(numVal)) {
+            errors.push({
+              field: attr.systemName,
+              message: `${attr.name} must be a valid number.`,
+              code: 'TYPE_MISMATCH',
+            });
+          } else {
+            if (attr.dataType === 'INTEGER' && !Number.isInteger(numVal)) {
+              errors.push({
+                field: attr.systemName,
+                message: `${attr.name} must be an integer.`,
+                code: 'TYPE_MISMATCH',
+              });
+            }
+            if (attr.options?.min !== undefined && numVal < attr.options.min) {
+              errors.push({
+                field: attr.systemName,
+                message: `${attr.name} must be at least ${attr.options.min}.`,
+                code: 'MINIMUM_VIOLATION',
+              });
+            }
+            if (attr.options?.max !== undefined && numVal > attr.options.max) {
+              errors.push({
+                field: attr.systemName,
+                message: `${attr.name} must be at most ${attr.options.max}.`,
+                code: 'MAXIMUM_VIOLATION',
+              });
+            }
+          }
+        }
+
         // Relation picker target check
         if (attr.uiComponent === 'relation_picker' && attr.options?.targetEntityTypeId) {
           const targetTypeId = String(attr.options.targetEntityTypeId);
@@ -1160,6 +1267,15 @@ export class MockMetadataService implements MetadataDataSource {
     if (entityType) {
       entityType.schemaVersion = (entityType.schemaVersion || 1) + 1;
       entityType.updatedDate = new Date().toISOString();
+
+      // Invalidate cluster L1 & L2 caches for this entity type
+      const prefix = `schema:${entityTypeId}:`;
+      Array.from(this.l1SchemaCache.keys())
+        .filter((k) => k.startsWith(prefix))
+        .forEach((k) => this.l1SchemaCache.delete(k));
+      Array.from(this.l2DistributedCache.keys())
+        .filter((k) => k.startsWith(prefix))
+        .forEach((k) => this.l2DistributedCache.delete(k));
     }
   }
 }

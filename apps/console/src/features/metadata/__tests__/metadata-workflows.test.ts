@@ -4,7 +4,7 @@ import type { CreateAttributeDefinitionDto, CreateEntityRecordDto } from '../api
 
 describe('Metadata Management Full E2E & Flow Test Suite', () => {
   beforeEach(() => {
-    // Fresh state for predictable testing
+    mockMetadataStore.resetToInitialState();
   });
 
   describe('Workflow 1: Entity Model Lifecycle', () => {
@@ -222,6 +222,101 @@ describe('Metadata Management Full E2E & Flow Test Suite', () => {
       // 4. Verify removed
       const remaining = await mockMetadataStore.getRecordRelationships(sourceRecordId);
       expect(remaining.content.some((l) => String(l.id) === String(edgeLink.id))).toBe(false);
+    });
+  });
+
+  describe('Workflow 5: Enhancements 1-5 Verification (JSONB Containment, Two-Tier Cache, Dry-Run Validation, Schema Backfill, Faceted Search)', () => {
+    it('Enhancement 1: should support exact match eq and multi-value in filters simulating JSONB containment', async () => {
+      const records = await mockMetadataStore.getEntityRecords('1', {
+        filters: {
+          subscription_tier: { in: 'Enterprise,Strategic' },
+        },
+      });
+
+      expect(records.content.length).toBeGreaterThan(0);
+      records.content.forEach((r) => {
+        expect(['Enterprise', 'Strategic']).toContain(r.attributes.subscription_tier);
+      });
+    });
+
+    it('Enhancement 2: should compile and cache schema in L1 and L2, and invalidate upon attribute change', async () => {
+      // First call: compiles and caches
+      const first = await mockMetadataStore.getCompiledSchema('1');
+      expect(first.schemaVersion).toBeDefined();
+
+      // Second call: served directly from cache
+      const cached = await mockMetadataStore.getCompiledSchema('1');
+      expect(cached).toEqual(first);
+
+      // Add attribute: triggers schema bump and cache invalidation
+      await mockMetadataStore.createAttributeDefinition('1', {
+        name: 'Cluster Identifier',
+        systemName: 'cluster_id',
+        dataType: 'STRING',
+        uiComponent: 'text',
+        isRequired: false,
+      });
+
+      const bumped = await mockMetadataStore.getCompiledSchema('1');
+      expect(bumped.schemaVersion).toBeGreaterThan(first.schemaVersion);
+    });
+
+    it('Enhancement 3: should dry-run pre-validate records including required fields and enum choices', async () => {
+      // Valid record
+      const validRes = await mockMetadataStore.validateEntityRecord('1', {
+        entityTypeId: '1',
+        attributes: {
+          legal_name: 'Valid Enterprise Corp',
+          contact_email: 'test@unipost.io',
+          subscription_tier: 'Enterprise',
+        },
+      });
+      expect(validRes.valid).toBe(true);
+      expect(validRes.errors).toHaveLength(0);
+
+      // Invalid record: missing required field and invalid choice
+      const invalidRes = await mockMetadataStore.validateEntityRecord('1', {
+        entityTypeId: '1',
+        attributes: {
+          legal_name: '', // Required!
+          subscription_tier: 'NonExistentTier', // Invalid choice!
+        },
+      });
+      expect(invalidRes.valid).toBe(false);
+      expect(invalidRes.errors.some((e) => e.field === 'legal_name')).toBe(true);
+      expect(invalidRes.errors.some((e) => e.field === 'subscription_tier')).toBe(true);
+    });
+
+    it('Enhancement 4: should detect schema drift and execute retroactive schema backfill with default values', async () => {
+      const drift = await mockMetadataStore.getSchemaDriftAnalysis('1');
+      expect(drift.totalRecords).toBeGreaterThan(0);
+      expect(drift.currentSchemaVersion).toBeDefined();
+
+      // If there are outdated records, backfill should migrate them
+      if (drift.outdatedRecords > 0) {
+        const backfillResult = await mockMetadataStore.executeSchemaBackfill('1', 50);
+        expect(backfillResult.migratedRecords).toBeGreaterThan(0);
+        expect(backfillResult.targetSchemaVersion).toBe(drift.currentSchemaVersion);
+
+        // Check updated drift analysis
+        const postDrift = await mockMetadataStore.getSchemaDriftAnalysis('1');
+        expect(postDrift.outdatedRecords).toBeLessThan(drift.outdatedRecords);
+      }
+    });
+
+    it('Enhancement 5: should filter by multi-attribute faceted criteria and tenant', async () => {
+      const filtered = await mockMetadataStore.getEntityRecords('1', {
+        tenantId: 'tenant-us-east-1',
+        filters: {
+          is_multi_region_ha: { eq: 'true' },
+        },
+      });
+
+      expect(filtered.content.length).toBeGreaterThan(0);
+      filtered.content.forEach((r) => {
+        expect(r.tenantId).toBe('tenant-us-east-1');
+        expect(r.attributes.is_multi_region_ha).toBe(true);
+      });
     });
   });
 });
