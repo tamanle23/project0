@@ -21,6 +21,7 @@ import {
   Command,
   GalleryVerticalEnd,
   Database,
+  Building2,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 import { useTranslation } from 'react-i18next'
@@ -78,6 +79,11 @@ export const useSidebarData = (): SidebarData => {
             url: '/chats',
             badge: '3',
             icon: MessagesSquare,
+          },
+          {
+            title: 'Customer Accounts',
+            url: '/customer-accounts',
+            icon: Building2,
           },
         ],
       },

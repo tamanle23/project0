@@ -10,4 +10,6 @@ export * from './components/data-explorer';
 export * from './components/entity-type';
 export * from './components/metadata-dialogs';
 export * from './components/metadata-feature';
+export * from './components/customer-accounts-explorer';
 export { MetadataFeature as Metadata } from './components/metadata-feature';
+

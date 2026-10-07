@@ -10,6 +10,7 @@ import { RecordEditorDialog } from './record-editor-dialog';
 import { RecordDeleteDialog } from './record-delete-dialog';
 import { RawJsonDialog } from './raw-json-dialog';
 import { AdvancedFilterPopover } from './advanced-filter-popover';
+import { FacetedSearchSidebar } from './faceted-search-sidebar';
 import {
   createColumnHelper,
   flexRender,
@@ -50,15 +51,23 @@ import {
   X,
   GitFork,
   Link2,
+  SlidersHorizontal,
 } from 'lucide-react';
 
 interface Props {
   entityTypeId: string | number;
+  showFacetedSidebar?: boolean;
+  defaultFacetOpen?: boolean;
 }
 
 const columnHelper = createColumnHelper<EntityRecord>();
 
-export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
+export const EntityDataGrid: React.FC<Props> = ({
+  entityTypeId,
+  showFacetedSidebar = true,
+  defaultFacetOpen = false,
+}) => {
+  const [isFacetOpen, setIsFacetOpen] = useState(defaultFacetOpen);
   const {
     openCreateRecordDialog,
     openEditRecordDialog,
@@ -160,6 +169,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
       number: number;
       size: number;
       sort?: string;
+      tenantId?: string;
       filters?: Record<string, string | Record<string, string>>;
     } = {
       number: page,
@@ -175,10 +185,14 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
     // 1. Incorporate compound attribute filters
     attributeFilters.forEach((clause) => {
       if (!clause.field || clause.value === undefined || clause.value === '') return;
-      if (!filtersObj[clause.field]) {
-        filtersObj[clause.field] = {};
+      if (clause.field === 'tenantId') {
+        params.tenantId = clause.value;
+      } else {
+        if (!filtersObj[clause.field]) {
+          filtersObj[clause.field] = {};
+        }
+        filtersObj[clause.field][clause.operator] = clause.value;
       }
-      filtersObj[clause.field][clause.operator] = clause.value;
     });
 
     // 2. Incorporate quick search filter
@@ -465,6 +479,20 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
             onChange={handleAttributeFiltersChange}
           />
 
+          {/* Faceted Search Sidebar Toggle Button */}
+          {showFacetedSidebar && (
+            <Button
+              variant={isFacetOpen ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setIsFacetOpen(!isFacetOpen)}
+              className="h-9 gap-1.5 text-xs bg-white/40 dark:bg-white/5 border-white/20 transition-all"
+              title="Toggle Faceted Search sidebar"
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              <span>Facets</span>
+            </Button>
+          )}
+
           <Badge variant="secondary" className="text-xs">
             {totalRecords} {totalRecords === 1 ? 'Record' : 'Records'}
           </Badge>
@@ -550,9 +578,20 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
         </div>
       )}
 
-      {/* Table Canvas with Horizontal Overflow & Sticky Action Column */}
-      <div className="rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 overflow-hidden w-full min-w-0">
-        <div className="overflow-x-auto relative w-full">
+      {/* Table Canvas with Optional Faceted Search Sidebar & Horizontal Overflow */}
+      <div className="flex flex-col lg:flex-row items-start gap-4 w-full min-w-0">
+        {showFacetedSidebar && isFacetOpen && (
+          <FacetedSearchSidebar
+            attributes={attributes}
+            records={records}
+            activeFilters={attributeFilters}
+            onFilterChange={handleAttributeFiltersChange}
+            className="w-full lg:w-72 shrink-0 animate-in fade-in slide-in-from-left-2 duration-200"
+          />
+        )}
+
+        <div className="flex-1 min-w-0 w-full rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 overflow-hidden">
+          <div className="overflow-x-auto relative w-full">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -673,6 +712,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
           </div>
         </div>
       </div>
+    </div>
 
       {/* Dialogs */}
       <RecordEditorDialog entityTypeId={entityTypeId} />

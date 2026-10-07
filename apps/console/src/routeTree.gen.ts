@@ -28,6 +28,7 @@ import { Route as AuthenticatedStorageIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedMetadataIndexRouteImport } from './routes/_authenticated/metadata/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
+import { Route as AuthenticatedCustomerAccountsIndexRouteImport } from './routes/_authenticated/customer-accounts/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
@@ -133,6 +134,12 @@ const AuthenticatedHelpCenterIndexRoute =
     path: '/help-center/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCustomerAccountsIndexRoute =
+  AuthenticatedCustomerAccountsIndexRouteImport.update({
+    id: '/customer-accounts/',
+    path: '/customer-accounts/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
   id: '/chats/',
   path: '/chats/',
@@ -180,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/apps/': typeof AuthenticatedAppsIndexRoute
   '/chats/': typeof AuthenticatedChatsIndexRoute
+  '/customer-accounts/': typeof AuthenticatedCustomerAccountsIndexRoute
   '/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/metadata/': typeof AuthenticatedMetadataIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -204,6 +212,7 @@ export interface FileRoutesByTo {
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/customer-accounts': typeof AuthenticatedCustomerAccountsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/metadata': typeof AuthenticatedMetadataIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
@@ -231,6 +240,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
+  '/_authenticated/customer-accounts/': typeof AuthenticatedCustomerAccountsIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/metadata/': typeof AuthenticatedMetadataIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -258,6 +268,7 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/apps/'
     | '/chats/'
+    | '/customer-accounts/'
     | '/help-center/'
     | '/metadata/'
     | '/settings/'
@@ -282,6 +293,7 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/apps'
     | '/chats'
+    | '/customer-accounts'
     | '/help-center'
     | '/metadata'
     | '/settings'
@@ -308,6 +320,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/notifications'
     | '/_authenticated/apps/'
     | '/_authenticated/chats/'
+    | '/_authenticated/customer-accounts/'
     | '/_authenticated/help-center/'
     | '/_authenticated/metadata/'
     | '/_authenticated/settings/'
@@ -465,6 +478,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/customer-accounts/': {
+      id: '/_authenticated/customer-accounts/'
+      path: '/customer-accounts'
+      fullPath: '/customer-accounts/'
+      preLoaderRoute: typeof AuthenticatedCustomerAccountsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/chats/': {
       id: '/_authenticated/chats/'
       path: '/chats'
@@ -528,6 +548,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
+  AuthenticatedCustomerAccountsIndexRoute: typeof AuthenticatedCustomerAccountsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedMetadataIndexRoute: typeof AuthenticatedMetadataIndexRoute
   AuthenticatedStorageIndexRoute: typeof AuthenticatedStorageIndexRoute
@@ -541,6 +562,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
+  AuthenticatedCustomerAccountsIndexRoute:
+    AuthenticatedCustomerAccountsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedMetadataIndexRoute: AuthenticatedMetadataIndexRoute,
   AuthenticatedStorageIndexRoute: AuthenticatedStorageIndexRoute,
