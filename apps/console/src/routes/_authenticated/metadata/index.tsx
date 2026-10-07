@@ -4,7 +4,7 @@ import { Metadata } from '@/features/metadata';
 
 const metadataSearchSchema = z.object({
   model: z.string().optional(),
-  tab: z.enum(['schema', 'data']).optional(),
+  tab: z.enum(['schema', 'data', 'relationships']).optional(),
 });
 
 export const Route = createFileRoute('/_authenticated/metadata/')({
