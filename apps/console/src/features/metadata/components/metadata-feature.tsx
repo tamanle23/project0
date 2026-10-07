@@ -15,11 +15,46 @@ import { ThemeSwitch } from '@/components/theme-switch';
 import { ConfigDrawer } from '@/components/config-drawer';
 import { ProfileDropdown } from '@/components/profile-dropdown';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getRouteApi } from '@tanstack/react-router';
 import { Layers, Database, Sparkles, GitFork } from 'lucide-react';
+
+const route = getRouteApi('/_authenticated/metadata/');
 
 export const MetadataFeature: React.FC = () => {
   const { t } = useTranslation('console');
-  const { selectedEntityTypeId, activeTab, setActiveTab } = useMetadataUiStore();
+  const navigate = route.useNavigate();
+  const searchParams = route.useSearch();
+
+  const { selectedEntityTypeId, setSelectedEntityTypeId, activeTab, setActiveTab } =
+    useMetadataUiStore();
+
+  // 1. Initial Sync from URL to Store
+  React.useEffect(() => {
+    if (searchParams.model && searchParams.model !== selectedEntityTypeId) {
+      setSelectedEntityTypeId(searchParams.model);
+    }
+    if (
+      searchParams.tab &&
+      ['schema', 'data', 'relationships'].includes(searchParams.tab) &&
+      searchParams.tab !== activeTab
+    ) {
+      setActiveTab(searchParams.tab);
+    }
+  }, [searchParams.model, searchParams.tab]);
+
+  // 2. Sync Tab change to URL and Store
+  const handleTabChange = (val: string) => {
+    const tab = val as 'schema' | 'data' | 'relationships';
+    setActiveTab(tab);
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        tab,
+        model: selectedEntityTypeId || prev.model,
+      }),
+    });
+  };
+
   const { data: activeEntity } = useEntityType(selectedEntityTypeId);
 
   return (
@@ -59,42 +94,44 @@ export const MetadataFeature: React.FC = () => {
           <div className="flex-1 w-full min-w-0 space-y-4">
             {selectedEntityTypeId && activeEntity ? (
               <div className="space-y-4">
-                {/* Active Model Banner */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-base md:text-lg text-foreground">
-                        {activeEntity.name}
-                      </span>
-                      <code className="text-xs font-mono text-muted-foreground bg-muted/60 dark:bg-white/5 px-2 py-0.5 rounded border border-white/20">
-                        {activeEntity.systemName}
-                      </code>
+                {/* Active Model Banner & Responsive Tabs Layout */}
+                <div className="flex flex-col gap-3 p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-base md:text-lg text-foreground">
+                          {activeEntity.name}
+                        </span>
+                        <code className="text-xs font-mono text-muted-foreground bg-muted/60 dark:bg-white/5 px-2 py-0.5 rounded border border-white/20">
+                          {activeEntity.systemName}
+                        </code>
+                      </div>
+                      {activeEntity.description && (
+                        <p className="text-xs text-muted-foreground max-w-2xl">
+                          {activeEntity.description}
+                        </p>
+                      )}
                     </div>
-                    {activeEntity.description && (
-                      <p className="text-xs text-muted-foreground max-w-2xl">
-                        {activeEntity.description}
-                      </p>
-                    )}
                   </div>
 
-                  {/* Schema vs Data vs Relationships Tab Selector */}
+                  {/* Adaptive Tab Selector: auto-balancing full width on mobile, inline pill on desktop */}
                   <Tabs
                     value={activeTab}
-                    onValueChange={(val) => setActiveTab(val as 'schema' | 'data' | 'relationships')}
-                    className="shrink-0"
+                    onValueChange={handleTabChange}
+                    className="w-full pt-1"
                   >
-                    <TabsList className="bg-white/50 dark:bg-white/5 border border-white/20">
+                    <TabsList className="w-full grid grid-cols-3 sm:w-auto sm:inline-flex bg-white/50 dark:bg-white/5 border border-white/20 p-1">
                       <TabsTrigger value="schema" className="gap-1.5 text-xs">
-                        <Layers className="h-3.5 w-3.5" />
-                        <span>{t('metadata.tabs.schema', 'Schema Builder')}</span>
+                        <Layers className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{t('metadata.tabs.schema', 'Schema Builder')}</span>
                       </TabsTrigger>
                       <TabsTrigger value="data" className="gap-1.5 text-xs">
-                        <Database className="h-3.5 w-3.5" />
-                        <span>{t('metadata.tabs.data', 'Data Explorer')}</span>
+                        <Database className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{t('metadata.tabs.data', 'Data Explorer')}</span>
                       </TabsTrigger>
                       <TabsTrigger value="relationships" className="gap-1.5 text-xs">
-                        <GitFork className="h-3.5 w-3.5" />
-                        <span>{t('metadata.tabs.relationships', 'Connected Edges')}</span>
+                        <GitFork className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{t('metadata.tabs.relationships', 'Connected Edges')}</span>
                       </TabsTrigger>
                     </TabsList>
                   </Tabs>

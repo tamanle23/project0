@@ -6,6 +6,14 @@ import type {
   RelationshipType,
 } from '../api/types';
 
+export interface GridState {
+  searchFilter: string;
+  page: number;
+  pageSize: number;
+  sortField: string | null;
+  sortDirection: 'asc' | 'desc';
+}
+
 interface MetadataUiState {
   // Navigation & selection
   selectedEntityTypeId: string | null;
@@ -14,6 +22,11 @@ interface MetadataUiState {
   setActiveTab: (tab: 'schema' | 'data' | 'relationships') => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+
+  // Per-model data grid state preservation
+  gridStateByModel: Record<string, GridState>;
+  setGridState: (modelId: string | number, state: Partial<GridState>) => void;
+  getGridState: (modelId: string | number) => GridState;
 
   // Relationship Types Dialogs
   isRelationshipTypeDialogOpen: boolean;
@@ -74,13 +87,45 @@ interface MetadataUiState {
   closeJsonSchemaPreview: () => void;
 }
 
-export const useMetadataUiStore = create<MetadataUiState>((set) => ({
+export const useMetadataUiStore = create<MetadataUiState>((set, get) => ({
   selectedEntityTypeId: '1',
   setSelectedEntityTypeId: (id) => set({ selectedEntityTypeId: id }),
   activeTab: 'schema',
   setActiveTab: (tab) => set({ activeTab: tab }),
   searchQuery: '',
   setSearchQuery: (query) => set({ searchQuery: query }),
+
+  // Per-model data grid state preservation
+  gridStateByModel: {},
+  setGridState: (modelId, partial) =>
+    set((state) => {
+      const key = String(modelId);
+      const current = state.gridStateByModel[key] || {
+        searchFilter: '',
+        page: 1,
+        pageSize: 10,
+        sortField: null,
+        sortDirection: 'asc',
+      };
+      return {
+        gridStateByModel: {
+          ...state.gridStateByModel,
+          [key]: { ...current, ...partial },
+        },
+      };
+    }),
+  getGridState: (modelId: string | number): GridState => {
+    const key = String(modelId);
+    return (
+      get().gridStateByModel[key] || {
+        searchFilter: '',
+        page: 1,
+        pageSize: 10,
+        sortField: null,
+        sortDirection: 'asc',
+      }
+    );
+  },
 
   // Relationship Types
   isRelationshipTypeDialogOpen: false,

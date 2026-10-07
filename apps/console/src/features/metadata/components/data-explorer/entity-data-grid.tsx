@@ -58,12 +58,31 @@ interface Props {
 const columnHelper = createColumnHelper<EntityRecord>();
 
 export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [searchFilter, setSearchFilter] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [sortField, setSortField] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const {
+    openCreateRecordDialog,
+    openEditRecordDialog,
+    openDeleteRecordDialog,
+    openRecordRelationshipsInspector,
+    gridStateByModel,
+    setGridState,
+  } = useMetadataUiStore();
+
+  // Read current model's grid state or fallback to defaults
+  const currentGridState = gridStateByModel[String(entityTypeId)] || {
+    searchFilter: '',
+    page: 1,
+    pageSize: 10,
+    sortField: null,
+    sortDirection: 'asc' as const,
+  };
+
+  const page = currentGridState.page;
+  const pageSize = currentGridState.pageSize;
+  const searchFilter = currentGridState.searchFilter;
+  const sortField = currentGridState.sortField;
+  const sortDirection = currentGridState.sortDirection;
+
+  const [debouncedSearch, setDebouncedSearch] = useState(searchFilter);
   const [inspectingRecord, setInspectingRecord] = useState<EntityRecord | null>(null);
 
   const { data: attributesResponse, isLoading: schemaLoading } =
@@ -78,10 +97,21 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
   React.useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchFilter.trim());
-      setPage(1); // Reset to page 1 on search change
     }, 300);
     return () => clearTimeout(handler);
   }, [searchFilter]);
+
+  const handleSearchChange = (val: string) => {
+    setGridState(entityTypeId, { searchFilter: val, page: 1 });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setGridState(entityTypeId, { page: newPage });
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setGridState(entityTypeId, { pageSize: newSize, page: 1 });
+  };
 
   // Construct server-side filters & sort
   const queryParams = useMemo(() => {
@@ -129,13 +159,6 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
     queryParams
   );
 
-  const {
-    openCreateRecordDialog,
-    openEditRecordDialog,
-    openDeleteRecordDialog,
-    openRecordRelationshipsInspector,
-  } = useMetadataUiStore();
-
   const records = useMemo(() => {
     return recordsResponse?.content || [];
   }, [recordsResponse]);
@@ -143,16 +166,13 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
   const handleSortToggle = (field: string) => {
     if (sortField === field) {
       if (sortDirection === 'asc') {
-        setSortDirection('desc');
+        setGridState(entityTypeId, { sortField: field, sortDirection: 'desc', page: 1 });
       } else {
-        setSortField(null);
-        setSortDirection('asc');
+        setGridState(entityTypeId, { sortField: null, sortDirection: 'asc', page: 1 });
       }
     } else {
-      setSortField(field);
-      setSortDirection('asc');
+      setGridState(entityTypeId, { sortField: field, sortDirection: 'asc', page: 1 });
     }
-    setPage(1);
   };
 
   const columns = useMemo(() => {
@@ -364,14 +384,14 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               value={searchFilter}
-              onChange={(e) => setSearchFilter(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               placeholder="Search records (server-side)..."
               className="pl-8 pr-8 h-9 text-xs bg-white/50 dark:bg-white/5 border-white/20"
             />
             {searchFilter && (
               <button
                 type="button"
-                onClick={() => setSearchFilter('')}
+                onClick={() => handleSearchChange('')}
                 className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X className="h-4 w-4" />
@@ -388,9 +408,11 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
               <button
                 type="button"
                 onClick={() => {
-                  setSortField(null);
-                  setSortDirection('asc');
-                  setPage(1);
+                  setGridState(entityTypeId, {
+                    sortField: null,
+                    sortDirection: 'asc',
+                    page: 1,
+                  });
                 }}
                 className="ml-1 hover:text-destructive"
               >
@@ -502,8 +524,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
             <Select
               value={String(pageSize)}
               onValueChange={(val) => {
-                setPageSize(Number(val));
-                setPage(1);
+                handlePageSizeChange(Number(val));
               }}
             >
               <SelectTrigger className="h-7 w-16 text-xs bg-white/50 dark:bg-white/5 border-white/20">
@@ -528,7 +549,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() => handlePageChange(Math.max(1, page - 1))}
                 disabled={page <= 1}
                 className="h-7 w-7 p-0 bg-white/40 dark:bg-white/5"
               >
@@ -537,7 +558,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
                 disabled={page >= totalPages}
                 className="h-7 w-7 p-0 bg-white/40 dark:bg-white/5"
               >
