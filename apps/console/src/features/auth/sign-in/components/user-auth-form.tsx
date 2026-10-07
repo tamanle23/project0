@@ -8,6 +8,11 @@ import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { IconFacebook, IconGithub } from '@unipost/ui/icons'
 import { useSpringAuthStore, springApiClient } from '@/features/spring-auth'
+import {
+  useSandboxStore,
+  DEFAULT_SANDBOX_PERSONAS,
+  type SandboxPersonaId,
+} from '@/core/sandbox'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -80,14 +85,15 @@ export function UserAuthForm({
     }
   }
 
-  // Sandbox bypass logic
-  const handleSandboxBypass = async (role: 'admin' | 'creator') => {
+  // Sandbox bypass logic wired directly to Unified Sandbox Platform
+  const handleSandboxBypass = async (personaId: SandboxPersonaId) => {
     setIsLoading(true);
     try {
-      // The mock engine intercepts this request and checks for `username` + password === 'bypass'
-      // It returns { accessToken, refreshToken } at the top level (no `.body` wrapper)
+      const persona = DEFAULT_SANDBOX_PERSONAS[personaId] || DEFAULT_SANDBOX_PERSONAS.admin;
+
+      // The mock engine intercepts this request and checks for username + password === 'bypass'
       const response = await springApiClient.post('/auth/token', {
-        username: `${role}_bypass`,
+        username: persona.username,
         password: 'bypass',
       }, {
         headers: {
@@ -95,10 +101,14 @@ export function UserAuthForm({
         }
       });
 
+      // Synchronize Unified Sandbox persona and tenant scope
+      useSandboxStore.getState().setEnabled(true);
+      useSandboxStore.getState().setActivePersona(personaId);
+
       setTokens(response.data.accessToken, response.data.refreshToken);
       toast.success(
         t('auth.sandbox.successToast', 'Sandbox Login Successful ({{role}})', {
-          role: role.toUpperCase(),
+          role: persona.name,
         })
       );
 
@@ -169,11 +179,26 @@ export function UserAuthForm({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="w-[var(--radix-dropdown-menu-trigger-width)]">
-              <DropdownMenuItem onClick={() => handleSandboxBypass('admin')} className="cursor-pointer text-emerald-600 dark:text-emerald-400">
-                {t('auth.sandbox.adminRole', 'Admin Role (All Access)')}
+              <DropdownMenuItem
+                onClick={() => handleSandboxBypass('admin')}
+                className="cursor-pointer flex items-center justify-between text-emerald-600 dark:text-emerald-400 font-medium"
+              >
+                <span>{t('auth.sandbox.adminRole', 'Admin (All Access)')}</span>
+                <span className="text-[10px] text-muted-foreground font-mono">us-east-1</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleSandboxBypass('creator')} className="cursor-pointer">
-                {t('auth.sandbox.creatorRole', 'Creator Role (Content)')}
+              <DropdownMenuItem
+                onClick={() => handleSandboxBypass('creator')}
+                className="cursor-pointer flex items-center justify-between"
+              >
+                <span>{t('auth.sandbox.creatorRole', 'Creator (Content)')}</span>
+                <span className="text-[10px] text-muted-foreground font-mono">eu-central-1</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleSandboxBypass('user')}
+                className="cursor-pointer flex items-center justify-between"
+              >
+                <span>{t('auth.sandbox.userRole', 'Standard User')}</span>
+                <span className="text-[10px] text-muted-foreground font-mono">us-west-2</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
