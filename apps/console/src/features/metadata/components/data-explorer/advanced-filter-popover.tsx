@@ -51,6 +51,15 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
   onChange,
 }) => {
   const [open, setOpen] = React.useState(false);
+  // Staged / Draft state so changes are only applied when user clicks "Apply"
+  const [draftRules, setDraftRules] = React.useState<AttributeFilterClause[]>(filters);
+
+  // Sync draft rules whenever popover opens or parent filters change externally
+  React.useEffect(() => {
+    if (open) {
+      setDraftRules(filters);
+    }
+  }, [open, filters]);
 
   // Active, non-archived attributes available for filtering
   const filterableAttributes = React.useMemo(() => {
@@ -66,12 +75,12 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
       operator: 'eq',
       value: '',
     };
-    onChange([...filters, newRule]);
+    setDraftRules((prev) => [...prev, newRule]);
   };
 
   const handleUpdateRule = (id: string, updates: Partial<AttributeFilterClause>) => {
-    onChange(
-      filters.map((rule) => {
+    setDraftRules((prev) =>
+      prev.map((rule) => {
         if (rule.id !== id) return rule;
         const updated = { ...rule, ...updates };
 
@@ -95,14 +104,26 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
   };
 
   const handleRemoveRule = (id: string) => {
-    onChange(filters.filter((rule) => rule.id !== id));
+    setDraftRules((prev) => prev.filter((rule) => rule.id !== id));
   };
 
   const handleClearAll = () => {
+    setDraftRules([]);
     onChange([]);
+    setOpen(false);
+  };
+
+  const handleApply = () => {
+    // Filter out completely empty rules before applying
+    const validRules = draftRules.filter(
+      (r) => r.field && r.value !== undefined && r.value !== ''
+    );
+    onChange(validRules);
+    setOpen(false);
   };
 
   const activeCount = filters.length;
+  const draftCount = draftRules.filter((r) => r.field && r.value !== undefined && r.value !== '').length;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -156,11 +177,11 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
 
         {/* Rule Rows */}
         <div className="space-y-3">
-          {filters.length === 0 ? (
+          {draftRules.length === 0 ? (
             <div className="text-center py-6 border border-dashed border-border/60 rounded-xl space-y-2 bg-muted/20">
               <Sparkles className="h-5 w-5 text-muted-foreground mx-auto opacity-40" />
               <p className="text-xs text-muted-foreground">
-                No active filter conditions. Add rules to narrow records.
+                No filter conditions yet. Add rules and click Apply to run filtering.
               </p>
               <Button
                 variant="outline"
@@ -174,7 +195,7 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
               </Button>
             </div>
           ) : (
-            filters.map((rule) => {
+            draftRules.map((rule) => {
               const currentAttr = filterableAttributes.find(
                 (a) => a.systemName === rule.field
               );
@@ -304,28 +325,36 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
         </div>
 
         {/* Footer Actions */}
-        {filters.length > 0 && (
-          <div className="flex items-center justify-between pt-2 border-t border-border/50">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleAddRule}
-              disabled={filterableAttributes.length === 0}
-              className="h-8 text-xs gap-1.5 bg-white/50 dark:bg-white/5 border-white/20"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              <span>Add condition</span>
-            </Button>
+        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleAddRule}
+            disabled={filterableAttributes.length === 0}
+            className="h-8 text-xs gap-1.5 bg-white/50 dark:bg-white/5 border-white/20"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>Add condition</span>
+          </Button>
 
+          <div className="flex items-center gap-2">
             <Button
+              variant="ghost"
               size="sm"
               onClick={() => setOpen(false)}
-              className="h-8 text-xs px-4"
+              className="h-8 text-xs"
             >
-              Apply ({activeCount})
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleApply}
+              className="h-8 text-xs px-4 shadow-sm"
+            >
+              Apply Filter {draftCount > 0 ? `(${draftCount})` : ''}
             </Button>
           </div>
-        )}
+        </div>
       </PopoverContent>
     </Popover>
   );
