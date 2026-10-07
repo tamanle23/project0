@@ -24,6 +24,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
@@ -337,6 +338,21 @@ class MetadataControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(mockResponse, response.getBody().getBody());
         verify(metadataService).createEntityRelationship(recordId, request);
+    }
+
+    @Test
+    void testValidateEntityRecord() {
+        Long entityTypeId = 1L;
+        CreateRecordRequest request = new CreateRecordRequest(Map.of("tier", "Enterprise"), "apac-prod");
+        ValidateRecordResponse mockResponse = ValidateRecordResponse.success(entityTypeId, 2L);
+        when(metadataService.validateEntityRecordDryRun(entityTypeId, request)).thenReturn(mockResponse);
+
+        ResponseEntity<ResponseWrapper<ContextHeader, ValidateRecordResponse>> response = metadataController.validateEntityRecord(entityTypeId, request);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockResponse, response.getBody().getBody());
+        assertTrue(response.getBody().getBody().valid());
+        verify(metadataService).validateEntityRecordDryRun(entityTypeId, request);
     }
 
     @Test

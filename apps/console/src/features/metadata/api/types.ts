@@ -147,3 +147,16 @@ export type CreateEntityRelationshipDto = Omit<
   EntityRelationship,
   'id' | 'createdDate' | 'updatedDate'
 >;
+
+export interface ValidationErrorDetail {
+  field?: string;
+  message: string;
+  code?: string;
+}
+
+export interface ValidateRecordResponse {
+  valid: boolean;
+  entityTypeId: string | number;
+  schemaVersion: number;
+  errors: ValidationErrorDetail[];
+}

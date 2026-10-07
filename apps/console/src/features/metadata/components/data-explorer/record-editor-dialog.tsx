@@ -4,6 +4,7 @@ import {
   useAttributeDefinitions,
   useCreateEntityRecord,
   useUpdateEntityRecord,
+  useValidateEntityRecord,
   useEntityType,
 } from '../../api/metadata-api';
 import { metadataService } from '../../api/metadata-service';
@@ -21,7 +22,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 interface Props {
   entityTypeId: string | number;
@@ -37,6 +38,7 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
   const queryClient = useQueryClient();
   const createMutation = useCreateEntityRecord(entityTypeId);
   const updateMutation = useUpdateEntityRecord(entityTypeId);
+  const validateMutation = useValidateEntityRecord(entityTypeId);
 
   const isEditMode = Boolean(editingRecord);
   const attributes = attributesResponse?.content || [];
@@ -44,6 +46,7 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
   const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [validationSuccess, setValidationSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     if (isRecordEditorDialogOpen && attributes.length > 0) {
@@ -55,6 +58,7 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
       );
       setErrors({});
       setGlobalError(null);
+      setValidationSuccess(null);
     }
   }, [isRecordEditorDialogOpen, editingRecord, attributes]);
 
@@ -89,6 +93,7 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
 
   const handleFieldChange = (fieldName: string, value: unknown) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }));
+    setValidationSuccess(null);
     // Clear field-specific error upon edit
     if (errors[fieldName]) {
       setErrors((prev) => {
@@ -108,6 +113,38 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
     );
     setErrors({});
     setGlobalError(null);
+    setValidationSuccess(null);
+  };
+
+  const handlePreValidate = async () => {
+    setGlobalError(null);
+    setValidationSuccess(null);
+    setErrors({});
+
+    try {
+      const res = await validateMutation.mutateAsync({
+        entityTypeId,
+        attributes: formData,
+      });
+
+      if (res.valid) {
+        setValidationSuccess(
+          `Payload is 100% compliant with JSON Schema v${res.schemaVersion}. All constraints & references verified.`
+        );
+      } else {
+        const fieldErrors: Record<string, string> = {};
+        res.errors.forEach((err) => {
+          const fieldKey = err.field || 'general';
+          if (!fieldErrors[fieldKey]) {
+            fieldErrors[fieldKey] = err.message;
+          }
+        });
+        setErrors(fieldErrors);
+        setGlobalError(`Dry-run validation found ${res.errors.length} issue(s).`);
+      }
+    } catch (err: unknown) {
+      setGlobalError(err instanceof Error ? err.message : 'Dry-run validation request failed.');
+    }
   };
 
   const parseValidationErrors = (err: unknown): Record<string, string> | null => {
@@ -216,8 +253,15 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
 
           {isConflict && <ConflictBanner onRefresh={handleRefresh} isRefreshing={isRefreshing} />}
 
+          {validationSuccess && (
+            <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs border border-emerald-500/20 font-medium animate-in fade-in-50">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+              <span>{validationSuccess}</span>
+            </div>
+          )}
+
           {globalError && (
-            <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-destructive/10 text-destructive text-xs border border-destructive/20">
+            <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-destructive/10 text-destructive text-xs border border-destructive/20 animate-in fade-in-50">
               <AlertCircle className="h-4 w-4 shrink-0" />
               <span>{globalError}</span>
             </div>
@@ -248,7 +292,7 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
               type="button"
               variant="ghost"
               onClick={handleReset}
-              disabled={isSubmitting}
+              disabled={isSubmitting || validateMutation.isPending}
               className="text-xs mr-auto"
             >
               Reset Values
@@ -256,12 +300,23 @@ export const RecordEditorDialog: React.FC<Props> = ({ entityTypeId }) => {
             <Button
               type="button"
               variant="outline"
+              onClick={handlePreValidate}
+              disabled={isSubmitting || validateMutation.isPending || attributes.length === 0}
+              className="gap-1.5 text-xs border-primary/30 hover:border-primary/60 text-primary hover:text-primary"
+              title="Perform server-authoritative dry-run validation without committing to DB"
+            >
+              <ShieldCheck className="h-3.5 w-3.5" />
+              <span>{validateMutation.isPending ? 'Verifying...' : 'Test Validation'}</span>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
               onClick={closeRecordEditorDialog}
-              disabled={isSubmitting}
+              disabled={isSubmitting || validateMutation.isPending}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting || attributes.length === 0}>
+            <Button type="submit" disabled={isSubmitting || validateMutation.isPending || attributes.length === 0}>
               {isSubmitting ? 'Saving Record...' : isEditMode ? 'Update Record' : 'Save Record'}
             </Button>
           </DialogFooter>

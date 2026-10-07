@@ -113,7 +113,7 @@ public class SchemaValidationService {
         });
     }
 
-    public void validatePayload(Long entityTypeId, Map<String, Object> payload) {
+    public List<Error> validatePayloadDryRun(Long entityTypeId, Map<String, Object> payload) {
         EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId)
                 .orElse(null);
         Long schemaVersion = entityType != null ? entityType.getSchemaVersion() : 1L;
@@ -124,33 +124,36 @@ public class SchemaValidationService {
             JsonNode payloadNode = objectMapper.valueToTree(payload != null ? payload : Map.of());
             Set<ValidationMessage> validationResult = schema.validate(payloadNode);
 
-            if (!validationResult.isEmpty()) {
-                List<Error> errorList = new ArrayList<>();
-                for (ValidationMessage vm : validationResult) {
-                    String path = vm.getInstanceLocation() != null ? vm.getInstanceLocation().toString() : vm.getProperty();
-                    if (path != null && path.startsWith("$.")) {
-                        path = path.substring(2);
-                    }
-                    errorList.add(Error.builder()
-                            .code("VALIDATION_ERROR")
-                            .message(vm.getMessage())
-                            .detail(path)
-                            .build());
-                }
-
-                String combinedMsg = validationResult.stream()
-                        .map(ValidationMessage::getMessage)
-                        .collect(Collectors.joining(", "));
-
-                throw new SchemaValidationException(errorList.isEmpty() 
-                        ? List.of(Error.builder().code("VALIDATION_ERROR").message("Payload validation failed: " + combinedMsg).build())
-                        : errorList);
+            if (validationResult.isEmpty()) {
+                return List.of();
             }
-        } catch (SchemaValidationException e) {
-            throw e;
+
+            List<Error> errorList = new ArrayList<>();
+            for (ValidationMessage vm : validationResult) {
+                String path = vm.getInstanceLocation() != null ? vm.getInstanceLocation().toString() : vm.getProperty();
+                if (path != null && path.startsWith("$.")) {
+                    path = path.substring(2);
+                }
+                errorList.add(Error.builder()
+                        .code("VALIDATION_ERROR")
+                        .message(vm.getMessage())
+                        .detail(path)
+                        .build());
+            }
+            return errorList;
         } catch (Exception e) {
-            log.error("Error validating payload against schema for entityTypeId {}", entityTypeId, e);
-            throw new SchemaValidationException("Validation error: " + e.getMessage());
+            log.error("Error dry-run validating payload against schema for entityTypeId {}", entityTypeId, e);
+            return List.of(Error.builder()
+                    .code("VALIDATION_ERROR")
+                    .message("Validation error: " + e.getMessage())
+                    .build());
+        }
+    }
+
+    public void validatePayload(Long entityTypeId, Map<String, Object> payload) {
+        List<Error> errorList = validatePayloadDryRun(entityTypeId, payload);
+        if (!errorList.isEmpty()) {
+            throw new SchemaValidationException(errorList);
         }
     }
 

@@ -322,7 +322,12 @@ metadata/
 - `PUT /v1/metadata/entity-types/{id}/attributes/order`: Reorder attribute display positions.
 - `POST /v1/metadata/entity-types/{id}/attributes/{attrId}/archive`: Archive attribute.
 - `POST /v1/metadata/entity-types/{id}/attributes/{attrId}/unarchive`: Restore archived attribute.
+- `POST /v1/metadata/entity-types/{id}/records/validate`: **Dry-Run Pre-Validation Endpoint**. Performs server-authoritative JSON Schema validation and relational foreign-key reference verification without writing to the database or altering audit sequences.
 - `GET /v1/metadata/entity-types/{id}/records?page=1&size=20&sort=field,asc`: Filter and sort records.
+- `POST /v1/metadata/entity-types/{id}/records`: Create new record (enforcing compiled JSON Schema).
+- `PUT /v1/metadata/entity-types/{id}/records/{recordId}`: Update record with optimistic locking.
+- `PATCH /v1/metadata/entity-types/{id}/records/{recordId}`: Partial update record attributes.
+- `DELETE /v1/metadata/entity-types/{id}/records/{recordId}`: Soft-delete record.
 - `GET /v1/metadata/relationship-types`: List graph relationship edge types.
 - `GET /v1/metadata/records/{recordId}/relationships`: List inbound/outbound edge connections.
 - `POST /v1/metadata/records/{recordId}/relationships`: Create record-to-record edge link.

@@ -196,6 +196,15 @@ public class MetadataController {
         return responseBuilder.success(page);
     }
 
+    @PostMapping("/entity-types/{id}/records/validate")
+    @PreAuthorize("hasAuthority('METADATA_RECORD_READ') or hasAuthority('METADATA_RECORD_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, ValidateRecordResponse>> validateEntityRecord(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateRecordRequest request) {
+        ValidateRecordResponse result = metadataService.validateEntityRecordDryRun(id, request);
+        return responseBuilder.success(result);
+    }
+
     @PostMapping("/entity-types/{id}/records")
     @PreAuthorize("hasAuthority('METADATA_RECORD_WRITE') or hasRole('ADMIN')")
     public ResponseEntity<ResponseWrapper<ContextHeader, EntityRecordResponse>> createEntityRecord(

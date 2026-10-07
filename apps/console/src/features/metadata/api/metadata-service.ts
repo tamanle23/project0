@@ -111,6 +111,10 @@ class MetadataServiceStrategy implements MetadataDataSource {
     return this.activeService.deleteEntityRecord(entityTypeId, recordId);
   }
 
+  validateEntityRecord(entityTypeId: string | number, dto: any) {
+    return this.activeService.validateEntityRecord(entityTypeId, dto);
+  }
+
   // 4. Relationship Types
   getRelationshipTypes(params?: any) {
     return this.activeService.getRelationshipTypes(params);

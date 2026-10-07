@@ -819,4 +819,45 @@ class MetadataServiceTest {
         assertThrows(MetadataNotFoundException.class, () -> metadataService.createEntityRecord(typeId, request));
         verify(entityRecordRepository, never()).save(any());
     }
+
+    @Test
+    void testValidateEntityRecordDryRun_Success() {
+        Long typeId = 1L;
+        EntityType type = new EntityType();
+        type.setId(typeId);
+        type.setSchemaVersion(3L);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(typeId)).thenReturn(Optional.of(type));
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(typeId)).thenReturn(List.of());
+        when(schemaValidationService.validatePayloadDryRun(eq(typeId), anyMap())).thenReturn(List.of());
+
+        CreateRecordRequest request = new CreateRecordRequest(Map.of("tier", "Enterprise"), "apac-prod");
+        ValidateRecordResponse response = metadataService.validateEntityRecordDryRun(typeId, request);
+
+        assertTrue(response.valid());
+        assertEquals(3L, response.schemaVersion());
+        assertTrue(response.errors().isEmpty());
+    }
+
+    @Test
+    void testValidateEntityRecordDryRun_Failure() {
+        Long typeId = 1L;
+        EntityType type = new EntityType();
+        type.setId(typeId);
+        type.setSchemaVersion(3L);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(typeId)).thenReturn(Optional.of(type));
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(typeId)).thenReturn(List.of());
+        when(schemaValidationService.validatePayloadDryRun(eq(typeId), anyMap())).thenReturn(List.of(
+                com.unipost.core.io.Error.builder().code("REQUIRED_FIELD").detail("tier").message("tier is required").build()
+        ));
+
+        CreateRecordRequest request = new CreateRecordRequest(Map.of(), "apac-prod");
+        ValidateRecordResponse response = metadataService.validateEntityRecordDryRun(typeId, request);
+
+        assertFalse(response.valid());
+        assertEquals(1, response.errors().size());
+        assertEquals("tier", response.errors().get(0).field());
+        assertEquals("REQUIRED_FIELD", response.errors().get(0).code());
+    }
 }

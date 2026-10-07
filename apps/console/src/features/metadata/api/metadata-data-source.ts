@@ -16,6 +16,7 @@ import type {
   UpdateEntityRecordDto,
   UpdateEntityTypeDto,
   UpdateRelationshipTypeDto,
+  ValidateRecordResponse,
 } from './types';
 
 export interface MetadataDataSource {
@@ -90,6 +91,10 @@ export interface MetadataDataSource {
     entityTypeId: string | number,
     recordId: string | number
   ): Promise<boolean>;
+  validateEntityRecord(
+    entityTypeId: string | number,
+    dto: CreateEntityRecordDto
+  ): Promise<ValidateRecordResponse>;
 
   // 4. Relationship Types
   getRelationshipTypes(params?: PageRequestParams): Promise<PageResponse<RelationshipType>>;

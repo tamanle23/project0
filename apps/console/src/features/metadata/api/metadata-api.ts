@@ -18,6 +18,7 @@ import type {
   UpdateEntityRecordDto,
   UpdateEntityTypeDto,
   UpdateRelationshipTypeDto,
+  ValidateRecordResponse,
 } from './types';
 
 // ==========================================
@@ -287,6 +288,13 @@ export const useDeleteEntityRecord = (entityTypeId: string | number) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['metadata', 'records', entityTypeId] });
     },
+  });
+};
+
+export const useValidateEntityRecord = (entityTypeId: string | number) => {
+  return useMutation({
+    mutationFn: (dto: CreateEntityRecordDto): Promise<ValidateRecordResponse> =>
+      metadataService.validateEntityRecord(entityTypeId, dto),
   });
 };
 

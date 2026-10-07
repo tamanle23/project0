@@ -17,6 +17,8 @@ import type {
   UpdateEntityRecordDto,
   UpdateEntityTypeDto,
   UpdateRelationshipTypeDto,
+  ValidateRecordResponse,
+  ValidationErrorDetail,
 } from '../api/types';
 
 export const initialMockEntityTypes: EntityType[] = [
@@ -897,6 +899,68 @@ export class MockMetadataService implements MetadataDataSource {
     const beforeCount = list.length;
     this.records[strId] = list.filter((r) => String(r.id) !== String(recordId));
     return this.records[strId].length < beforeCount;
+  }
+
+  async validateEntityRecord(
+    entityTypeId: string | number,
+    dto: CreateEntityRecordDto
+  ): Promise<ValidateRecordResponse> {
+    const strId = String(entityTypeId);
+    const attrs = this.attributes[strId] || [];
+    const entityType = this.entityTypes.find((e) => String(e.id) === strId);
+    const schemaVersion = entityType?.schemaVersion || 1;
+    const errors: ValidationErrorDetail[] = [];
+
+    const recordAttrs = dto.attributes || {};
+
+    // Validate required & type rules
+    attrs.forEach((attr) => {
+      if (attr.isArchived) return;
+      const val = recordAttrs[attr.systemName];
+
+      if (attr.isRequired && (val === undefined || val === null || val === '')) {
+        errors.push({
+          field: attr.systemName,
+          message: `${attr.name} is required.`,
+          code: 'REQUIRED_FIELD',
+        });
+        return;
+      }
+
+      if (val !== undefined && val !== null && val !== '') {
+        // Options enum choices validation
+        if (attr.options?.choices && Array.isArray(attr.options.choices)) {
+          if (!attr.options.choices.includes(String(val))) {
+            errors.push({
+              field: attr.systemName,
+              message: `Value must be one of: ${attr.options.choices.join(', ')}`,
+              code: 'ENUM_MISMATCH',
+            });
+          }
+        }
+
+        // Relation picker target check
+        if (attr.uiComponent === 'relation_picker' && attr.options?.targetEntityTypeId) {
+          const targetTypeId = String(attr.options.targetEntityTypeId);
+          const targetRecords = this.records[targetTypeId] || [];
+          const exists = targetRecords.some((r) => String(r.id) === String(val));
+          if (!exists) {
+            errors.push({
+              field: attr.systemName,
+              message: `Referenced target record #${val} does not exist for entity type ${targetTypeId}`,
+              code: 'REFERENCED_RECORD_NOT_FOUND',
+            });
+          }
+        }
+      }
+    });
+
+    return {
+      valid: errors.length === 0,
+      entityTypeId,
+      schemaVersion,
+      errors,
+    };
   }
 
   // ==========================================

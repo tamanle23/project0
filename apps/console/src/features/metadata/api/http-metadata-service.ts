@@ -18,6 +18,7 @@ import type {
   UpdateEntityRecordDto,
   UpdateEntityTypeDto,
   UpdateRelationshipTypeDto,
+  ValidateRecordResponse,
 } from './types';
 
 const BASE_URL = '/v1/metadata';
@@ -255,6 +256,17 @@ export class HttpMetadataService implements MetadataDataSource {
       `${BASE_URL}/entity-types/${entityTypeId}/records/${recordId}`
     );
     return true;
+  }
+
+  async validateEntityRecord(
+    entityTypeId: string | number,
+    dto: CreateEntityRecordDto
+  ): Promise<ValidateRecordResponse> {
+    const res = await springApiClient.post(
+      `${BASE_URL}/entity-types/${entityTypeId}/records/validate`,
+      dto
+    );
+    return unwrapResponse(res.data);
   }
 
   // ==========================================

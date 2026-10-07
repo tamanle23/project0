@@ -411,6 +411,68 @@ public class MetadataService {
         return MetadataDtoMapper.toResponse(record);
     }
 
+    public ValidateRecordResponse validateEntityRecordDryRun(Long entityTypeId, CreateRecordRequest request) {
+        EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId)
+                .orElseThrow(() -> new MetadataNotFoundException("EntityType not found with id: " + entityTypeId));
+
+        Long schemaVersion = entityType.getSchemaVersion() != null ? entityType.getSchemaVersion() : 1L;
+        List<ValidateRecordResponse.ValidationErrorDetail> errorDetails = new ArrayList<>();
+
+        Map<String, Object> finalAttributes = applyAttributeDefaults(entityTypeId, request.attributes());
+
+        // 1. Dry-run validate RelationPicker references
+        if (finalAttributes != null && !finalAttributes.isEmpty()) {
+            List<AttributeDefinition> definitions = attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId);
+            for (AttributeDefinition def : definitions) {
+                if (Boolean.TRUE.equals(def.getIsArchived())) continue;
+                if ("relation_picker".equalsIgnoreCase(def.getUiComponent())) {
+                    Object val = finalAttributes.get(def.getSystemName());
+                    if (val != null) {
+                        Map<String, Object> options = def.getOptions() != null ? def.getOptions() : Map.of();
+                        Object targetTypeIdObj = options.get("targetEntityTypeId");
+                        if (targetTypeIdObj != null) {
+                            try {
+                                Long targetTypeId = targetTypeIdObj instanceof Number n ? n.longValue() : Long.parseLong(targetTypeIdObj.toString());
+                                Long targetRecordId = val instanceof Number n ? n.longValue() : Long.parseLong(val.toString());
+                                boolean exists = entityRecordRepository.findByEntityTypeIdAndIdAndDeletedDateIsNull(targetTypeId, targetRecordId).isPresent();
+                                if (!exists) {
+                                    errorDetails.add(new ValidateRecordResponse.ValidationErrorDetail(
+                                            def.getSystemName(),
+                                            "Referenced target record #" + targetRecordId + " does not exist for entity type " + targetTypeId,
+                                            "REFERENCED_RECORD_NOT_FOUND"
+                                    ));
+                                }
+                            } catch (Exception e) {
+                                errorDetails.add(new ValidateRecordResponse.ValidationErrorDetail(
+                                        def.getSystemName(),
+                                        "Invalid record reference: " + val,
+                                        "INVALID_REFERENCE"
+                                ));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Dry-run validate against Draft-07 JSON Schema rules
+        List<com.unipost.core.io.Error> schemaErrors = schemaValidationService.validatePayloadDryRun(entityTypeId, finalAttributes);
+        for (com.unipost.core.io.Error<?> err : schemaErrors) {
+            String detailStr = err.getDetail() != null ? String.valueOf(err.getDetail()) : null;
+            errorDetails.add(new ValidateRecordResponse.ValidationErrorDetail(
+                    detailStr,
+                    err.getMessage(),
+                    err.getCode() != null ? err.getCode() : "VALIDATION_ERROR"
+            ));
+        }
+
+        if (errorDetails.isEmpty()) {
+            return ValidateRecordResponse.success(entityTypeId, schemaVersion);
+        } else {
+            return ValidateRecordResponse.failure(entityTypeId, schemaVersion, errorDetails);
+        }
+    }
+
     @Transactional
     public EntityRecordResponse createEntityRecord(Long entityTypeId, CreateRecordRequest request) {
         EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId)
