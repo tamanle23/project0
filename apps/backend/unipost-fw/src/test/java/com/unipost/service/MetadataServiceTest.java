@@ -280,6 +280,70 @@ class MetadataServiceTest {
     }
 
     @Test
+    void testGetEntityRecords_WithEqualityContainmentFilters() {
+        Long typeId = 1L;
+        EntityType type = new EntityType();
+        type.setId(typeId);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(typeId)).thenReturn(Optional.of(type));
+
+        AttributeDefinition defStatus = new AttributeDefinition();
+        defStatus.setSystemName("status");
+        defStatus.setDataType("string");
+
+        AttributeDefinition defAge = new AttributeDefinition();
+        defAge.setSystemName("age");
+        defAge.setDataType("number");
+
+        AttributeDefinition defActive = new AttributeDefinition();
+        defActive.setSystemName("active");
+        defActive.setDataType("boolean");
+
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(typeId))
+                .thenReturn(List.of(defStatus, defAge, defActive));
+
+        EntityRecord record = new EntityRecord();
+        record.setId(101L);
+        record.setEntityType(type);
+        record.setAttributes(Map.of("status", "PUBLISHED", "age", 30, "active", true));
+
+        org.springframework.data.domain.Page<EntityRecord> springPage = new org.springframework.data.domain.PageImpl<>(
+                List.of(record),
+                org.springframework.data.domain.PageRequest.of(0, 10),
+                1
+        );
+        when(entityRecordRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(springPage);
+
+        PageRequest pageRequest = new PageRequest();
+        pageRequest.setNumber(1);
+        pageRequest.setSize(10);
+
+        when(pageBuilder.build(eq(pageRequest), any(), any())).thenReturn(customPageMock);
+
+        // Filter combining multiple equality checks across different data types
+        Map<String, Map<String, String>> filterParams = Map.of(
+                "status", Map.of("eq", "PUBLISHED"),
+                "age", Map.of("eq", "30"),
+                "active", Map.of("eq", "true")
+        );
+
+        Page<EntityRecordResponse> result = metadataService.getEntityRecords(
+                typeId,
+                pageRequest,
+                filterParams,
+                "id",
+                "asc",
+                "tenant-alpha"
+        );
+
+        assertNotNull(result);
+        assertSame(customPageMock, result);
+        verify(entityRecordRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
+        verify(pageBuilder).build(eq(pageRequest), any(), any());
+    }
+
+    @Test
     void testCreateEntityRecord_ThrowsIfTypeNotFound() {
         Long typeId = 99L;
         CreateRecordRequest request = new CreateRecordRequest(Map.of(), "tenant-1");
