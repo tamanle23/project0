@@ -14,6 +14,71 @@ import {
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
+import { useEntityRecords } from '../../api/metadata-api';
+
+interface RelationPickerControlProps {
+  id: string;
+  value: unknown;
+  onChange: (value: unknown) => void;
+  targetEntityTypeId?: string | number;
+  placeholder?: string;
+  errorClass: string;
+}
+
+const RelationPickerControl: React.FC<RelationPickerControlProps> = ({
+  id,
+  value,
+  onChange,
+  targetEntityTypeId,
+  placeholder,
+  errorClass,
+}) => {
+  const { data: recordsResponse } = useEntityRecords(targetEntityTypeId || '', {
+    size: 50,
+  });
+  const records = recordsResponse?.content || [];
+
+  if (targetEntityTypeId && records.length > 0) {
+    return (
+      <Select
+        value={typeof value === 'string' || typeof value === 'number' ? String(value) : ''}
+        onValueChange={(val) => onChange(val)}
+      >
+        <SelectTrigger
+          id={id}
+          className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm', errorClass)}
+        >
+          <SelectValue placeholder={placeholder || 'Select Target Entity Record...'} />
+        </SelectTrigger>
+        <SelectContent>
+          {records.map((r) => {
+            const label =
+              (r.attributes?.legal_name as string) ||
+              (r.attributes?.resource_code as string) ||
+              (r.attributes?.policy_id as string) ||
+              `Record #${r.id}`;
+            return (
+              <SelectItem key={r.id} value={String(r.id)}>
+                #{r.id} - {label}
+              </SelectItem>
+            );
+          })}
+        </SelectContent>
+      </Select>
+    );
+  }
+
+  return (
+    <Input
+      id={id}
+      type="text"
+      value={typeof value === 'string' || typeof value === 'number' ? value : ''}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder || 'Target Entity Record ID...'}
+      className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm font-mono text-xs', errorClass)}
+    />
+  );
+};
 
 interface Props {
   attribute: AttributeDefinition;
@@ -219,17 +284,19 @@ export const DynamicFieldRenderer: React.FC<Props> = ({
           />
         );
 
-      case 'relation_picker':
+      case 'relation_picker': {
+        const targetEntityTypeId = options?.targetEntityTypeId || options?.entityTypeId;
         return (
-          <Input
+          <RelationPickerControl
             id={systemName}
-            type="text"
-            value={typeof value === 'string' || typeof value === 'number' ? value : ''}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={options?.placeholder || 'Target Entity Record ID...'}
-            className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm font-mono text-xs', errorClass)}
+            value={value}
+            onChange={onChange}
+            targetEntityTypeId={targetEntityTypeId as string | number | undefined}
+            placeholder={options?.placeholder || 'Select or enter Target Entity Record ID...'}
+            errorClass={errorClass}
           />
         );
+      }
 
       default:
         return (

@@ -135,7 +135,8 @@
     "description": "Architect flexible data schemas, enforce dynamic validation rules, and manage records.",
     "tabs": {
       "schema": "Schema Builder",
-      "data": "Data Explorer"
+      "data": "Data Explorer",
+      "relationships": "Relationships"
     }
   }
 }

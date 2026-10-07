@@ -5,6 +5,7 @@ import { useEntityType } from '../api/metadata-api';
 import { EntityTypeSidebar } from './entity-type';
 import { SchemaBuilder } from './schema-builder';
 import { EntityDataGrid } from './data-explorer';
+import { RelationshipTypesManager } from './relationships';
 import { MetadataDialogs } from './metadata-dialogs';
 import { Header } from '@/components/layout/header';
 import { Main } from '@/components/layout/main';
@@ -14,7 +15,7 @@ import { ThemeSwitch } from '@/components/theme-switch';
 import { ConfigDrawer } from '@/components/config-drawer';
 import { ProfileDropdown } from '@/components/profile-dropdown';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Layers, Database, Sparkles } from 'lucide-react';
+import { Layers, Database, Sparkles, GitFork } from 'lucide-react';
 
 export const MetadataFeature: React.FC = () => {
   const { t } = useTranslation('console');
@@ -76,10 +77,10 @@ export const MetadataFeature: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Schema vs Data Tab Selector */}
+                  {/* Schema vs Data vs Relationships Tab Selector */}
                   <Tabs
                     value={activeTab}
-                    onValueChange={(val) => setActiveTab(val as 'schema' | 'data')}
+                    onValueChange={(val) => setActiveTab(val as 'schema' | 'data' | 'relationships')}
                     className="shrink-0"
                   >
                     <TabsList className="bg-white/50 dark:bg-white/5 border border-white/20">
@@ -91,6 +92,10 @@ export const MetadataFeature: React.FC = () => {
                         <Database className="h-3.5 w-3.5" />
                         <span>{t('metadata.tabs.data', 'Data Explorer')}</span>
                       </TabsTrigger>
+                      <TabsTrigger value="relationships" className="gap-1.5 text-xs">
+                        <GitFork className="h-3.5 w-3.5" />
+                        <span>{t('metadata.tabs.relationships', 'Relationships')}</span>
+                      </TabsTrigger>
                     </TabsList>
                   </Tabs>
                 </div>
@@ -98,8 +103,10 @@ export const MetadataFeature: React.FC = () => {
                 {/* Tab Views */}
                 {activeTab === 'schema' ? (
                   <SchemaBuilder entityTypeId={selectedEntityTypeId} />
-                ) : (
+                ) : activeTab === 'data' ? (
                   <EntityDataGrid entityTypeId={selectedEntityTypeId} />
+                ) : (
+                  <RelationshipTypesManager entityTypeId={selectedEntityTypeId} />
                 )}
               </div>
             ) : (

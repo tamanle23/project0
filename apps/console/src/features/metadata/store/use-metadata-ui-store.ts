@@ -3,16 +3,34 @@ import type {
   AttributeDefinition,
   EntityRecord,
   EntityType,
+  RelationshipType,
 } from '../api/types';
 
 interface MetadataUiState {
   // Navigation & selection
   selectedEntityTypeId: string | null;
   setSelectedEntityTypeId: (id: string | null) => void;
-  activeTab: 'schema' | 'data';
-  setActiveTab: (tab: 'schema' | 'data') => void;
+  activeTab: 'schema' | 'data' | 'relationships';
+  setActiveTab: (tab: 'schema' | 'data' | 'relationships') => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+
+  // Relationship Types Dialogs
+  isRelationshipTypeDialogOpen: boolean;
+  editingRelationshipType: RelationshipType | null;
+  openCreateRelationshipTypeDialog: () => void;
+  openEditRelationshipTypeDialog: (relType: RelationshipType) => void;
+  closeRelationshipTypeDialog: () => void;
+
+  isRelationshipTypeDeleteDialogOpen: boolean;
+  deletingRelationshipType: RelationshipType | null;
+  openDeleteRelationshipTypeDialog: (relType: RelationshipType) => void;
+  closeDeleteRelationshipTypeDialog: () => void;
+
+  // Record Relationships Inspector Dialog
+  inspectingRecordRelationships: EntityRecord | null;
+  openRecordRelationshipsInspector: (record: EntityRecord) => void;
+  closeRecordRelationshipsInspector: () => void;
 
   // Entity Type Dialogs
   isEntityTypeDialogOpen: boolean;
@@ -63,6 +81,30 @@ export const useMetadataUiStore = create<MetadataUiState>((set) => ({
   setActiveTab: (tab) => set({ activeTab: tab }),
   searchQuery: '',
   setSearchQuery: (query) => set({ searchQuery: query }),
+
+  // Relationship Types
+  isRelationshipTypeDialogOpen: false,
+  editingRelationshipType: null,
+  openCreateRelationshipTypeDialog: () =>
+    set({ isRelationshipTypeDialogOpen: true, editingRelationshipType: null }),
+  openEditRelationshipTypeDialog: (relType) =>
+    set({ isRelationshipTypeDialogOpen: true, editingRelationshipType: relType }),
+  closeRelationshipTypeDialog: () =>
+    set({ isRelationshipTypeDialogOpen: false, editingRelationshipType: null }),
+
+  isRelationshipTypeDeleteDialogOpen: false,
+  deletingRelationshipType: null,
+  openDeleteRelationshipTypeDialog: (relType) =>
+    set({ isRelationshipTypeDeleteDialogOpen: true, deletingRelationshipType: relType }),
+  closeDeleteRelationshipTypeDialog: () =>
+    set({ isRelationshipTypeDeleteDialogOpen: false, deletingRelationshipType: null }),
+
+  // Record Relationships Inspector
+  inspectingRecordRelationships: null,
+  openRecordRelationshipsInspector: (record) =>
+    set({ inspectingRecordRelationships: record }),
+  closeRecordRelationshipsInspector: () =>
+    set({ inspectingRecordRelationships: null }),
 
   // Entity Type
   isEntityTypeDialogOpen: false,

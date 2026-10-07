@@ -79,3 +79,25 @@ Implemented the **Strategy Pattern** for the Metadata Management module in `@uni
 
 ### Verification
 - `pnpm --filter @unipost/console build`: **BUILD SUCCESS** (verified clean build in 550ms).
+
+## Phase 6: Relationships UI & Edge Management
+
+### Enhancements
+- **Workspace Tab Navigation**:
+  - Added 3rd tab (`Relationships`) to [`MetadataFeature`](file:///C:/Users/Admin/workspace/git/unipost/apps/console/src/features/metadata/components/metadata-feature.tsx) alongside `Schema Builder` and `Data Explorer`.
+  - Added localized i18n keys for tab navigation in English and Vietnamese (`locales/en/console.json` and `locales/vi/console.json`).
+- **Relationship Types Manager (`relationship-types-manager.tsx`)**:
+  - Interactive grid displaying all incoming and outgoing edge schema definitions associated with the active entity model.
+  - Directional flow badges, cardinality indicators (`1:1`, `1:N`, `N:1`, `N:N`), and full CRUD controls.
+- **Relationship Type Modals**:
+  - `RelationshipTypeDialog`: Modal for creating and editing relationship edge models (source/target selector, name, auto-slugging `rel_system_name`, cardinality, and description).
+  - `RelationshipTypeDeleteDialog`: Confirmation dialog for unlinking/removing relationship types.
+- **Record Relationships Inspector (`record-relationships-inspector.tsx`)**:
+  - Dedicated inspector modal accessible directly from the `EntityDataGrid` row action menu (`View Relationships`).
+  - Displays all inbound and outbound edges linked to the specific record.
+  - Allows instant edge creation and deletion with live target record lookup.
+- **Dynamic Field `relation_picker` Upgrades**:
+  - Upgraded `RelationPickerControl` in `dynamic-field-renderer.tsx` to automatically populate dropdown choices with target entity records when `targetEntityTypeId` is defined.
+
+### Verification
+- `pnpm --filter @unipost/console build`: **BUILD SUCCESS** (TypeScript compilation and Vite bundle creation verified cleanly in 599ms).

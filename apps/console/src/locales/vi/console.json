@@ -135,7 +135,8 @@
     "description": "Thiết kế lược đồ dữ liệu linh hoạt, thực thi quy tắc kiểm thực và quản lý bản ghi.",
     "tabs": {
       "schema": "Trình tạo Lược đồ",
-      "data": "Trình khám phá Dữ liệu"
+      "data": "Trình khám phá Dữ liệu",
+      "relationships": "Mối quan hệ"
     }
   }
 }

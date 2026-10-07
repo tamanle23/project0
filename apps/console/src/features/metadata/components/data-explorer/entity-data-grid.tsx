@@ -47,6 +47,7 @@ import {
   ChevronRight,
   Database,
   X,
+  GitFork,
 } from 'lucide-react';
 
 interface Props {
@@ -131,6 +132,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
     openCreateRecordDialog,
     openEditRecordDialog,
     openDeleteRecordDialog,
+    openRecordRelationshipsInspector,
   } = useMetadataUiStore();
 
   const records = useMemo(() => {
@@ -281,6 +283,12 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
                 <Edit2 className="h-3.5 w-3.5" /> Edit Record
               </DropdownMenuItem>
               <DropdownMenuItem
+                onClick={() => openRecordRelationshipsInspector(row.original)}
+                className="gap-2 text-primary focus:text-primary"
+              >
+                <GitFork className="h-3.5 w-3.5" /> View Relationships
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 onClick={() => setInspectingRecord(row.original)}
                 className="gap-2"
               >
@@ -299,7 +307,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
     });
 
     return [...baseCols, ...dynamicCols, actionCol];
-  }, [attributes, sortField, sortDirection, openEditRecordDialog, openDeleteRecordDialog]);
+  }, [attributes, sortField, sortDirection, openEditRecordDialog, openDeleteRecordDialog, openRecordRelationshipsInspector]);
 
   const table = useReactTable({
     data: records,
