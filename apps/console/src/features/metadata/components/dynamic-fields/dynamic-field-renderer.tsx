@@ -16,6 +16,22 @@ import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 import { useEntityRecords } from '../../api/metadata-api';
 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import { Button } from '@/components/ui/button';
+import { Check, ChevronsUpDown, AlertTriangle, Link2 } from 'lucide-react';
+
 interface RelationPickerControlProps {
   id: string;
   value: unknown;
@@ -33,50 +49,138 @@ const RelationPickerControl: React.FC<RelationPickerControlProps> = ({
   placeholder,
   errorClass,
 }) => {
-  const { data: recordsResponse } = useEntityRecords(targetEntityTypeId || '', {
+  const [open, setOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  const { data: recordsResponse, isLoading } = useEntityRecords(targetEntityTypeId || '', {
     size: 100,
   });
   const records = recordsResponse?.content || [];
 
+  const stringVal = value !== undefined && value !== null ? String(value) : '';
+
   const selectedRecord = records.find(
-    (r) => String(r.id) === String(value)
+    (r) => String(r.id) === stringVal
   );
+
+  // If a value exists but is not found in the current active records
+  const isDanglingReference = Boolean(stringVal && !selectedRecord && !isLoading);
 
   const formatLabel = (r: (typeof records)[0]) => {
     return (
       (r.attributes?.legal_name as string) ||
       (r.attributes?.resource_code as string) ||
       (r.attributes?.policy_id as string) ||
+      (r.attributes?.name as string) ||
       `Record #${r.id}`
     );
   };
 
   return (
     <div className="space-y-2">
-      {targetEntityTypeId && records.length > 0 ? (
-        <Select
-          value={typeof value === 'string' || typeof value === 'number' ? String(value) : ''}
-          onValueChange={(val) => onChange(val)}
-        >
-          <SelectTrigger
-            id={id}
-            className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm', errorClass)}
-          >
-            <SelectValue placeholder={placeholder || 'Select Target Entity Record...'} />
-          </SelectTrigger>
-          <SelectContent>
-            {records.map((r) => (
-              <SelectItem key={r.id} value={String(r.id)}>
-                #{r.id} - {formatLabel(r)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      {targetEntityTypeId ? (
+        <Popover open={open} onOpenChange={setOpen}>
+          <div className="flex items-center gap-1.5">
+            <PopoverTrigger asChild>
+              <Button
+                id={id}
+                type="button"
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className={cn(
+                  'w-full justify-between font-normal bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm text-left h-9 text-xs',
+                  !stringVal && 'text-muted-foreground',
+                  errorClass
+                )}
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <Link2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  {selectedRecord ? (
+                    <span className="truncate">
+                      <span className="font-mono font-semibold">#{selectedRecord.id}</span> -{' '}
+                      {formatLabel(selectedRecord)}
+                    </span>
+                  ) : stringVal ? (
+                    <span className="font-mono text-amber-500 truncate">
+                      #{stringVal} (External / Custom)
+                    </span>
+                  ) : (
+                    <span>{placeholder || 'Search target entity record...'}</span>
+                  )}
+                </div>
+                <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+
+            {stringVal && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-9 px-2 text-xs text-muted-foreground hover:text-destructive shrink-0"
+                onClick={() => onChange('')}
+                title="Clear selection"
+              >
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            )}
+          </div>
+
+          <PopoverContent className="w-[360px] p-0 shadow-2xl border-white/20 dark:border-white/10" align="start">
+            <Command>
+              <CommandInput
+                placeholder="Search by ID, name, or code..."
+                value={searchQuery}
+                onValueChange={setSearchQuery}
+                className="text-xs"
+              />
+              <CommandList>
+                <CommandEmpty className="py-4 text-center text-xs text-muted-foreground">
+                  {isLoading ? 'Loading records...' : 'No matching records found.'}
+                </CommandEmpty>
+                <CommandGroup heading="Available Target Records">
+                  {records.map((r) => {
+                    const isSelected = String(r.id) === stringVal;
+                    const label = formatLabel(r);
+                    return (
+                      <CommandItem
+                        key={r.id}
+                        value={`${r.id} ${label} ${r.tenantId || ''}`}
+                        onSelect={() => {
+                          onChange(isSelected ? '' : String(r.id));
+                          setOpen(false);
+                        }}
+                        className="text-xs cursor-pointer flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2 truncate">
+                          <Check
+                            className={cn(
+                              'h-3.5 w-3.5 text-primary shrink-0',
+                              isSelected ? 'opacity-100' : 'opacity-0'
+                            )}
+                          />
+                          <span className="font-mono font-semibold text-[11px]">#{r.id}</span>
+                          <span className="truncate">{label}</span>
+                        </div>
+                        {r.tenantId && (
+                          <span className="text-[10px] font-mono text-muted-foreground shrink-0 ml-2">
+                            {r.tenantId}
+                          </span>
+                        )}
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       ) : (
         <Input
           id={id}
           type="text"
-          value={typeof value === 'string' || typeof value === 'number' ? value : ''}
+          value={stringVal}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder || 'Target Entity Record ID...'}
           className={cn('bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm font-mono text-xs', errorClass)}
@@ -85,18 +189,28 @@ const RelationPickerControl: React.FC<RelationPickerControlProps> = ({
 
       {/* Target Record Live Preview Card */}
       {selectedRecord && (
-        <div className="flex items-center gap-2 p-2 rounded-lg bg-primary/5 border border-primary/20 text-xs">
-          <Badge variant="secondary" className="font-mono text-[10px] px-1.5 py-0 bg-primary/10 text-primary">
+        <div className="flex items-center gap-2 p-2 rounded-lg bg-primary/5 border border-primary/20 text-xs animate-in fade-in-50">
+          <Badge variant="secondary" className="font-mono text-[10px] px-1.5 py-0 bg-primary/10 text-primary shrink-0">
             #{selectedRecord.id}
           </Badge>
           <span className="font-semibold text-foreground truncate">
             {formatLabel(selectedRecord)}
           </span>
           {selectedRecord.tenantId && (
-            <span className="text-[10px] text-muted-foreground ml-auto font-mono">
+            <span className="text-[10px] text-muted-foreground ml-auto font-mono shrink-0">
               {selectedRecord.tenantId}
             </span>
           )}
+        </div>
+      )}
+
+      {/* Dangling Reference Warning Card */}
+      {isDanglingReference && (
+        <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700 dark:text-amber-400 animate-in fade-in-50">
+          <AlertTriangle className="h-4 w-4 shrink-0 text-amber-500" />
+          <span className="truncate">
+            Referenced record <code className="font-mono font-bold">#{stringVal}</code> was not found or has been archived.
+          </span>
         </div>
       )}
     </div>

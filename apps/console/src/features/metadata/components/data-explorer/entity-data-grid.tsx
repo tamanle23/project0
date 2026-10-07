@@ -48,6 +48,7 @@ import {
   Database,
   X,
   GitFork,
+  Link2,
 } from 'lucide-react';
 
 interface Props {
@@ -247,6 +248,18 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
                   <code className="text-[10px] font-mono text-muted-foreground truncate max-w-[120px] inline-block">
                     {JSON.stringify(val)}
                   </code>
+                );
+              }
+
+              if (attr.uiComponent === 'relation_picker') {
+                return (
+                  <Badge
+                    variant="outline"
+                    className="gap-1 font-mono text-[11px] bg-primary/5 hover:bg-primary/10 border-primary/25 text-primary cursor-default"
+                  >
+                    <Link2 className="h-3 w-3 shrink-0 opacity-70" />
+                    <span>#{String(val)}</span>
+                  </Badge>
                 );
               }
 

@@ -200,8 +200,11 @@ export const AttributeDialog: React.FC<Props> = ({ entityTypeId }) => {
     if (minVal !== '') options.min = Number(minVal);
     if (maxVal !== '') options.max = Number(maxVal);
     if (placeholder.trim()) options.placeholder = placeholder.trim();
-    if (pattern.trim()) options.pattern = pattern.trim();
-    if (uiComponent === 'relation_picker' && targetEntityTypeId) {
+    if (uiComponent === 'relation_picker') {
+      if (!targetEntityTypeId) {
+        alert('Please select a Target Entity Model for the relation picker.');
+        return;
+      }
       options.targetEntityTypeId = targetEntityTypeId;
     }
 
@@ -343,6 +346,36 @@ export const AttributeDialog: React.FC<Props> = ({ entityTypeId }) => {
                 </div>
               </div>
 
+              {uiComponent === 'relation_picker' && (
+                <div className="space-y-2 p-3 rounded-lg border border-primary/20 bg-primary/5">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="attr-target-entity" className="text-sm font-semibold text-primary">
+                      Target Entity Model *
+                    </Label>
+                    <span className="text-[11px] text-muted-foreground">Foreign Model Reference</span>
+                  </div>
+                  <Select
+                    value={targetEntityTypeId}
+                    onValueChange={setTargetEntityTypeId}
+                  >
+                    <SelectTrigger id="attr-target-entity" className="bg-white/70 dark:bg-slate-850/70 backdrop-blur-sm border-primary/30">
+                      <SelectValue placeholder="Select Referenced Entity Model..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {entityTypes.map((et) => (
+                        <SelectItem key={et.id} value={String(et.id)}>
+                          <span className="font-medium">{et.name}</span>{' '}
+                          <span className="font-mono text-xs text-muted-foreground">({et.systemName})</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Required. Defines which entity records can be selected as references for this attribute.
+                  </p>
+                </div>
+              )}
+
               <div className="p-3 rounded-lg bg-muted/40 border border-white/10 text-xs text-muted-foreground">
                 <p className="font-semibold text-foreground mb-1">{currentMeta.label}</p>
                 <p>{currentMeta.description}</p>
@@ -448,30 +481,6 @@ export const AttributeDialog: React.FC<Props> = ({ entityTypeId }) => {
                       placeholder="e.g. 1000"
                     />
                   </div>
-                </div>
-              )}
-
-              {uiComponent === 'relation_picker' && (
-                <div className="space-y-2">
-                  <Label htmlFor="attr-target-entity">Target Entity Model</Label>
-                  <Select
-                    value={targetEntityTypeId}
-                    onValueChange={setTargetEntityTypeId}
-                  >
-                    <SelectTrigger id="attr-target-entity" className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm">
-                      <SelectValue placeholder="Select Target Entity Model..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {entityTypes.map((et) => (
-                        <SelectItem key={et.id} value={String(et.id)}>
-                          {et.name} ({et.systemName})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">
-                    Specifies which entity model records are referenced by this relationship lookup field.
-                  </p>
                 </div>
               )}
 
