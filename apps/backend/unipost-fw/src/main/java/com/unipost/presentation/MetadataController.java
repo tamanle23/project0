@@ -196,6 +196,23 @@ public class MetadataController {
         return responseBuilder.success(page);
     }
 
+    @GetMapping("/entity-types/{id}/drift")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_READ') or hasAuthority('METADATA_RECORD_READ') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, SchemaDriftAnalysisResponse>> getSchemaDriftAnalysis(
+            @PathVariable Long id) {
+        SchemaDriftAnalysisResponse analysis = metadataService.analyzeSchemaDrift(id);
+        return responseBuilder.success(analysis);
+    }
+
+    @PostMapping("/entity-types/{id}/backfill")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, SchemaBackfillExecutionResponse>> executeSchemaBackfill(
+            @PathVariable Long id,
+            @RequestParam(required = false, defaultValue = "100") Integer batchSize) {
+        SchemaBackfillExecutionResponse result = metadataService.executeSchemaBackfill(id, batchSize != null ? batchSize : 100);
+        return responseBuilder.success(result);
+    }
+
     @PostMapping("/entity-types/{id}/records/validate")
     @PreAuthorize("hasAuthority('METADATA_RECORD_READ') or hasAuthority('METADATA_RECORD_WRITE') or hasRole('ADMIN')")
     public ResponseEntity<ResponseWrapper<ContextHeader, ValidateRecordResponse>> validateEntityRecord(

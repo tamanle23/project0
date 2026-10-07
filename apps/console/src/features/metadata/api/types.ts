@@ -160,3 +160,25 @@ export interface ValidateRecordResponse {
   schemaVersion: number;
   errors: ValidationErrorDetail[];
 }
+
+export interface SchemaDriftAnalysisResponse {
+  entityTypeId: string | number;
+  currentSchemaVersion: number;
+  totalRecords: number;
+  outdatedRecords: number;
+  compliantRecords: number;
+}
+
+export interface BackfillFailureDetail {
+  recordId: string | number;
+  reason: string;
+}
+
+export interface SchemaBackfillExecutionResponse {
+  entityTypeId: string | number;
+  targetSchemaVersion: number;
+  processedRecords: number;
+  migratedRecords: number;
+  failedRecords: number;
+  failures: BackfillFailureDetail[];
+}

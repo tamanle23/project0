@@ -860,4 +860,64 @@ class MetadataServiceTest {
         assertEquals("tier", response.errors().get(0).field());
         assertEquals("REQUIRED_FIELD", response.errors().get(0).code());
     }
+
+    @Test
+    void testAnalyzeSchemaDrift() {
+        Long typeId = 1L;
+        EntityType type = new EntityType();
+        type.setId(typeId);
+        type.setSchemaVersion(3L);
+
+        EntityRecord r1 = new EntityRecord();
+        r1.setId(10L);
+        r1.setSchemaVersion(3L);
+
+        EntityRecord r2 = new EntityRecord();
+        r2.setId(20L);
+        r2.setSchemaVersion(1L);
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(typeId)).thenReturn(Optional.of(type));
+        when(entityRecordRepository.findByEntityTypeIdAndDeletedDateIsNull(typeId)).thenReturn(List.of(r1, r2));
+
+        SchemaDriftAnalysisResponse analysis = metadataService.analyzeSchemaDrift(typeId);
+
+        assertEquals(typeId, analysis.entityTypeId());
+        assertEquals(3L, analysis.currentSchemaVersion());
+        assertEquals(2L, analysis.totalRecords());
+        assertEquals(1L, analysis.outdatedRecords());
+        assertEquals(1L, analysis.compliantRecords());
+    }
+
+    @Test
+    void testExecuteSchemaBackfill_MigratesOutdatedRecords() {
+        Long typeId = 1L;
+        EntityType type = new EntityType();
+        type.setId(typeId);
+        type.setSchemaVersion(3L);
+
+        EntityRecord outdatedRecord = new EntityRecord();
+        outdatedRecord.setId(20L);
+        outdatedRecord.setSchemaVersion(1L);
+        outdatedRecord.setAttributes(new HashMap<>());
+
+        AttributeDefinition attrWithDefault = new AttributeDefinition();
+        attrWithDefault.setSystemName("cluster");
+        attrWithDefault.setDataType("string");
+        attrWithDefault.setDefaultValue("primary");
+
+        when(entityTypeRepository.findByIdAndDeletedDateIsNull(typeId)).thenReturn(Optional.of(type));
+        when(entityRecordRepository.findByEntityTypeIdAndSchemaVersionLessThanAndDeletedDateIsNull(eq(typeId), eq(3L), any()))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(outdatedRecord)));
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(typeId))
+                .thenReturn(List.of(attrWithDefault));
+
+        SchemaBackfillExecutionResponse backfill = metadataService.executeSchemaBackfill(typeId, 50);
+
+        assertEquals(1, backfill.processedRecords());
+        assertEquals(1, backfill.migratedRecords());
+        assertEquals(0, backfill.failedRecords());
+        assertEquals(3L, outdatedRecord.getSchemaVersion());
+        assertEquals("primary", outdatedRecord.getAttributes().get("cluster"));
+        verify(entityRecordRepository).save(outdatedRecord);
+    }
 }

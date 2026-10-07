@@ -323,6 +323,8 @@ metadata/
 - `POST /v1/metadata/entity-types/{id}/attributes/{attrId}/archive`: Archive attribute.
 - `POST /v1/metadata/entity-types/{id}/attributes/{attrId}/unarchive`: Restore archived attribute.
 - `POST /v1/metadata/entity-types/{id}/records/validate`: **Dry-Run Pre-Validation Endpoint**. Performs server-authoritative JSON Schema validation and relational foreign-key reference verification without writing to the database or altering audit sequences.
+- `GET /v1/metadata/entity-types/{id}/drift`: **Schema Drift Analysis Endpoint**. Inspects total record volume, counts records stamped with obsolete `schema_version` numbers, and flags migration requirements.
+- `POST /v1/metadata/entity-types/{id}/backfill?batchSize=100`: **Retroactive Schema Evolution Backfill Job**. Ingests batches of legacy records, computes default values for newly added attributes, dry-run validates constraints, and updates `schema_version` atomically.
 - `GET /v1/metadata/entity-types/{id}/records?page=1&size=20&sort=field,asc`: Filter and sort records.
 - `POST /v1/metadata/entity-types/{id}/records`: Create new record (enforcing compiled JSON Schema).
 - `PUT /v1/metadata/entity-types/{id}/records/{recordId}`: Update record with optimistic locking.

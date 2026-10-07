@@ -473,6 +473,78 @@ public class MetadataService {
         }
     }
 
+    public SchemaDriftAnalysisResponse analyzeSchemaDrift(Long entityTypeId) {
+        EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId)
+                .orElseThrow(() -> new MetadataNotFoundException("EntityType not found with id: " + entityTypeId));
+
+        Long currentVersion = entityType.getSchemaVersion() != null ? entityType.getSchemaVersion() : 1L;
+        List<EntityRecord> allRecords = entityRecordRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId);
+        long total = allRecords.size();
+        long outdated = allRecords.stream()
+                .filter(r -> r.getSchemaVersion() == null || r.getSchemaVersion() < currentVersion)
+                .count();
+
+        return new SchemaDriftAnalysisResponse(
+                entityTypeId,
+                currentVersion,
+                total,
+                outdated,
+                total - outdated
+        );
+    }
+
+    @Transactional
+    public SchemaBackfillExecutionResponse executeSchemaBackfill(Long entityTypeId, int batchSize) {
+        EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId)
+                .orElseThrow(() -> new MetadataNotFoundException("EntityType not found with id: " + entityTypeId));
+
+        Long targetVersion = entityType.getSchemaVersion() != null ? entityType.getSchemaVersion() : 1L;
+        int effectiveBatchSize = batchSize > 0 ? Math.min(batchSize, 500) : 100;
+
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0, effectiveBatchSize);
+        org.springframework.data.domain.Page<EntityRecord> outdatedPage = entityRecordRepository
+                .findByEntityTypeIdAndSchemaVersionLessThanAndDeletedDateIsNull(entityTypeId, targetVersion, pageable);
+
+        List<EntityRecord> recordsToMigrate = outdatedPage.getContent();
+        int processed = 0;
+        int migrated = 0;
+        int failed = 0;
+        List<SchemaBackfillExecutionResponse.BackfillFailureDetail> failures = new ArrayList<>();
+
+        for (EntityRecord record : recordsToMigrate) {
+            processed++;
+            try {
+                // Apply defaults for newly added attributes and validate against target schema
+                Map<String, Object> currentAttrs = record.getAttributes() != null ? record.getAttributes() : Map.of();
+                Map<String, Object> finalAttributes = applyAttributeDefaults(entityTypeId, currentAttrs);
+
+                validateRelationPickerAttributes(entityTypeId, finalAttributes);
+                schemaValidationService.validatePayload(entityTypeId, finalAttributes);
+
+                record.setAttributes(finalAttributes);
+                record.setSchemaVersion(targetVersion);
+                entityRecordRepository.save(record);
+                migrated++;
+            } catch (Exception e) {
+                failed++;
+                failures.add(new SchemaBackfillExecutionResponse.BackfillFailureDetail(
+                        record.getId(),
+                        e.getMessage()
+                ));
+                log.warn("Backfill migration skipped for record ID {}: {}", record.getId(), e.getMessage());
+            }
+        }
+
+        return new SchemaBackfillExecutionResponse(
+                entityTypeId,
+                targetVersion,
+                processed,
+                migrated,
+                failed,
+                failures
+        );
+    }
+
     @Transactional
     public EntityRecordResponse createEntityRecord(Long entityTypeId, CreateRecordRequest request) {
         EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId)

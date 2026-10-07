@@ -3,6 +3,8 @@ import {
   useEntityRecords,
   useAttributeDefinitions,
   useEntityType,
+  useSchemaDriftAnalysis,
+  useExecuteSchemaBackfill,
 } from '../../api/metadata-api';
 import { useMetadataUiStore, type AttributeFilterClause } from '../../store/use-metadata-ui-store';
 import type { AttributeDefinition, EntityRecord } from '../../api/types';
@@ -52,6 +54,8 @@ import {
   GitFork,
   Link2,
   SlidersHorizontal,
+  RefreshCw,
+  ShieldAlert,
 } from 'lucide-react';
 
 interface Props {
@@ -110,10 +114,25 @@ export const EntityDataGrid: React.FC<Props> = ({
   const { data: attributesResponse, isLoading: schemaLoading } =
     useAttributeDefinitions(entityTypeId);
   const { data: entityType } = useEntityType(entityTypeId);
+  const { data: driftAnalysis } = useSchemaDriftAnalysis(entityTypeId);
+  const backfillMutation = useExecuteSchemaBackfill(entityTypeId);
+  const [backfillFeedback, setBackfillFeedback] = useState<string | null>(null);
 
   const attributes = useMemo(() => {
     return attributesResponse?.content || [];
   }, [attributesResponse]);
+
+  const handleRunBackfill = async () => {
+    setBackfillFeedback(null);
+    try {
+      const res = await backfillMutation.mutateAsync(100);
+      setBackfillFeedback(
+        `Successfully backfilled ${res.migratedRecords} record(s) to Schema v${res.targetSchemaVersion}.`
+      );
+    } catch (err: unknown) {
+      setBackfillFeedback(err instanceof Error ? err.message : 'Backfill failed.');
+    }
+  };
 
   // Debounce search filter input (600ms comfortable cadence)
   React.useEffect(() => {
@@ -448,6 +467,41 @@ export const EntityDataGrid: React.FC<Props> = ({
 
   return (
     <div className="space-y-4 w-full min-w-0">
+      {/* Schema Drift Warning & Backfill Banner */}
+      {driftAnalysis && driftAnalysis.outdatedRecords > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 backdrop-blur-xl animate-in fade-in-50">
+          <div className="flex items-center gap-2.5 text-xs">
+            <ShieldAlert className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+            <span>
+              <strong>Schema Drift Detected:</strong> {driftAnalysis.outdatedRecords} of{' '}
+              {driftAnalysis.totalRecords} record(s) conform to older schema versions (Current:{' '}
+              <Badge variant="outline" className="px-1.5 py-0 text-[10px] font-mono border-amber-500/40">
+                v{driftAnalysis.currentSchemaVersion}
+              </Badge>
+              ).
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {backfillFeedback && (
+              <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                {backfillFeedback}
+              </span>
+            )}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleRunBackfill}
+              disabled={backfillMutation.isPending}
+              className="h-7 px-2.5 text-xs gap-1.5 border-amber-500/30 hover:bg-amber-500/20 text-amber-900 dark:text-amber-200"
+              title="Apply attribute defaults and migrate records to current schema version"
+            >
+              <RefreshCw className={cn('h-3.5 w-3.5', backfillMutation.isPending && 'animate-spin')} />
+              <span>{backfillMutation.isPending ? 'Migrating...' : 'Run Backfill'}</span>
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Action Toolbar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
         <div className="flex flex-wrap items-center gap-2">

@@ -53,6 +53,14 @@ class MetadataServiceStrategy implements MetadataDataSource {
     return this.activeService.getCompiledSchema(id);
   }
 
+  getSchemaDriftAnalysis(id: string | number) {
+    return this.activeService.getSchemaDriftAnalysis(id);
+  }
+
+  executeSchemaBackfill(id: string | number, batchSize?: number) {
+    return this.activeService.executeSchemaBackfill(id, batchSize);
+  }
+
   // 2. Attribute Definitions
   getAttributeDefinitions(entityTypeId: string | number, params?: any) {
     return this.activeService.getAttributeDefinitions(entityTypeId, params);

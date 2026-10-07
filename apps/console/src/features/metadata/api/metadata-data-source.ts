@@ -12,6 +12,8 @@ import type {
   PageRequestParams,
   PageResponse,
   RelationshipType,
+  SchemaBackfillExecutionResponse,
+  SchemaDriftAnalysisResponse,
   UpdateAttributeDefinitionDto,
   UpdateEntityRecordDto,
   UpdateEntityTypeDto,
@@ -27,6 +29,8 @@ export interface MetadataDataSource {
   updateEntityType(id: string | number, dto: UpdateEntityTypeDto): Promise<EntityType>;
   deleteEntityType(id: string | number): Promise<boolean>;
   getCompiledSchema(id: string | number): Promise<CompiledSchema>;
+  getSchemaDriftAnalysis(id: string | number): Promise<SchemaDriftAnalysisResponse>;
+  executeSchemaBackfill(id: string | number, batchSize?: number): Promise<SchemaBackfillExecutionResponse>;
 
   // 2. Attribute Definitions
   getAttributeDefinitions(

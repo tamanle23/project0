@@ -13,6 +13,8 @@ import type {
   PageRequestParams,
   PageResponse,
   RelationshipType,
+  SchemaBackfillExecutionResponse,
+  SchemaDriftAnalysisResponse,
   UpdateAttributeDefinitionDto,
   UpdateEntityRecordDto,
   UpdateEntityTypeDto,
@@ -589,6 +591,60 @@ export class MockMetadataService implements MetadataDataSource {
       schemaVersion: entityType.schemaVersion || 1,
       jsonSchema,
       updatedDate: entityType.updatedDate,
+    };
+  }
+
+  async getSchemaDriftAnalysis(id: string | number): Promise<SchemaDriftAnalysisResponse> {
+    const strId = String(id);
+    const entityType = this.entityTypes.find((e) => String(e.id) === strId);
+    const currentVersion = entityType?.schemaVersion || 1;
+    const records = this.records[strId] || [];
+    const total = records.length;
+    const outdated = records.filter(
+      (r) => !r.version || (r.version < currentVersion)
+    ).length;
+
+    return {
+      entityTypeId: id,
+      currentSchemaVersion: currentVersion,
+      totalRecords: total,
+      outdatedRecords: outdated,
+      compliantRecords: total - outdated,
+    };
+  }
+
+  async executeSchemaBackfill(
+    id: string | number,
+    batchSize: number = 100
+  ): Promise<SchemaBackfillExecutionResponse> {
+    const strId = String(id);
+    const entityType = this.entityTypes.find((e) => String(e.id) === strId);
+    const targetVersion = entityType?.schemaVersion || 1;
+    const records = this.records[strId] || [];
+    const attrs = this.attributes[strId] || [];
+
+    let migrated = 0;
+    records.slice(0, batchSize).forEach((r) => {
+      // Backfill default values
+      attrs.forEach((attr) => {
+        if (!attr.isArchived && attr.defaultValue !== undefined && attr.defaultValue !== '') {
+          if (!r.attributes) r.attributes = {};
+          if (r.attributes[attr.systemName] === undefined) {
+            r.attributes[attr.systemName] = attr.defaultValue;
+          }
+        }
+      });
+      r.version = targetVersion;
+      migrated++;
+    });
+
+    return {
+      entityTypeId: id,
+      targetSchemaVersion: targetVersion,
+      processedRecords: Math.min(records.length, batchSize),
+      migratedRecords: migrated,
+      failedRecords: 0,
+      failures: [],
     };
   }
 

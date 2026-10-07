@@ -14,6 +14,8 @@ import type {
   PageRequestParams,
   PageResponse,
   RelationshipType,
+  SchemaBackfillExecutionResponse,
+  SchemaDriftAnalysisResponse,
   UpdateAttributeDefinitionDto,
   UpdateEntityRecordDto,
   UpdateEntityTypeDto,
@@ -73,6 +75,23 @@ export class HttpMetadataService implements MetadataDataSource {
 
   async getCompiledSchema(id: string | number): Promise<CompiledSchema> {
     const res = await springApiClient.get(`${BASE_URL}/entity-types/${id}/schema`);
+    return unwrapResponse(res.data);
+  }
+
+  async getSchemaDriftAnalysis(id: string | number): Promise<SchemaDriftAnalysisResponse> {
+    const res = await springApiClient.get(`${BASE_URL}/entity-types/${id}/drift`);
+    return unwrapResponse(res.data);
+  }
+
+  async executeSchemaBackfill(
+    id: string | number,
+    batchSize: number = 100
+  ): Promise<SchemaBackfillExecutionResponse> {
+    const res = await springApiClient.post(
+      `${BASE_URL}/entity-types/${id}/backfill`,
+      null,
+      { params: { batchSize } }
+    );
     return unwrapResponse(res.data);
   }
 

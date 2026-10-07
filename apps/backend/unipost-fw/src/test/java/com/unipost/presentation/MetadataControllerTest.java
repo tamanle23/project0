@@ -20,6 +20,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -353,6 +354,33 @@ class MetadataControllerTest {
         assertEquals(mockResponse, response.getBody().getBody());
         assertTrue(response.getBody().getBody().valid());
         verify(metadataService).validateEntityRecordDryRun(entityTypeId, request);
+    }
+
+    @Test
+    void testGetSchemaDriftAnalysis() {
+        Long entityTypeId = 1L;
+        SchemaDriftAnalysisResponse mockResponse = new SchemaDriftAnalysisResponse(entityTypeId, 2L, 100L, 15L, 85L);
+        when(metadataService.analyzeSchemaDrift(entityTypeId)).thenReturn(mockResponse);
+
+        ResponseEntity<ResponseWrapper<ContextHeader, SchemaDriftAnalysisResponse>> response = metadataController.getSchemaDriftAnalysis(entityTypeId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(15L, response.getBody().getBody().outdatedRecords());
+        assertEquals(85L, response.getBody().getBody().compliantRecords());
+        verify(metadataService).analyzeSchemaDrift(entityTypeId);
+    }
+
+    @Test
+    void testExecuteSchemaBackfill() {
+        Long entityTypeId = 1L;
+        SchemaBackfillExecutionResponse mockResponse = new SchemaBackfillExecutionResponse(entityTypeId, 2L, 15, 15, 0, List.of());
+        when(metadataService.executeSchemaBackfill(entityTypeId, 100)).thenReturn(mockResponse);
+
+        ResponseEntity<ResponseWrapper<ContextHeader, SchemaBackfillExecutionResponse>> response = metadataController.executeSchemaBackfill(entityTypeId, 100);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(15, response.getBody().getBody().migratedRecords());
+        verify(metadataService).executeSchemaBackfill(entityTypeId, 100);
     }
 
     @Test

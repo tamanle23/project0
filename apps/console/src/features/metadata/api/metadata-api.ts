@@ -14,6 +14,8 @@ import type {
   PageRequestParams,
   PageResponse,
   RelationshipType,
+  SchemaBackfillExecutionResponse,
+  SchemaDriftAnalysisResponse,
   UpdateAttributeDefinitionDto,
   UpdateEntityRecordDto,
   UpdateEntityTypeDto,
@@ -48,6 +50,27 @@ export const useCompiledSchema = (entityTypeId: string | number | null) => {
       entityTypeId ? metadataService.getCompiledSchema(entityTypeId) : Promise.resolve(null),
     enabled: Boolean(entityTypeId),
     staleTime: 30 * 1000,
+  });
+};
+
+export const useSchemaDriftAnalysis = (entityTypeId: string | number | null) => {
+  return useQuery({
+    queryKey: ['metadata', 'schema-drift', entityTypeId],
+    queryFn: (): Promise<SchemaDriftAnalysisResponse | null> =>
+      entityTypeId ? metadataService.getSchemaDriftAnalysis(entityTypeId) : Promise.resolve(null),
+    enabled: Boolean(entityTypeId),
+  });
+};
+
+export const useExecuteSchemaBackfill = (entityTypeId: string | number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (batchSize?: number): Promise<SchemaBackfillExecutionResponse> =>
+      metadataService.executeSchemaBackfill(entityTypeId, batchSize),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'schema-drift', entityTypeId] });
+      queryClient.invalidateQueries({ queryKey: ['metadata', 'records', entityTypeId] });
+    },
   });
 };
 
