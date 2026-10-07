@@ -34,7 +34,7 @@ export const MetadataFeature: React.FC = () => {
         </div>
       </Header>
 
-      <Main className="flex flex-1 flex-col gap-4 sm:gap-6">
+      <Main fluid className="flex flex-1 flex-col gap-4 sm:gap-6 min-w-0 w-full overflow-hidden">
         {/* Page Title & Intro */}
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
@@ -51,12 +51,12 @@ export const MetadataFeature: React.FC = () => {
         </div>
 
         {/* Liquid Glass Split Workspace */}
-        <div className="flex flex-col lg:flex-row gap-6 items-start flex-1 w-full">
+        <div className="flex flex-col lg:flex-row gap-6 items-start flex-1 w-full min-w-0">
           {/* Left: Entity Models Rail */}
           <EntityTypeSidebar />
 
           {/* Right: Active Model Workspace */}
-          <div className="flex-1 w-full space-y-4">
+          <div className="flex-1 w-full min-w-0 space-y-4">
             {selectedEntityTypeId && activeEntity ? (
               <div className="space-y-4">
                 {/* Active Model Banner */}

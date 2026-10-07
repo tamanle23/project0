@@ -356,11 +356,11 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full min-w-0">
       {/* Action Toolbar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
-        <div className="flex items-center gap-2">
-          <div className="relative w-64">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative w-full sm:w-64">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               value={searchFilter}
@@ -400,7 +400,7 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <Button
             variant="outline"
             size="sm"
@@ -424,8 +424,8 @@ export const EntityDataGrid: React.FC<Props> = ({ entityTypeId }) => {
       </div>
 
       {/* Table Canvas with Horizontal Overflow & Sticky Action Column */}
-      <div className="rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 overflow-hidden">
-        <div className="overflow-x-auto relative">
+      <div className="rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 overflow-hidden w-full min-w-0">
+        <div className="overflow-x-auto relative w-full">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
