@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Edit2,
   Trash2,
+  Info,
 } from 'lucide-react';
 
 interface Props {
@@ -61,6 +62,21 @@ export const RelationshipTypesManager: React.FC<Props> = ({ entityTypeId }) => {
 
   return (
     <div className="space-y-4">
+      {/* Architectural Guidance Banner */}
+      <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-900 dark:text-blue-200">
+        <Info className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400 mt-0.5" />
+        <div className="space-y-1">
+          <p className="font-semibold text-blue-700 dark:text-blue-300">
+            Relationship Architecture: Graph Edges vs. Field Lookups
+          </p>
+          <p className="text-muted-foreground leading-relaxed">
+            <strong>Graph Edges (configured here):</strong> Manage multi-cardinality (<code className="text-[11px] font-mono">1:1, 1:N, N:1, N:N</code>) connections with bidirectional indexing, lifecycle cascade rules, and edge metadata.
+            <br />
+            <strong>Field Lookups (<code className="text-[11px] font-mono">relation_picker</code>):</strong> Configured in the <em>Schema Builder</em> as lightweight single foreign key references inside record JSON attributes (e.g., <code className="text-[11px] font-mono">default_policy_id</code>).
+          </p>
+        </div>
+      </div>
+
       {/* Top action bar */}
       <div className="flex items-center justify-between p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-sm">
         <div>

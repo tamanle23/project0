@@ -29,11 +29,15 @@ Following the rollout of Phase 6 (Entity Relationship Types and Edge Inspector),
 - **Issue**: Field-level references (`record.attributes[field] = targetId`) live inside JSONB. If the referenced target record is deleted or archived, the referencing record holds a dangling ID.
 - **Target Resolution**: In the ComboBox and preview renderer, gracefully handle unknown/archived IDs by displaying an amber warning indicator (`⚠️ Record #ID not found or archived`) instead of crashing or showing blank state.
 
+### E. Conceptual Separation: Graph Relationships vs. Relation Picker
+- **Issue**: Users can get confused between Graph Edges (Tab 3: Relationships & Inspector) and Field Lookups (`relation_picker` attributes). They might create duplicate or conflicting representations without understanding when to use which.
+- **Target Resolution**: Add clear contextual in-app guidance in `RelationshipTypesManager` and `AttributeCard` clarifying when to model a connection as a multi-cardinality Graph Edge (1:N, N:N with cascade lifecycle) versus an in-schema attribute lookup (`relation_picker`).
+
 ---
 
 ## 2. Implementation Deliverables
 
-### Step 1: Schema Builder Attribute Dialog Refinement
+### Step 1 (Point A): Schema Builder Attribute Dialog Refinement
 - **File**: `apps/console/src/features/metadata/components/schema-builder/attribute-dialog.tsx`
 - **Actions**:
   1. Relocate `Target Entity Model` selector into the `General & Types` tab.
@@ -41,25 +45,38 @@ Following the rollout of Phase 6 (Entity Relationship Types and Edge Inspector),
   3. Validate on form submission: block saving if `uiComponent === 'relation_picker'` and no `targetEntityTypeId` is selected.
   4. Automatically clean up `targetEntityTypeId` from `options` if the user changes `uiComponent` to a non-relation component.
 
-### Step 2: Searchable ComboBox Component for `RelationPickerControl`
+### Step 2 (Point B): Searchable ComboBox Component for `RelationPickerControl`
 - **File**: `apps/console/src/features/metadata/components/dynamic-fields/dynamic-field-renderer.tsx`
 - **Actions**:
   1. Build a searchable ComboBox using `Popover`, `PopoverTrigger`, `PopoverContent`, `Command`, `CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup`, and `CommandItem`.
   2. Render items with formatted labels (`#ID - Title / Code`), tenant badge, and checkmark.
   3. Include a "Clear selection" option for optional attributes.
   4. Include live record preview badge card below the picker.
-  5. Fallback warning badge when a foreign ID cannot be resolved among active records.
 
-### Step 3: EntityDataGrid Relation Attribute Formatter
+### Step 3 (Point C): EntityDataGrid Relation Attribute Formatter
 - **File**: `apps/console/src/features/metadata/components/data-explorer/entity-data-grid.tsx`
 - **Actions**:
   1. Check if the attribute's `uiComponent === 'relation_picker'`.
   2. If so, render a styled relation badge: `🔗 #{id}` with subtle border and icon to distinguish it from regular numerical/text fields.
 
+### Step 4 (Point D): Dangling Reference & Soft-Delete Warning in UI
+- **File**: `apps/console/src/features/metadata/components/dynamic-fields/dynamic-field-renderer.tsx`
+- **Actions**:
+  1. Detect when `value` exists but the target record cannot be resolved among active records (`isDanglingReference`).
+  2. Render an amber warning banner: `⚠️ Referenced record #ID was not found or has been archived`.
+
+### Step 5 (Point E): In-App Architectural Guidance for Dual Relationship Models
+- **File**: `apps/console/src/features/metadata/components/relationships/relationship-types-manager.tsx`
+- **Actions**:
+  1. Add an architectural guidance banner at the top of the Relationships tab.
+  2. Clarify that Graph Edges manage multi-cardinality (1:1, 1:N, N:1, N:N) lifecycle connections with edge metadata, whereas Field Lookups (`relation_picker`) serve as single foreign reference IDs inside JSON attributes.
+
 ---
 
 ## 3. Verification & Acceptance Criteria
 1. `pnpm --filter @unipost/console build` compiles cleanly with zero type errors.
-2. Opening `AttributeDialog` and choosing `Relation Picker` shows the Target Entity Model selector directly on the first tab.
+2. Opening `AttributeDialog` and choosing `Relation Picker` shows the Target Entity Model selector directly on the first tab and blocks saving if empty.
 3. Editing a record with a `relation_picker` presents a searchable ComboBox that allows typing to filter records and clicking to select or clear.
-4. `EntityDataGrid` presents relation attributes as styled reference badges.
+4. `EntityDataGrid` presents relation attributes as styled reference badges (`🔗 #ID`).
+5. Dangling foreign keys render an explicit amber warning badge.
+6. Relationships management view displays clear architecture guidance separating Graph Edges from attribute lookups.
