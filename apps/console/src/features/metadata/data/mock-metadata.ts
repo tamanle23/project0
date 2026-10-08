@@ -25,6 +25,12 @@ import type {
   ValidationErrorDetail,
 } from '../api/types';
 
+import {
+  additionalEntityTypes,
+  additionalAttributes,
+  generateAdditionalRecords,
+} from './mock-catalog-data';
+
 export const initialMockEntityTypes: EntityType[] = [
   {
     id: '1',
@@ -56,9 +62,11 @@ export const initialMockEntityTypes: EntityType[] = [
     createdDate: new Date('2026-02-01').toISOString(),
     updatedDate: new Date('2026-03-25').toISOString(),
   },
+  ...additionalEntityTypes,
 ];
 
 export const initialMockAttributes: Record<string, AttributeDefinition[]> = {
+  ...additionalAttributes,
   '1': [
     {
       id: '101',
@@ -348,11 +356,11 @@ const generateInitialRecords = (): Record<string, EntityRecord[]> => {
     });
   }
 
-  // Generate 80 Cloud Resource Specification records
+  // Generate 200 Cloud Resource Specification records
   const architectures = ['arm64', 'x86_64', 'riscv64'];
   const resourceFamilies = ['c3-compute', 'm4-general', 'r5-highmem', 'g4-gpu', 'i3-storage', 't4-nano'];
   const resourceRecords: EntityRecord[] = [];
-  for (let i = 1; i <= 80; i++) {
+  for (let i = 1; i <= 200; i++) {
     const id = String(2000 + i);
     const family = resourceFamilies[i % resourceFamilies.length];
     const vcpu = [2, 4, 8, 16, 32, 48, 64, 96, 128][i % 9];
@@ -364,6 +372,7 @@ const generateInitialRecords = (): Record<string, EntityRecord[]> => {
     resourceRecords.push({
       id,
       entityTypeId: '2',
+      tenantId: regions[i % regions.length],
       version: 1,
       attributes: {
         resource_code: code,
@@ -377,10 +386,10 @@ const generateInitialRecords = (): Record<string, EntityRecord[]> => {
     });
   }
 
-  // Generate 50 Deployment Policy records
+  // Generate 200 Deployment Policy records
   const rolloutStrategies = ['Canary', 'Rolling', 'Blue-Green', 'Recreate'];
   const policyRecords: EntityRecord[] = [];
-  for (let i = 1; i <= 50; i++) {
+  for (let i = 1; i <= 200; i++) {
     const id = String(3000 + i);
     const strategy = rolloutStrategies[i % rolloutStrategies.length];
     const strictZeroDowntime = strategy !== 'Recreate';
@@ -389,6 +398,7 @@ const generateInitialRecords = (): Record<string, EntityRecord[]> => {
     policyRecords.push({
       id,
       entityTypeId: '3',
+      tenantId: regions[i % regions.length],
       version: 1,
       attributes: {
         policy_id: policyId,
@@ -401,6 +411,7 @@ const generateInitialRecords = (): Record<string, EntityRecord[]> => {
   }
 
   return {
+    ...generateAdditionalRecords(),
     '1': customerRecords,
     '2': resourceRecords,
     '3': policyRecords,
@@ -483,7 +494,7 @@ export class MockMetadataService implements MetadataDataSource {
   // ==========================================
   async getEntityTypes(params?: PageRequestParams): Promise<PageResponse<EntityType>> {
     const page = params?.number && params.number > 0 ? params.number : 1;
-    const size = params?.size && params.size > 0 ? params.size : 10;
+    const size = params?.size && params.size > 0 ? params.size : 200;
     const start = (page - 1) * size;
     const end = start + size;
     const content = this.entityTypes.slice(start, end);

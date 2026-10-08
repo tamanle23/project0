@@ -10,7 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Database, Plus, Search, MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Database, Plus, Search, MoreVertical, Edit2, Trash2, X } from 'lucide-react';
 
 export const EntityTypeSidebar: React.FC = () => {
   const { data: entityTypesResponse, isLoading } = useEntityTypes();
@@ -45,6 +46,10 @@ export const EntityTypeSidebar: React.FC = () => {
         <div className="flex items-center gap-2">
           <Database className="h-5 w-5 text-primary" />
           <h3 className="font-bold text-foreground text-sm tracking-tight">Entity Models</h3>
+          <Badge variant="secondary" className="text-[10px] h-5 px-1.5 font-mono">
+            {filteredEntityTypes.length}
+            {filteredEntityTypes.length !== entityTypes.length && ` / ${entityTypes.length}`}
+          </Badge>
         </div>
         <Button
           size="sm"
@@ -64,9 +69,19 @@ export const EntityTypeSidebar: React.FC = () => {
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Filter models..."
-          className="pl-8 h-8 text-xs bg-white/50 dark:bg-white/5 border-white/20"
+          placeholder="Filter models (e.g. cluster, vpc)..."
+          className="pl-8 pr-7 h-8 text-xs bg-white/50 dark:bg-white/5 border-white/20"
         />
+        {search && (
+          <button
+            type="button"
+            onClick={() => setSearch('')}
+            className="absolute right-2 top-2 p-0.5 text-muted-foreground hover:text-foreground"
+            title="Clear filter"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
 
       {/* List */}

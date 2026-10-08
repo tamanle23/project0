@@ -51,6 +51,8 @@ import {
   Code,
   ChevronLeft,
   ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   Database,
   X,
   GitFork,
@@ -760,13 +762,14 @@ export const EntityDataGrid: React.FC<Props> = ({
                 handlePageSizeChange(Number(val));
               }}
             >
-              <SelectTrigger className="h-7 w-16 text-xs bg-white/50 dark:bg-white/5 border-white/20">
+              <SelectTrigger className="h-7 w-18 text-xs bg-white/50 dark:bg-white/5 border-white/20">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="10">10</SelectItem>
                 <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
               </SelectContent>
             </Select>
             <span>per page</span>
@@ -776,15 +779,31 @@ export const EntityDataGrid: React.FC<Props> = ({
             <span className="text-muted-foreground">
               Page <span className="font-semibold text-foreground">{page}</span> of{' '}
               <span className="font-semibold text-foreground">{totalPages}</span>
+              {totalRecords > 0 && (
+                <span className="ml-1 text-muted-foreground/80">
+                  ({totalRecords.toLocaleString()} {totalRecords === 1 ? 'record' : 'records'})
+                </span>
+              )}
             </span>
 
             <div className="flex items-center gap-1">
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => handlePageChange(1)}
+                disabled={page <= 1}
+                className="h-7 w-7 p-0 bg-white/40 dark:bg-white/5"
+                title="First page"
+              >
+                <ChevronsLeft className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => handlePageChange(Math.max(1, page - 1))}
                 disabled={page <= 1}
                 className="h-7 w-7 p-0 bg-white/40 dark:bg-white/5"
+                title="Previous page"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
               </Button>
@@ -794,8 +813,19 @@ export const EntityDataGrid: React.FC<Props> = ({
                 onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
                 disabled={page >= totalPages}
                 className="h-7 w-7 p-0 bg-white/40 dark:bg-white/5"
+                title="Next page"
               >
                 <ChevronRight className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(totalPages)}
+                disabled={page >= totalPages}
+                className="h-7 w-7 p-0 bg-white/40 dark:bg-white/5"
+                title="Last page"
+              >
+                <ChevronsRight className="h-3.5 w-3.5" />
               </Button>
             </div>
           </div>

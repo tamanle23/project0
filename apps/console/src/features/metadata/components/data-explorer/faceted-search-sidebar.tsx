@@ -4,6 +4,7 @@ import type { AttributeFilterClause } from '../../store/use-metadata-ui-store';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 import {
   SlidersHorizontal,
   ChevronDown,
@@ -17,6 +18,7 @@ import {
   CheckCircle2,
   Hash,
   Calendar,
+  Search,
 } from 'lucide-react';
 
 interface FacetedSearchSidebarProps {
@@ -54,9 +56,18 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
   className = '',
 }) => {
   const [collapsedGroups, setCollapsedGroups] = React.useState<Record<string, boolean>>({});
+  const [expandedGroups, setExpandedGroups] = React.useState<Record<string, boolean>>({});
+  const [groupSearchQuery, setGroupSearchQuery] = React.useState<Record<string, string>>({});
 
   const toggleGroupCollapse = (field: string) => {
     setCollapsedGroups((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
+
+  const toggleGroupExpand = (field: string) => {
+    setExpandedGroups((prev) => ({
       ...prev,
       [field]: !prev[field],
     }));
@@ -470,60 +481,104 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
               </button>
 
               {/* Bucket Choices */}
-              {!isCollapsed && (
-                <div className="mt-2 space-y-1.5 pl-1">
-                  {group.buckets.map((bucket) => {
-                    let isChecked = false;
-                    if (group.type === 'numeric_range') {
-                      isChecked = activeFilters.some(
-                        (f) => f.field === group.field && f.operator === 'gte' && f.value === bucket.minVal
-                      );
-                    } else if (group.type === 'date_range') {
-                      isChecked = activeFilters.some(
-                        (f) => f.id.startsWith(`facet-date-${group.field}-`) && f.value === bucket.value
-                      );
-                    } else {
-                      isChecked = activeFilters.some(
-                        (f) =>
-                          f.field === group.field &&
-                          f.operator === 'eq' &&
-                          f.value === bucket.value
-                      );
-                    }
+              {!isCollapsed && (() => {
+                const query = (groupSearchQuery[group.field] || '').toLowerCase().trim();
+                const filteredBuckets = query
+                  ? group.buckets.filter((b) => b.label.toLowerCase().includes(query))
+                  : group.buckets;
+                const isExpanded = Boolean(expandedGroups[group.field]);
+                const visibleBuckets = isExpanded || query || filteredBuckets.length <= 5
+                  ? filteredBuckets
+                  : filteredBuckets.slice(0, 5);
 
-                    return (
-                      <label
-                        key={bucket.value}
-                        onClick={() => handleToggleFacet(group, bucket)}
-                        className={`flex items-center justify-between text-xs px-2 py-1.5 rounded-lg cursor-pointer transition-all select-none ${
-                          isChecked
-                            ? 'bg-primary/15 text-primary font-medium border border-primary/20'
-                            : 'hover:bg-white/40 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 truncate">
-                          <Checkbox
-                            checked={isChecked}
-                            onCheckedChange={() => handleToggleFacet(group, bucket)}
-                            className="h-3.5 w-3.5 pointer-events-none"
-                          />
-                          <span className="truncate">{bucket.label}</span>
-                        </div>
+                return (
+                  <div className="mt-2 space-y-1.5 pl-1">
+                    {group.buckets.length > 6 && (
+                      <div className="relative mb-2 pr-1">
+                        <Search className="absolute left-2 top-2 h-3 w-3 text-muted-foreground" />
+                        <Input
+                          value={groupSearchQuery[group.field] || ''}
+                          onChange={(e) =>
+                            setGroupSearchQuery((prev) => ({
+                              ...prev,
+                              [group.field]: e.target.value,
+                            }))
+                          }
+                          placeholder={`Filter ${group.name.toLowerCase()}...`}
+                          className="h-7 pl-6 pr-2 text-[11px] bg-white/40 dark:bg-white/5 border-white/20"
+                        />
+                      </div>
+                    )}
 
-                        <span
-                          className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full ${
+                    {visibleBuckets.map((bucket) => {
+                      let isChecked = false;
+                      if (group.type === 'numeric_range') {
+                        isChecked = activeFilters.some(
+                          (f) => f.field === group.field && f.operator === 'gte' && f.value === bucket.minVal
+                        );
+                      } else if (group.type === 'date_range') {
+                        isChecked = activeFilters.some(
+                          (f) => f.id.startsWith(`facet-date-${group.field}-`) && f.value === bucket.value
+                        );
+                      } else {
+                        isChecked = activeFilters.some(
+                          (f) =>
+                            f.field === group.field &&
+                            f.operator === 'eq' &&
+                            f.value === bucket.value
+                        );
+                      }
+
+                      return (
+                        <label
+                          key={bucket.value}
+                          onClick={() => handleToggleFacet(group, bucket)}
+                          className={`flex items-center justify-between text-xs px-2 py-1.5 rounded-lg cursor-pointer transition-all select-none ${
                             isChecked
-                              ? 'bg-primary text-primary-foreground font-semibold'
-                              : 'bg-muted/80 text-muted-foreground'
+                              ? 'bg-primary/15 text-primary font-medium border border-primary/20'
+                              : 'hover:bg-white/40 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground'
                           }`}
                         >
-                          {bucket.count}
-                        </span>
-                      </label>
-                    );
-                  })}
-                </div>
-              )}
+                          <div className="flex items-center gap-2 truncate">
+                            <Checkbox
+                              checked={isChecked}
+                              onCheckedChange={() => handleToggleFacet(group, bucket)}
+                              className="h-3.5 w-3.5 pointer-events-none"
+                            />
+                            <span className="truncate">{bucket.label}</span>
+                          </div>
+
+                          <span
+                            className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full ${
+                              isChecked
+                                ? 'bg-primary text-primary-foreground font-semibold'
+                                : 'bg-muted/80 text-muted-foreground'
+                            }`}
+                          >
+                            {bucket.count}
+                          </span>
+                        </label>
+                      );
+                    })}
+
+                    {visibleBuckets.length === 0 && (
+                      <div className="text-[11px] text-muted-foreground/80 py-1 pl-1 italic">
+                        No matching options
+                      </div>
+                    )}
+
+                    {!query && filteredBuckets.length > 5 && (
+                      <button
+                        type="button"
+                        onClick={() => toggleGroupExpand(group.field)}
+                        className="text-[11px] text-primary hover:underline font-medium pl-1 pt-1 block"
+                      >
+                        {isExpanded ? 'Show less' : `+ Show ${filteredBuckets.length - 5} more`}
+                      </button>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           );
         })}
