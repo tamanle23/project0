@@ -152,7 +152,7 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
       <PopoverContent
         align="start"
         sideOffset={6}
-        className="w-[92vw] sm:w-[540px] max-h-[85vh] overflow-y-auto p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-white/30 dark:border-white/10 shadow-2xl space-y-4"
+        className="w-[94vw] sm:w-[620px] max-h-[85vh] overflow-y-auto p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-white/30 dark:border-white/10 shadow-2xl space-y-4"
       >
         <div className="flex items-center justify-between border-b border-border/50 pb-3">
           <div className="flex items-center gap-2">
@@ -211,15 +211,15 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
               return (
                 <div
                   key={rule.id}
-                  className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-2.5 rounded-xl bg-slate-500/5 border border-border/40 hover:border-primary/30 transition-colors"
+                  className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-2.5 rounded-xl bg-slate-500/5 border border-border/40 hover:border-primary/30 transition-colors min-w-0"
                 >
                   {/* Field Selector */}
-                  <div className="w-full sm:w-[150px] shrink-0">
+                  <div className="w-full sm:w-[170px] sm:min-w-[170px] shrink-0 min-w-0">
                     <Select
                       value={rule.field}
                       onValueChange={(val) => handleUpdateRule(rule.id, { field: val })}
                     >
-                      <SelectTrigger className="h-8 text-xs bg-white/70 dark:bg-white/5">
+                      <SelectTrigger className="w-full h-8 text-xs bg-white/70 dark:bg-white/5 truncate">
                         <SelectValue placeholder="Field" />
                       </SelectTrigger>
                       <SelectContent className="max-h-56">
@@ -229,10 +229,12 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
                             value={attr.systemName}
                             className="text-xs"
                           >
-                            <span className="font-medium">{attr.name}</span>
-                            <span className="ml-1 text-[10px] text-muted-foreground opacity-70">
-                              ({attr.dataType?.toLowerCase()})
-                            </span>
+                            <div className="flex items-center justify-between gap-1.5 w-full min-w-0">
+                              <span className="font-medium truncate">{attr.name}</span>
+                              <span className="text-[10px] text-muted-foreground opacity-70 shrink-0 font-mono">
+                                ({attr.dataType?.toLowerCase()})
+                              </span>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -240,12 +242,12 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
                   </div>
 
                   {/* Operator Selector */}
-                  <div className="w-full sm:w-[130px] shrink-0">
+                  <div className="w-full sm:w-[140px] sm:min-w-[140px] shrink-0 min-w-0">
                     <Select
                       value={rule.operator}
                       onValueChange={(val: any) => handleUpdateRule(rule.id, { operator: val })}
                     >
-                      <SelectTrigger className="h-8 text-xs bg-white/70 dark:bg-white/5">
+                      <SelectTrigger className="w-full h-8 text-xs bg-white/70 dark:bg-white/5 truncate">
                         <SelectValue placeholder="Operator" />
                       </SelectTrigger>
                       <SelectContent>
@@ -270,13 +272,13 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
                   </div>
 
                   {/* Value Input */}
-                  <div className="flex-1 min-w-0">
+                  <div className="w-full sm:flex-1 min-w-0">
                     {dataType === 'boolean' ? (
                       <Select
                         value={rule.value || 'true'}
                         onValueChange={(val) => handleUpdateRule(rule.id, { value: val })}
                       >
-                        <SelectTrigger className="h-8 text-xs bg-white/70 dark:bg-white/5">
+                        <SelectTrigger className="w-full h-8 text-xs bg-white/70 dark:bg-white/5">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -289,7 +291,7 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
                         value={rule.value}
                         onValueChange={(val) => handleUpdateRule(rule.id, { value: val })}
                       >
-                        <SelectTrigger className="h-8 text-xs bg-white/70 dark:bg-white/5">
+                        <SelectTrigger className="w-full h-8 text-xs bg-white/70 dark:bg-white/5 truncate">
                           <SelectValue placeholder="Select choice..." />
                         </SelectTrigger>
                         <SelectContent>
@@ -310,7 +312,7 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
                             ? 'e.g. VIP, Early-Adopter'
                             : 'Enter value...'
                         }
-                        className="h-8 text-xs bg-white/70 dark:bg-white/5"
+                        className="w-full h-8 text-xs bg-white/70 dark:bg-white/5 min-w-0"
                       />
                     )}
                   </div>
@@ -320,7 +322,8 @@ export const AdvancedFilterPopover: React.FC<AdvancedFilterPopoverProps> = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => handleRemoveRule(rule.id)}
-                    className="h-8 w-8 p-0 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                    className="h-8 w-8 p-0 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors self-end sm:self-center"
+                    title="Remove condition"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
