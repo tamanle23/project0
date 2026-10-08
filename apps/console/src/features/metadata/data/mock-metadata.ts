@@ -495,14 +495,33 @@ export class MockMetadataService implements MetadataDataSource {
   async getEntityTypes(params?: PageRequestParams): Promise<PageResponse<EntityType>> {
     const page = params?.number && params.number > 0 ? params.number : 1;
     const size = params?.size && params.size > 0 ? params.size : 200;
+    let list = [...this.entityTypes];
+
+    const search = typeof params?.search === 'string'
+      ? params.search.trim().toLowerCase()
+      : typeof params?.filters?.search === 'string'
+      ? (params.filters.search as string).trim().toLowerCase()
+      : '';
+
+    if (search) {
+      list = list.filter(
+        (et) =>
+          et.name.toLowerCase().includes(search) ||
+          et.systemName.toLowerCase().includes(search) ||
+          (et.description && et.description.toLowerCase().includes(search))
+      );
+    }
+
+    const totalElements = list.length;
+    const totalPages = Math.ceil(totalElements / size) || 1;
     const start = (page - 1) * size;
     const end = start + size;
-    const content = this.entityTypes.slice(start, end);
+    const content = list.slice(start, end);
 
     return {
       content,
-      totalElements: this.entityTypes.length,
-      totalPages: Math.ceil(this.entityTypes.length / size) || 1,
+      totalElements,
+      totalPages,
       number: page,
       size,
     };

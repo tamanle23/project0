@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useEntityTypes } from '../../api/metadata-api';
 import { useMetadataUiStore } from '../../store/use-metadata-ui-store';
 import type { EntityType } from '../../api/types';
@@ -10,11 +10,34 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Database, Plus, Search, MoreVertical, Edit2, Trash2, X } from 'lucide-react';
+import {
+  Database,
+  Plus,
+  Search,
+  MoreVertical,
+  Edit2,
+  Trash2,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from 'lucide-react';
 
 export const EntityTypeSidebar: React.FC = () => {
-  const { data: entityTypesResponse, isLoading } = useEntityTypes();
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+
   const {
     selectedEntityTypeId,
     setSelectedEntityTypeId,
@@ -23,39 +46,54 @@ export const EntityTypeSidebar: React.FC = () => {
     openDeleteEntityTypeDialog,
   } = useMetadataUiStore();
 
-  const [search, setSearch] = useState('');
+  // Debounce search query (300ms) and reset page to 1
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  const { data: entityTypesResponse, isLoading } = useEntityTypes({
+    number: page,
+    size: pageSize,
+    search: debouncedSearch,
+  });
 
   const entityTypes = useMemo(() => {
     return entityTypesResponse?.content || [];
   }, [entityTypesResponse]);
 
-  const filteredEntityTypes = useMemo(() => {
-    if (!search.trim()) return entityTypes;
-    const query = search.toLowerCase();
-    return entityTypes.filter(
-      (et) =>
-        et.name.toLowerCase().includes(query) ||
-        et.systemName.toLowerCase().includes(query)
-    );
-  }, [entityTypes, search]);
+  const totalElements = entityTypesResponse?.totalElements ?? entityTypes.length;
+  const totalPages = entityTypesResponse?.totalPages ?? (Math.ceil(totalElements / pageSize) || 1);
+
+  // If no model is selected and we have items, set the first item
+  useEffect(() => {
+    if (!selectedEntityTypeId && entityTypes.length > 0) {
+      setSelectedEntityTypeId(String(entityTypes[0].id));
+    }
+  }, [selectedEntityTypeId, entityTypes, setSelectedEntityTypeId]);
+
+  const startRecord = totalElements > 0 ? (page - 1) * pageSize + 1 : 0;
+  const endRecord = Math.min(page * pageSize, totalElements);
 
   return (
-    <aside className="w-full lg:w-72 shrink-0 flex flex-col gap-4 p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
+    <aside className="w-full lg:w-76 shrink-0 flex flex-col gap-3 p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Database className="h-5 w-5 text-primary" />
-          <h3 className="font-bold text-foreground text-sm tracking-tight">Entity Models</h3>
-          <Badge variant="secondary" className="text-[10px] h-5 px-1.5 font-mono">
-            {filteredEntityTypes.length}
-            {filteredEntityTypes.length !== entityTypes.length && ` / ${entityTypes.length}`}
+        <div className="flex items-center gap-2 min-w-0">
+          <Database className="h-5 w-5 text-primary shrink-0" />
+          <h3 className="font-bold text-foreground text-sm tracking-tight truncate">Entity Models</h3>
+          <Badge variant="secondary" className="text-[10px] h-5 px-1.5 font-mono shrink-0">
+            {totalElements}
           </Badge>
         </div>
         <Button
           size="sm"
           variant="outline"
           onClick={openCreateEntityTypeDialog}
-          className="h-8 px-2 gap-1 text-xs bg-white/40 dark:bg-white/5 border-white/20"
+          className="h-8 px-2 gap-1 text-xs bg-white/40 dark:bg-white/5 border-white/20 shrink-0"
           title="Create New Entity Model"
         >
           <Plus className="h-3.5 w-3.5" />
@@ -85,15 +123,18 @@ export const EntityTypeSidebar: React.FC = () => {
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto space-y-1.5 max-h-[calc(100vh-280px)] pr-1">
+      <div className="flex-1 overflow-y-auto space-y-1.5 min-h-[300px] max-h-[calc(100vh-340px)] pr-1">
         {isLoading ? (
-          <div className="text-xs text-muted-foreground p-4 text-center">Loading models...</div>
-        ) : filteredEntityTypes.length === 0 ? (
-          <div className="text-xs text-muted-foreground p-4 text-center">
-            {search ? 'No matching models' : 'No entity models yet.'}
+          <div className="flex flex-col items-center justify-center p-8 text-xs text-muted-foreground gap-2">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            <span>Loading models...</span>
+          </div>
+        ) : entityTypes.length === 0 ? (
+          <div className="text-xs text-muted-foreground p-6 text-center">
+            {debouncedSearch ? `No models matching "${debouncedSearch}".` : 'No entity models yet.'}
           </div>
         ) : (
-          filteredEntityTypes.map((et: EntityType) => {
+          entityTypes.map((et: EntityType) => {
             const isSelected = String(selectedEntityTypeId) === String(et.id);
 
             return (
@@ -118,7 +159,7 @@ export const EntityTypeSidebar: React.FC = () => {
                 </div>
 
                 <div
-                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <DropdownMenu>
@@ -151,6 +192,83 @@ export const EntityTypeSidebar: React.FC = () => {
             );
           })
         )}
+      </div>
+
+      {/* Pagination Footer */}
+      <div className="pt-2 border-t border-white/20 dark:border-white/10 flex flex-col gap-2">
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+          <span>
+            {totalElements > 0 ? `${startRecord}–${endRecord} of ${totalElements}` : '0 models'}
+          </span>
+          <div className="flex items-center gap-1">
+            <span className="text-[10px]">Per page</span>
+            <Select
+              value={String(pageSize)}
+              onValueChange={(val) => {
+                setPageSize(Number(val));
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="h-6 w-14 text-[11px] px-1.5 py-0 bg-white/40 dark:bg-white/5 border-white/20">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="text-xs min-w-[4rem]">
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="15">15</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-1 text-xs">
+          <span className="text-[11px] text-muted-foreground font-mono">
+            Pg {page}/{totalPages}
+          </span>
+          <div className="flex items-center gap-0.5">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(1)}
+              disabled={page <= 1}
+              className="h-6 w-6 p-0 bg-white/40 dark:bg-white/5"
+              title="First page"
+            >
+              <ChevronsLeft className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="h-6 w-6 p-0 bg-white/40 dark:bg-white/5"
+              title="Previous page"
+            >
+              <ChevronLeft className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              className="h-6 w-6 p-0 bg-white/40 dark:bg-white/5"
+              title="Next page"
+            >
+              <ChevronRight className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(totalPages)}
+              disabled={page >= totalPages}
+              className="h-6 w-6 p-0 bg-white/40 dark:bg-white/5"
+              title="Last page"
+            >
+              <ChevronsRight className="h-3 w-3" />
+            </Button>
+          </div>
+        </div>
       </div>
     </aside>
   );

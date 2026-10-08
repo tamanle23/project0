@@ -49,6 +49,7 @@ export class HttpMetadataService implements MetadataDataSource {
         number: params?.number || 1,
         size: params?.size || 10,
         sort: params?.sort,
+        search: params?.search,
       },
     });
     return unwrapResponse(res.data);
