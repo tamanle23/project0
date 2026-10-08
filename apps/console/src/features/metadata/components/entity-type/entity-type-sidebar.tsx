@@ -182,9 +182,10 @@ export const EntityTypeSidebar: React.FC = () => {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
-                        className={`p-1 rounded hover:bg-white/20 ${
+                        className={`p-1 rounded min-h-[28px] min-w-[28px] flex items-center justify-center hover:bg-white/20 ${
                           isSelected ? 'text-primary-foreground' : 'text-muted-foreground'
                         }`}
+                        aria-label={`Actions for ${et.name}`}
                       >
                         <MoreVertical className="h-3.5 w-3.5" />
                       </button>
@@ -243,7 +244,7 @@ export const EntityTypeSidebar: React.FC = () => {
             size="sm"
             onClick={() => setPage(1)}
             disabled={page <= 1}
-            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground disabled:opacity-25"
+            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground disabled:opacity-25"
             title="First page"
           >
             <ChevronsLeft className="h-3.5 w-3.5" />
@@ -253,7 +254,7 @@ export const EntityTypeSidebar: React.FC = () => {
             size="sm"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground disabled:opacity-25"
+            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground disabled:opacity-25"
             title="Previous page"
           >
             <ChevronLeft className="h-3.5 w-3.5" />
@@ -263,7 +264,7 @@ export const EntityTypeSidebar: React.FC = () => {
             size="sm"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground disabled:opacity-25"
+            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground disabled:opacity-25"
             title="Next page"
           >
             <ChevronRight className="h-3.5 w-3.5" />
@@ -273,7 +274,7 @@ export const EntityTypeSidebar: React.FC = () => {
             size="sm"
             onClick={() => setPage(totalPages)}
             disabled={page >= totalPages}
-            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground disabled:opacity-25"
+            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground disabled:opacity-25"
             title="Last page"
           >
             <ChevronsRight className="h-3.5 w-3.5" />
