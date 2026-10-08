@@ -17,8 +17,15 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useDialogState<TasksDialogType>(null)
   const [currentRow, setCurrentRow] = useState<Task | null>(null)
 
+  // Optimization: Memoize context value to preserve referential equality and prevent
+  // unnecessary re-renders of consumer components when TasksProvider re-renders.
+  const contextValue = React.useMemo<TasksContextType>(
+    () => ({ open, setOpen, currentRow, setCurrentRow }),
+    [open, setOpen, currentRow, setCurrentRow]
+  )
+
   return (
-    <TasksContext value={{ open, setOpen, currentRow, setCurrentRow }}>
+    <TasksContext value={contextValue}>
       {children}
     </TasksContext>
   )
