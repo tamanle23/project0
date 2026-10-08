@@ -494,7 +494,7 @@ export class MockMetadataService implements MetadataDataSource {
   // ==========================================
   async getEntityTypes(params?: PageRequestParams): Promise<PageResponse<EntityType>> {
     const page = params?.number && params.number > 0 ? params.number : 1;
-    const size = params?.size && params.size > 0 ? params.size : 200;
+    const size = params?.size && params.size > 0 ? params.size : 10;
     let list = [...this.entityTypes];
 
     const search = typeof params?.search === 'string'

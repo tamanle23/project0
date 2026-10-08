@@ -18,6 +18,7 @@ import {
   Hash,
   Calendar,
   Search,
+  X,
 } from 'lucide-react';
 
 interface FacetedSearchSidebarProps {
@@ -27,6 +28,7 @@ interface FacetedSearchSidebarProps {
   onFilterChange: (filters: AttributeFilterClause[]) => void;
   serverFacets?: EntityFacetsResponse | null;
   className?: string;
+  onClose?: () => void;
 }
 
 interface FacetBucket {
@@ -53,6 +55,7 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
   onFilterChange,
   serverFacets,
   className = '',
+  onClose,
 }) => {
   const [collapsedGroups, setCollapsedGroups] = React.useState<Record<string, boolean>>({});
   const [expandedGroups, setExpandedGroups] = React.useState<Record<string, boolean>>({});
@@ -380,10 +383,10 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
 
   return (
     <aside
-      className={`w-64 shrink-0 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 flex flex-col overflow-hidden transition-all ${className}`}
+      className={`w-full lg:w-64 xl:w-72 shrink-0 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 flex flex-col min-h-0 overflow-hidden transition-all ${className}`}
     >
       {/* Header */}
-      <div className="p-3.5 border-b border-white/20 dark:border-white/10 flex items-center justify-between">
+      <div className="p-3.5 border-b border-white/20 dark:border-white/10 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <div className="h-6 w-6 rounded-md bg-primary/10 flex items-center justify-center text-primary">
             <SlidersHorizontal className="h-3.5 w-3.5" />
@@ -398,22 +401,36 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
           )}
         </div>
 
-        {activeFacetCount > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleResetFacets}
-            className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-destructive flex items-center gap-1"
-            title="Reset facets"
-          >
-            <RotateCcw className="h-3 w-3" />
-            <span>Reset</span>
-          </Button>
-        )}
+        <div className="flex items-center gap-1">
+          {activeFacetCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleResetFacets}
+              className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-destructive flex items-center gap-1"
+              title="Reset facets"
+            >
+              <RotateCcw className="h-3 w-3" />
+              <span>Reset</span>
+            </Button>
+          )}
+
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+              title="Close Facets"
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Facet Groups Accordions */}
-      <div className="p-3 space-y-4 overflow-y-auto max-h-[calc(100vh-280px)] divide-y divide-white/10 dark:divide-white/5">
+      <div className="p-3 space-y-4 overflow-y-auto flex-1 min-h-[220px] divide-y divide-white/10 dark:divide-white/5">
         {facetGroups.map((group, gIdx) => {
           const isCollapsed = Boolean(collapsedGroups[group.field]);
           const groupActiveFilters = activeFilters.filter((f) => f.field === group.field);
@@ -565,7 +582,7 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
       </div>
 
       {/* Footer Info */}
-      <div className="p-3 border-t border-white/20 dark:border-white/10 text-[10px] text-muted-foreground/80 flex items-center justify-between bg-white/20 dark:bg-black/10">
+      <div className="p-3 border-t border-white/20 dark:border-white/10 text-[10px] text-muted-foreground/80 flex items-center justify-between bg-white/20 dark:bg-black/10 shrink-0">
         <span>PostgreSQL GIN Indexed</span>
         <CheckCircle2 className="h-3 w-3 text-emerald-500" />
       </div>

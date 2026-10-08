@@ -48,7 +48,7 @@ Workflow:
 -  **PERFORMANCE-TUNING**: NEVER block the Event Loop with synchronous I/O. MUST use `await fs.promises` for all file operations. Yield CPU-bound loops explicitly.
 
 ## 6. HISTORY-GIT-ARCHIVAL**: For EVERY change:
-  1. Create sequential 3-digit history log `docs/history/XXX_<task>.md` (Problem, Plan, Changes, Verification, Walkthrough, Tasks).
+  1. Create sequential 3-digit history log `docs/history/XXX_<task>.md` (Problem, Plan, Changes, Verification, Walkthrough, Tasks, Enhancement).
   2. Update index in `docs/history/README.md`.
   3. Run `git add .` and `git commit -m "[XXX] Task Title" -m "Brief summary"`.
   4.MUST auto-stage and commit only after implementation passes verification (build/lint/test).
@@ -65,3 +65,7 @@ Workflow:
 
 ## 8. Project Routing Map
 Before modifying or analyzing any project endpoints or architecture, read the routing architecture rules defined in [ROUTE.md](./ROUTE.md).
+
+## 9.Rule: WAI-ARIA & Accessibility Enforcement (WCAG 2.2 AA)
+
+- Enforce WAI-ARIA to make any UI project in side turborepo comply with WCAG 2.2 AA standard

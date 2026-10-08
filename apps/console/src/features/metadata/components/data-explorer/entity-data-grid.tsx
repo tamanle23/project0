@@ -356,9 +356,8 @@ export const EntityDataGrid: React.FC<Props> = ({
                 return (
                   <Badge
                     variant={val ? 'secondary' : 'outline'}
-                    className={`text-[10px] ${
-                      val ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : ''
-                    }`}
+                    className={`text-[10px] ${val ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : ''
+                      }`}
                   >
                     {val ? 'True' : 'False'}
                   </Badge>
@@ -493,10 +492,10 @@ export const EntityDataGrid: React.FC<Props> = ({
   }
 
   return (
-    <div className="space-y-4 w-full min-w-0">
+    <div className="flex flex-col gap-4 w-full min-w-0 flex-1 min-h-0">
       {/* Schema Drift Warning & Backfill Banner */}
       {driftAnalysis && driftAnalysis.outdatedRecords > 0 && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 backdrop-blur-xl animate-in fade-in-50">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 backdrop-blur-xl animate-in fade-in-50 shrink-0">
           <div className="flex items-center gap-2.5 text-xs">
             <ShieldAlert className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
             <span>
@@ -530,7 +529,7 @@ export const EntityDataGrid: React.FC<Props> = ({
       )}
 
       {/* Action Toolbar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 shrink-0">
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative w-full sm:w-64">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -628,7 +627,7 @@ export const EntityDataGrid: React.FC<Props> = ({
 
       {/* Active Filter Chips / Pills */}
       {attributeFilters.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 px-1">
+        <div className="flex flex-wrap items-center gap-2 px-1 shrink-0">
           <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
             Active Filters:
           </span>
@@ -665,7 +664,7 @@ export const EntityDataGrid: React.FC<Props> = ({
       )}
 
       {/* Table Canvas with Optional Faceted Search Sidebar & Horizontal Overflow */}
-      <div className="flex flex-col lg:flex-row items-start gap-4 w-full min-w-0">
+      <div className="flex flex-col lg:flex-row items-stretch gap-4 w-full min-w-0 flex-1 min-h-0">
         {showFacetedSidebar && isFacetOpen && (
           <FacetedSearchSidebar
             attributes={attributes}
@@ -673,161 +672,162 @@ export const EntityDataGrid: React.FC<Props> = ({
             activeFilters={attributeFilters}
             onFilterChange={handleAttributeFiltersChange}
             serverFacets={serverFacets}
+            onClose={() => setIsFacetOpen(false)}
             className="w-full lg:w-72 shrink-0 animate-in fade-in slide-in-from-left-2 duration-200"
           />
         )}
 
-        <div className="flex-1 min-w-0 w-full rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 overflow-hidden">
-          <div className="overflow-x-auto relative w-full">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr
-                  key={headerGroup.id}
-                  className="bg-white/70 dark:bg-slate-800/80 backdrop-blur-md border-b border-border"
-                >
-                  {headerGroup.headers.map((header) => {
-                    const isAction = header.column.id === 'actions';
-                    return (
-                      <th
-                        key={header.id}
-                        className={cn(
-                          'p-3 font-semibold text-muted-foreground uppercase tracking-wider text-[11px] whitespace-nowrap',
-                          isAction &&
-                            'sticky right-0 z-20 w-12 bg-white/75 dark:bg-slate-900/80 backdrop-blur-xl border-l border-white/30 dark:border-white/10 shadow-[-8px_0_20px_-4px_rgba(0,0,0,0.08),inset_1px_0_1px_0_rgba(255,255,255,0.4)] dark:shadow-[-8px_0_20px_-4px_rgba(0,0,0,0.5),inset_1px_0_1px_0_rgba(255,255,255,0.08)]'
-                        )}
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </th>
-                    );
-                  })}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows.map((row) => (
-                <tr
-                  key={row.id}
-                  className="group border-b border-white/10 hover:bg-white/40 dark:hover:bg-white/5 transition-colors"
-                >
-                  {row.getVisibleCells().map((cell) => {
-                    const isAction = cell.column.id === 'actions';
-                    return (
-                      <td
-                        key={cell.id}
-                        className={cn(
-                          'p-3 whitespace-nowrap',
-                          isAction &&
-                            'sticky right-0 z-10 w-12 bg-white/70 dark:bg-slate-900/75 group-hover:bg-white/85 dark:group-hover:bg-slate-800/85 backdrop-blur-xl border-l border-white/30 dark:border-white/10 shadow-[-8px_0_20px_-4px_rgba(0,0,0,0.08),inset_1px_0_1px_0_rgba(255,255,255,0.4)] dark:shadow-[-8px_0_20px_-4px_rgba(0,0,0,0.5),inset_1px_0_1px_0_rgba(255,255,255,0.08)] transition-[background-color,backdrop-filter] duration-150'
-                        )}
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-              {table.getRowModel().rows.length === 0 && (
-                <tr>
-                  <td colSpan={columns.length} className="p-12 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <Database className="h-8 w-8 text-muted-foreground/50 mb-1" />
-                      <p className="font-semibold text-sm">No records found</p>
-                      <p className="text-xs">
-                        {searchFilter
-                          ? `No records matching "${searchFilter}".`
-                          : 'Create your first entity record using the button above.'}
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 border-t border-white/10 bg-white/30 dark:bg-slate-850/30">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Show</span>
-            <Select
-              value={String(pageSize)}
-              onValueChange={(val) => {
-                handlePageSizeChange(Number(val));
-              }}
-            >
-              <SelectTrigger className="h-7 w-18 text-xs bg-white/50 dark:bg-white/5 border-white/20">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-            <span>per page</span>
+        <div className="flex-1 min-w-0 w-full rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 flex flex-col overflow-hidden max-lg:min-h-[420px] lg:min-h-0">
+          <div className="overflow-x-auto overflow-y-auto relative w-full flex-1 min-h-0">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead className="sticky top-0 z-10 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xs">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr
+                    key={headerGroup.id}
+                    className="border-b border-border"
+                  >
+                    {headerGroup.headers.map((header) => {
+                      const isAction = header.column.id === 'actions';
+                      return (
+                        <th
+                          key={header.id}
+                          className={cn(
+                            'p-3 font-semibold text-muted-foreground uppercase tracking-wider text-[11px] whitespace-nowrap',
+                            isAction &&
+                            'sticky right-0 z-20 w-12 backdrop-blur-xl border-l border-white/30 dark:border-white/10 shadow-[-8px_0_20px_-4px_rgba(0,0,0,0.08),inset_1px_0_1px_0_rgba(255,255,255,0.4)] dark:shadow-[-8px_0_20px_-4px_rgba(0,0,0,0.5),inset_1px_0_1px_0_rgba(255,255,255,0.08)]'
+                          )}
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </th>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="group border-b border-white/10 hover:bg-white/40 dark:hover:bg-white/5 transition-colors"
+                  >
+                    {row.getVisibleCells().map((cell) => {
+                      const isAction = cell.column.id === 'actions';
+                      return (
+                        <td
+                          key={cell.id}
+                          className={cn(
+                            'p-3 whitespace-nowrap',
+                            isAction &&
+                            'sticky right-0 z-10 w-12 group-hover:bg-white/85 dark:group-hover:bg-slate-800/85 backdrop-blur-xl border-l border-white/30 dark:border-white/10 shadow-[-8px_0_20px_-4px_rgba(0,0,0,0.08),inset_1px_0_1px_0_rgba(255,255,255,0.4)] dark:shadow-[-8px_0_20px_-4px_rgba(0,0,0,0.5),inset_1px_0_1px_0_rgba(255,255,255,0.08)] transition-[background-color,backdrop-filter] duration-150'
+                          )}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+                {table.getRowModel().rows.length === 0 && (
+                  <tr>
+                    <td colSpan={columns.length} className="p-12 text-center text-muted-foreground">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <Database className="h-8 w-8 text-muted-foreground/50 mb-1" />
+                        <p className="font-semibold text-sm">No records found</p>
+                        <p className="text-xs">
+                          {searchFilter
+                            ? `No records matching "${searchFilter}".`
+                            : 'Create your first entity record using the button above.'}
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
 
-          <div className="flex items-center gap-3 text-xs">
-            <span className="text-muted-foreground">
-              Page <span className="font-semibold text-foreground">{page}</span> of{' '}
-              <span className="font-semibold text-foreground">{totalPages}</span>
-              {totalRecords > 0 && (
-                <span className="ml-1 text-muted-foreground/80">
-                  ({totalRecords.toLocaleString()} {totalRecords === 1 ? 'record' : 'records'})
-                </span>
-              )}
-            </span>
+          {/* Pagination Bar */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 border-t border-white/10 bg-white/30 dark:bg-slate-850/30 shrink-0">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>Show</span>
+              <Select
+                value={String(pageSize)}
+                onValueChange={(val) => {
+                  handlePageSizeChange(Number(val));
+                }}
+              >
+                <SelectTrigger className="h-7 w-18 text-xs bg-white/50 dark:bg-white/5 border-white/20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>per page</span>
+            </div>
 
-            <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(1)}
-                disabled={page <= 1}
-                className="h-7 w-7 p-0 bg-white/40 dark:bg-white/5"
-                title="First page"
-              >
-                <ChevronsLeft className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(Math.max(1, page - 1))}
-                disabled={page <= 1}
-                className="h-7 w-7 p-0 bg-white/40 dark:bg-white/5"
-                title="Previous page"
-              >
-                <ChevronLeft className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
-                disabled={page >= totalPages}
-                className="h-7 w-7 p-0 bg-white/40 dark:bg-white/5"
-                title="Next page"
-              >
-                <ChevronRight className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(totalPages)}
-                disabled={page >= totalPages}
-                className="h-7 w-7 p-0 bg-white/40 dark:bg-white/5"
-                title="Last page"
-              >
-                <ChevronsRight className="h-3.5 w-3.5" />
-              </Button>
+            <div className="flex items-center gap-3 text-xs">
+              <span className="text-muted-foreground">
+                Page <span className="font-semibold text-foreground">{page}</span> of{' '}
+                <span className="font-semibold text-foreground">{totalPages}</span>
+                {totalRecords > 0 && (
+                  <span className="ml-1 text-muted-foreground/80">
+                    ({totalRecords.toLocaleString()} {totalRecords === 1 ? 'record' : 'records'})
+                  </span>
+                )}
+              </span>
+
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(1)}
+                  disabled={page <= 1}
+                  className="h-7 w-7 p-0 bg-white/40 dark:bg-white/5"
+                  title="First page"
+                >
+                  <ChevronsLeft className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(Math.max(1, page - 1))}
+                  disabled={page <= 1}
+                  className="h-7 w-7 p-0 bg-white/40 dark:bg-white/5"
+                  title="Previous page"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
+                  disabled={page >= totalPages}
+                  className="h-7 w-7 p-0 bg-white/40 dark:bg-white/5"
+                  title="Next page"
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(totalPages)}
+                  disabled={page >= totalPages}
+                  className="h-7 w-7 p-0 bg-white/40 dark:bg-white/5"
+                  title="Last page"
+                >
+                  <ChevronsRight className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
       {/* Dialogs */}
       <RecordEditorDialog entityTypeId={entityTypeId} />

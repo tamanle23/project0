@@ -81,7 +81,7 @@ export const MetadataFeature: React.FC = () => {
 
   return (
     <>
-      <Header fixed>
+      <Header>
         <Search />
         <div className="ms-auto flex items-center space-x-4">
           <LanguageSwitch />
@@ -91,9 +91,9 @@ export const MetadataFeature: React.FC = () => {
         </div>
       </Header>
 
-      <Main fluid className="flex flex-1 flex-col gap-4 sm:gap-6 min-w-0 w-full overflow-hidden">
+      <Main fixed fluid className="flex flex-1 flex-col gap-4 sm:gap-6 min-w-0 w-full lg:overflow-hidden">
         {/* Page Title & Intro */}
-        <div className="flex flex-wrap items-end justify-between gap-2">
+        <div className="flex flex-wrap items-end justify-between gap-2 shrink-0">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">
               {t('metadata.title', 'Metadata Management')}
@@ -108,16 +108,16 @@ export const MetadataFeature: React.FC = () => {
         </div>
 
         {/* Liquid Glass Split Workspace */}
-        <div className="flex flex-col lg:flex-row gap-6 items-start flex-1 w-full min-w-0">
+        <div className="flex flex-col lg:flex-row gap-6 items-stretch flex-1 w-full min-w-0 max-lg:min-h-fit lg:min-h-0">
           {/* Left: Entity Models Rail */}
           <EntityTypeSidebar />
 
           {/* Right: Active Model Workspace */}
-          <div className="flex-1 w-full min-w-0 space-y-4">
+          <div className="flex-1 w-full min-w-0 flex flex-col gap-4 max-lg:min-h-fit lg:min-h-0">
             {selectedEntityTypeId && activeEntity ? (
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4 flex-1 max-lg:min-h-fit lg:min-h-0">
                 {/* Active Model Banner & Segmented Frosted Glass Rail (Option A) */}
-                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 md:p-5 rounded-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
+                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 md:p-5 rounded-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 shrink-0">
                   <div className="space-y-1.5 min-w-0 flex-1">
                     <div className="flex items-center gap-2.5 flex-wrap">
                       <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20 shrink-0">

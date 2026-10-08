@@ -58,21 +58,49 @@ To eliminate data modeling confusion, the system strictly categorizes relationsh
 
 ## 3. End-to-End User Workflows on UI
 
-The Metadata Management console features an intuitive **two-pane workspace layout**:
-- **Left Rail**: Entity Model Navigation & Model Management.
-- **Main Stage**: Tabbed Workspaces (**Schema Builder**, **Data Explorer**, **Connected Edges**).
+The Metadata Management console features a high-density, responsive **Bento Box Workspace Architecture**:
+- **Left Bento Tile**: Entity Model Rail with live search, model count badge, scrollable list, and a compact single-row pagination bar.
+- **Top Bento Tile**: Active Model Identity Banner with system slug and segmented frosted-glass tab navigation rail.
+- **Main Bento Canvas**: Tabbed Workspaces (**Schema Builder**, **Data Explorer**, **Connected Edges**) with internal multi-directional scrolling and docked toolbars/paginations.
 
 ```
-┌──────────────────┬─────────────────────────────────────────────────────────────────────┐
-│ Entity Models    │ [Model Title]  (ent_customer_account)                               │
-│ [+] New Model    │ [ Layers Schema Builder ]  [ ⛁ Data Explorer ]  [ ᛦ Connected Edges ] │
-│ ──────────────── ┼─────────────────────────────────────────────────────────────────────┤
-│ 🏢 Customer Acc  │                                                                     │
-│ ☁️ Cloud Spec    │                     Active Tab View Canvas                          │
-│ 🛡️ Deployment Pl │                                                                     │
-│                  │                                                                     │
-└──────────────────┴─────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│ Top Bento Tile: Active Model Identity Banner & Metric Tabs                             │
+│ ┌───────────────────────────┐ ┌──────────────────────────────────────────────────────┐ │
+│ │ ⚙️ Customer Account       │ │ [ ❖ Schema (14) ]  [ ⛁ Records (240) ] [ ᛦ Edges (3) ]│ │
+│ │ ent_customer_account      │ └──────────────────────────────────────────────────────┘ │
+│ └───────────────────────────┘                                                          │
+├───────────────────┬────────────────────────────────────────────────────────────────────┤
+│ Left Bento Tile   │ Center/Right Bento Canvas (Data Explorer / Table View)             │
+│ ┌───────────────┐ │ ┌────────────────────────────────────────────────────────────────┐ │
+│ │ ⛁ Entity (100)│ │ │ Toolbar: [Search...] [Compound Filter] [Facets] [Export] [+New]│ │
+│ ├───────────────┤ │ ├──────────────────────────────┬─────────────────────────────────┤ │
+│ │ [Filter...]   │ │ │ Faceted Filter Sidebar       │ Entity DataGrid (Table Canvas)  │ │
+│ ├───────────────┤ │ │ [Reset]                  [X] │ [Record] [Legal Name] [Tier]... │ │
+│ │ 🏢 Customer   │ │ ├──────────────────────────────┼─────────────────────────────────┤ │
+│ │ ☁️ Cloud Spec │ │ │ 🏷️ Tier                      │ #101     Acme Corp    Strategic  │ │
+│ │ 🛡️ Policy     │ │ │   ☑ Enterprise (42)          │ #102     Globex       Standard   │ │
+│ │ (scrollable)  │ │ │   ☐ Standard   (88)          │ (horizontal & vertical scroll)  │ │
+│ ├───────────────┤ │ ├──────────────────────────────┼─────────────────────────────────┤ │
+│ │ [10▾] 1/10 ◄ ►│ │ │ GIN Indexed                  │ Show [10▾] per page  Pg 1/24 ◄ ►│ │
+│ └───────────────┘ │ └──────────────────────────────┴─────────────────────────────────┘ │
+└───────────────────┴────────────────────────────────────────────────────────────────────┘
 ```
+
+#### Bento Box Architecture & Small/Medium Screen Ergonomics
+1. **Viewport-Fitted Height (`items-stretch` & `min-h-0`)**:
+   - The left sidebar, active model workspace, faceted drawer, and data grid stretch to fill available vertical space without spilling past the viewport or pushing primary actions off-screen.
+2. **Internal Multi-Axis Scrolling**:
+   - Long model lists and multi-column tables scroll independently within their respective bento tiles while action bars, search inputs, and pagination controls remain pinned.
+3. **Small & Medium Screen Breakpoints (`< lg`)**:
+   - On tablet and mobile viewports, the multi-column layout smoothly switches from side-by-side to stacked tiles (`flex-col lg:flex-row`).
+   - The **Entity Models Sidebar** caps its height (`max-h-[400px]`), and the **Faceted Filter** switches to a full-width drawer with a dedicated dismiss button (`[X]`), ensuring touch friendliness and avoiding broken viewports.
+
+#### Technical Deep Dive: Viewport Height & Flexbox Containment
+When hosting dense data grids inside a fixed-height layout (`Main fixed` inside `SidebarInset has-data-[layout=fixed]:h-svh`), layout overflow can occur if the flex containment chain is broken:
+- **Header Fixed vs. Flow**: `<Header fixed>` uses `sticky top-0 h-16` while `<Main fixed>` takes full vertical space. Because `<SidebarInset>` sets `h-svh` without `overflow-hidden`, combining `<Header fixed>` with `<Main fixed>` pushes content down by 64px, inducing outer window scrollbars. Switching to standard flow `<Header>` allows the header and `<Main>` flex container to perfectly divide `100svh`.
+- **CSS `min-height` Flexbox Trap (`min-h-0`)**: In CSS Flexbox, flex items default to `min-height: auto`. When switching pagination to larger page sizes (e.g. 25, 50, or 100 rows per page), child tables expand their parent containers unless every intermediate flex container explicitly declares `min-h-0`.
+- **Child Margin Collisions**: Legacy `space-y-*` applies top margin to direct children, altering computed heights in nested flex columns. Replacing `space-y-*` with modern flexbox `gap-*` guarantees that inner scroll containers (`overflow-y-auto min-h-0`) cleanly isolate vertical table scrolling.
 
 ---
 
@@ -188,10 +216,23 @@ The **Data Explorer** tab provides an enterprise-grade datatable for record CRUD
    - An amber **Conflict Banner** appears: *"This record has been modified by another user. Please reload the latest changes."*
    - Click **Refresh** to load the newest version while retaining non-conflicting edits, then re-submit.
 
-#### 3. Filtering & Sorting
+#### 3. High-Density Filtering & Small/Medium Screen Navigation
+- **Single-Row Compact Sidebar Pagination**:
+  - The **Entity Models** sidebar features an ergonomic single-row footer (`h-6`) containing a compact page size selector (`10`, `25`, `50`), current page indicator (`Pg {page}/{totalPages}`), and 4 ghost navigation buttons (`⏮`, `◀`, `▶`, `⏭`).
+  - Default model page size is set to `10` to accommodate large catalogs of 100+ entities without clutter.
 - **Debounced Search**: Type any string in the search bar. The grid applies a 300ms debounce and sends `filter[<attr>][contains]=<query>` to the backend.
-- **Column Header Sorting**: Click any column header to toggle ascending (`▲`) or descending (`▼`) sorting. The server re-queries with `sort=<field>,<dir>`.
-- **Pagination**: Use the bottom pagination rail (`< Previous`, `Next >`, and items-per-page selector) for server-side page navigation.
+- **Universal Multi-Type Faceted Search Drawer**:
+  - Click the **Facets** toggle button in the toolbar to display categorical, numeric range, and temporal facets.
+  - On large screens, facets sit as an anchored bento sidebar aligned with the table height.
+  - On small/medium screens, it opens as a responsive full-width drawer with an inline `[X]` dismiss button and independent accordion scrolling (`flex-1 min-h-[220px]`).
+- **Advanced Compound Filter Popover**:
+  - Configure multi-attribute condition rows (`AND`/`OR`) with type-specific operators (`eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `contains`, `in`).
+  - Automatically excludes tenant-isolation fields (e.g. `tenantId`), delegating tenant boundaries strictly to server-side session headers.
+- **Column Header Sorting & Table Bounding**:
+  - Click any column header to toggle ascending (`▲`) or descending (`▼`) sorting. The server re-queries with `sort=<field>,<dir>`.
+  - The table header and the rightmost **Actions** column remain sticky while table rows scroll horizontally and vertically within the tile (`max-h-[550px] lg:max-h-[calc(100vh-320px)]`).
+- **DataGrid Server-Side Pagination**:
+  - Bottom pagination rail with customizable items-per-page (`10`, `25`, `50`, `100`), total record counter, and page jumping controls.
 
 #### 4. Schema Drift Detection & Interactive Backfill Modal
 - **Schema Drift Alert Banner**: When attributes are added, reordered, or modified, existing entity records may reside on an earlier schema version. An amber banner appears at the top of the Data Explorer displaying:
@@ -355,4 +396,8 @@ metadata/
 - [x] **Optimistic Locking**: Every mutation passes `version`, preventing silent overwrites with `409 ConflictBanner`.
 - [x] **Dual Relationship Ergonomics**: Unambiguous split between **Entity Reference** (Pattern B field lookup) and **Connected Edges** (Pattern C graph junction).
 - [x] **Searchable ComboBox UX**: Fuzzy search across `#ID`, name, and code with 1-click clear and dangling reference detection.
+- [x] **Bento Box Workspace Alignment**: Unified `items-stretch` layout ensuring left rail, active workspace, facets drawer, and datagrid fit within viewport heights without overflowing.
+- [x] **Strict Viewport & Pagination Bounds**: Guaranteed Bento box height containment across variable page sizes (10, 25, 50, 100 items) via `<Main fixed fluid>`, inner `flex-1 min-h-0` scrolling, and pinned `sticky top-0` table headers.
+- [x] **Multi-Device Screen Ergonomics**: Smooth breakpoint handling (`< lg`) with scrollable bento tiles, capped sidebar heights, and dedicated drawer dismissal (`[X]`).
+- [x] **Compact Sidebar Pagination**: Space-optimized single-row footer (`h-6`) with default page size of 10 for high-volume entity catalogs.
 - [x] **Full i18n Localization**: All tabs, buttons, and alerts available in English and Vietnamese.

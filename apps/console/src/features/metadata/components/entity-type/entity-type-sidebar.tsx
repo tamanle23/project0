@@ -30,13 +30,16 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export const EntityTypeSidebar: React.FC = () => {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(15);
+  const [pageSize, setPageSize] = useState(10);
 
   const {
     selectedEntityTypeId,
@@ -45,6 +48,8 @@ export const EntityTypeSidebar: React.FC = () => {
     openEditEntityTypeDialog,
     openDeleteEntityTypeDialog,
   } = useMetadataUiStore();
+
+  const [isMobileExpanded, setIsMobileExpanded] = useState(!selectedEntityTypeId);
 
   // Debounce search query (300ms) and reset page to 1
   useEffect(() => {
@@ -75,13 +80,10 @@ export const EntityTypeSidebar: React.FC = () => {
     }
   }, [selectedEntityTypeId, entityTypes, setSelectedEntityTypeId]);
 
-  const startRecord = totalElements > 0 ? (page - 1) * pageSize + 1 : 0;
-  const endRecord = Math.min(page * pageSize, totalElements);
-
   return (
-    <aside className="w-full lg:w-76 shrink-0 flex flex-col gap-3 p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
+    <aside className="w-full lg:w-76 shrink-0 flex flex-col gap-3 p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 min-h-0 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2 min-w-0">
           <Database className="h-5 w-5 text-primary shrink-0" />
           <h3 className="font-bold text-foreground text-sm tracking-tight truncate">Entity Models</h3>
@@ -89,20 +91,32 @@ export const EntityTypeSidebar: React.FC = () => {
             {totalElements}
           </Badge>
         </div>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={openCreateEntityTypeDialog}
-          className="h-8 px-2 gap-1 text-xs bg-white/40 dark:bg-white/5 border-white/20 shrink-0"
-          title="Create New Entity Model"
-        >
-          <Plus className="h-3.5 w-3.5" />
-          <span>New</span>
-        </Button>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setIsMobileExpanded((prev) => !prev)}
+            className="h-8 px-2 text-xs lg:hidden text-muted-foreground hover:text-foreground"
+            title={isMobileExpanded ? 'Collapse Models Rail' : 'Expand Models Rail'}
+          >
+            {isMobileExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={openCreateEntityTypeDialog}
+            className="h-8 px-2 gap-1 text-xs bg-white/40 dark:bg-white/5 border-white/20 shrink-0"
+            title="Create New Entity Model"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>New</span>
+          </Button>
+        </div>
       </div>
 
-      {/* Search Filter */}
-      <div className="relative">
+      <div className={cn('flex flex-col gap-3 flex-1 min-h-0', !isMobileExpanded && 'max-lg:hidden')}>
+        {/* Search Filter */}
+      <div className="relative shrink-0">
         <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
         <Input
           value={search}
@@ -123,7 +137,7 @@ export const EntityTypeSidebar: React.FC = () => {
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto space-y-1.5 min-h-[300px] max-h-[calc(100vh-340px)] pr-1">
+      <div className="flex-1 overflow-y-auto space-y-1.5 min-h-[220px] max-h-[400px] lg:max-h-none pr-1">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center p-8 text-xs text-muted-foreground gap-2">
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -140,7 +154,10 @@ export const EntityTypeSidebar: React.FC = () => {
             return (
               <div
                 key={et.id}
-                onClick={() => setSelectedEntityTypeId(String(et.id))}
+                onClick={() => {
+                  setSelectedEntityTypeId(String(et.id));
+                  setIsMobileExpanded(false);
+                }}
                 className={`group relative flex items-center justify-between p-2.5 rounded-xl cursor-pointer text-xs transition-all ${
                   isSelected
                     ? 'bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20'
@@ -194,81 +211,75 @@ export const EntityTypeSidebar: React.FC = () => {
         )}
       </div>
 
-      {/* Pagination Footer */}
-      <div className="pt-2 border-t border-white/20 dark:border-white/10 flex flex-col gap-2">
-        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-          <span>
-            {totalElements > 0 ? `${startRecord}–${endRecord} of ${totalElements}` : '0 models'}
+      {/* Compact Sidebar Pagination Footer */}
+      <div className="pt-2 border-t border-white/20 dark:border-white/10 flex items-center justify-between text-xs select-none shrink-0">
+        {/* Left: Compact page size & page position */}
+        <div className="flex items-center gap-1.5 text-muted-foreground">
+          <Select
+            value={String(pageSize)}
+            onValueChange={(val) => {
+              setPageSize(Number(val));
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="h-6 w-[54px] text-[11px] px-1.5 py-0 bg-white/40 dark:bg-white/5 border-white/20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="text-xs min-w-[3.5rem]">
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="25">25</SelectItem>
+              <SelectItem value="50">50</SelectItem>
+            </SelectContent>
+          </Select>
+          <span className="text-[11px] font-mono text-muted-foreground">
+            {page}/{totalPages}
           </span>
-          <div className="flex items-center gap-1">
-            <span className="text-[10px]">Per page</span>
-            <Select
-              value={String(pageSize)}
-              onValueChange={(val) => {
-                setPageSize(Number(val));
-                setPage(1);
-              }}
-            >
-              <SelectTrigger className="h-6 w-14 text-[11px] px-1.5 py-0 bg-white/40 dark:bg-white/5 border-white/20">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="text-xs min-w-[4rem]">
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="15">15</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </div>
 
-        <div className="flex items-center justify-between gap-1 text-xs">
-          <span className="text-[11px] text-muted-foreground font-mono">
-            Pg {page}/{totalPages}
-          </span>
-          <div className="flex items-center gap-0.5">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(1)}
-              disabled={page <= 1}
-              className="h-6 w-6 p-0 bg-white/40 dark:bg-white/5"
-              title="First page"
-            >
-              <ChevronsLeft className="h-3 w-3" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1}
-              className="h-6 w-6 p-0 bg-white/40 dark:bg-white/5"
-              title="Previous page"
-            >
-              <ChevronLeft className="h-3 w-3" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
-              className="h-6 w-6 p-0 bg-white/40 dark:bg-white/5"
-              title="Next page"
-            >
-              <ChevronRight className="h-3 w-3" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(totalPages)}
-              disabled={page >= totalPages}
-              className="h-6 w-6 p-0 bg-white/40 dark:bg-white/5"
-              title="Last page"
-            >
-              <ChevronsRight className="h-3 w-3" />
-            </Button>
-          </div>
+        {/* Right: Streamlined Navigation (First, Prev, Next, Last) */}
+        <div className="flex items-center gap-0.5">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setPage(1)}
+            disabled={page <= 1}
+            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground disabled:opacity-25"
+            title="First page"
+          >
+            <ChevronsLeft className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground disabled:opacity-25"
+            title="Previous page"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground disabled:opacity-25"
+            title="Next page"
+          >
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setPage(totalPages)}
+            disabled={page >= totalPages}
+            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground disabled:opacity-25"
+            title="Last page"
+          >
+            <ChevronsRight className="h-3.5 w-3.5" />
+          </Button>
         </div>
+      </div>
       </div>
     </aside>
   );

@@ -61,7 +61,7 @@ export const RelationshipTypesManager: React.FC<Props> = ({ entityTypeId }) => {
   };
 
   return (
-    <div className="space-y-4 w-full min-w-0">
+    <div className="space-y-4 w-full min-w-0 flex flex-col flex-1 min-h-0 overflow-y-auto pr-1">
       {/* Architectural Guidance Banner */}
       <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-900 dark:text-blue-200">
         <Info className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400 mt-0.5" />
