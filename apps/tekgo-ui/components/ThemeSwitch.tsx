@@ -59,8 +59,12 @@ const ThemeSwitch = () => {
   const { theme, setTheme, resolvedTheme } = useTheme()
 
   // When mounted on client, now we can show the UI
-  useEffect(() => // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true), [])
+  useEffect(
+    () =>
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setMounted(true),
+    []
+  )
 
   return (
     <div className="flex items-center">
