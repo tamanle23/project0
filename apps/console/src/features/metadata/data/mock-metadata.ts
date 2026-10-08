@@ -1036,19 +1036,7 @@ export class MockMetadataService implements MetadataDataSource {
     const attrs: AttributeDefinition[] = (this.attributes[strId] || []).filter((a) => !a.isArchived);
     const facets: FacetGroupDto[] = [];
 
-    // Tenant distribution facet
-    const tenantCounts: Record<string, number> = {};
-    records.forEach((r) => {
-      if (r.tenantId) tenantCounts[r.tenantId] = (tenantCounts[r.tenantId] || 0) + 1;
-    });
-    if (Object.keys(tenantCounts).length > 0) {
-      facets.push({
-        field: 'tenantId',
-        dataType: 'STRING',
-        buckets: Object.entries(tenantCounts).map(([value, count]) => ({ value, count })),
-      });
-    }
-
+    // Special fields like tenantId are handled separately, so only dynamic schema attributes are faceted
     // Attributes facets
     attrs.forEach((attr) => {
       const counts: Record<string, number> = {};

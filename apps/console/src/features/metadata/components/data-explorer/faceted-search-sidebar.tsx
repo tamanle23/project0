@@ -78,43 +78,21 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
     const activeAttrs = attributes.filter((a) => !a.isArchived);
     const groups: FacetGroup[] = [];
 
-    // Helper map of server-side facet counts
+    // Helper map of server-side facet counts (excluding special fields like tenantId)
     const serverFacetMap = new Map<string, Record<string, number>>();
     if (serverFacets?.facets) {
-      serverFacets.facets.forEach((g) => {
-        const counts: Record<string, number> = {};
-        g.buckets.forEach((b) => {
-          counts[b.value] = b.count;
+      serverFacets.facets
+        .filter((g) => g.field !== 'tenantId')
+        .forEach((g) => {
+          const counts: Record<string, number> = {};
+          g.buckets.forEach((b) => {
+            counts[b.value] = b.count;
+          });
+          serverFacetMap.set(g.field, counts);
         });
-        serverFacetMap.set(g.field, counts);
-      });
     }
 
-    // 1. Region / Tenant facet (Multi-Region Distribution)
-    const tenantCounts: Record<string, number> = {};
-    records.forEach((r) => {
-      if (r.tenantId) {
-        tenantCounts[r.tenantId] = (tenantCounts[r.tenantId] || 0) + 1;
-      }
-    });
-
-    if (Object.keys(tenantCounts).length > 1) {
-      groups.push({
-        field: 'tenantId',
-        name: 'Deployment Region / Tenant',
-        dataType: 'STRING',
-        type: 'discrete',
-        buckets: Object.entries(tenantCounts)
-          .map(([val, count]) => ({
-            value: val,
-            label: val.startsWith('tenant-') ? val.replace('tenant-', '').toUpperCase() : val,
-            count,
-          }))
-          .sort((a, b) => b.count - a.count),
-      });
-    }
-
-    // 2. Process all attributes by data type
+    // Process all entity schema attributes by data type (special fields like tenantId are handled separately)
     activeAttrs.forEach((attr) => {
       const field = attr.systemName;
       const dataType = attr.dataType;

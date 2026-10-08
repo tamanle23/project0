@@ -211,17 +211,16 @@ export const EntityDataGrid: React.FC<Props> = ({
 
     attributeFilters.forEach((clause) => {
       if (!clause.field || clause.value === undefined || clause.value === '') return;
-      if (clause.field === 'tenantId') {
-        params.tenantId = clause.value;
+      // Special fields like tenantId are handled separately, so ignore them here
+      if (clause.field === 'tenantId') return;
+
+      if (!fieldValuesMap[clause.field]) {
+        fieldValuesMap[clause.field] = { eqValues: [], otherOps: {} };
+      }
+      if (clause.operator === 'eq') {
+        fieldValuesMap[clause.field].eqValues.push(clause.value);
       } else {
-        if (!fieldValuesMap[clause.field]) {
-          fieldValuesMap[clause.field] = { eqValues: [], otherOps: {} };
-        }
-        if (clause.operator === 'eq') {
-          fieldValuesMap[clause.field].eqValues.push(clause.value);
-        } else {
-          fieldValuesMap[clause.field].otherOps[clause.operator] = clause.value;
-        }
+        fieldValuesMap[clause.field].otherOps[clause.operator] = clause.value;
       }
     });
 
@@ -276,8 +275,7 @@ export const EntityDataGrid: React.FC<Props> = ({
 
   // Fetch server-aggregated facet counts if enabled/available
   const { data: serverFacets } = useEntityFacets(
-    isFacetOpen ? entityTypeId : null,
-    { tenantId: queryParams.tenantId }
+    isFacetOpen ? entityTypeId : null
   );
 
   const records = useMemo(() => {
