@@ -211,8 +211,6 @@ export const EntityDataGrid: React.FC<Props> = ({
 
     attributeFilters.forEach((clause) => {
       if (!clause.field || clause.value === undefined || clause.value === '') return;
-      // Special fields like tenantId are handled separately, so ignore them here
-      if (clause.field === 'tenantId') return;
 
       if (!fieldValuesMap[clause.field]) {
         fieldValuesMap[clause.field] = { eqValues: [], otherOps: {} };

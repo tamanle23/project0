@@ -14,7 +14,6 @@ import {
   Tag,
   Layers,
   ToggleLeft,
-  Globe2,
   CheckCircle2,
   Hash,
   Calendar,
@@ -78,21 +77,19 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
     const activeAttrs = attributes.filter((a) => !a.isArchived);
     const groups: FacetGroup[] = [];
 
-    // Helper map of server-side facet counts (excluding special fields like tenantId)
+    // Helper map of server-side facet counts
     const serverFacetMap = new Map<string, Record<string, number>>();
     if (serverFacets?.facets) {
-      serverFacets.facets
-        .filter((g) => g.field !== 'tenantId')
-        .forEach((g) => {
-          const counts: Record<string, number> = {};
-          g.buckets.forEach((b) => {
-            counts[b.value] = b.count;
-          });
-          serverFacetMap.set(g.field, counts);
+      serverFacets.facets.forEach((g) => {
+        const counts: Record<string, number> = {};
+        g.buckets.forEach((b) => {
+          counts[b.value] = b.count;
         });
+        serverFacetMap.set(g.field, counts);
+      });
     }
 
-    // Process all entity schema attributes by data type (special fields like tenantId are handled separately)
+    // Process all entity schema attributes by data type
     activeAttrs.forEach((attr) => {
       const field = attr.systemName;
       const dataType = attr.dataType;
@@ -430,9 +427,7 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
                 className="w-full flex items-center justify-between text-left group py-1 text-xs font-semibold text-foreground/90 hover:text-primary transition-colors"
               >
                 <div className="flex items-center gap-1.5 truncate">
-                  {group.field === 'tenantId' ? (
-                    <Globe2 className="h-3.5 w-3.5 text-sky-500 shrink-0" />
-                  ) : group.type === 'numeric_range' || group.dataType === 'INTEGER' || group.dataType === 'DECIMAL' ? (
+                  {group.type === 'numeric_range' || group.dataType === 'INTEGER' || group.dataType === 'DECIMAL' ? (
                     <Hash className="h-3.5 w-3.5 text-blue-500 shrink-0" />
                   ) : group.type === 'date_range' || group.dataType === 'DATE' || group.dataType === 'DATETIME' ? (
                     <Calendar className="h-3.5 w-3.5 text-rose-500 shrink-0" />
