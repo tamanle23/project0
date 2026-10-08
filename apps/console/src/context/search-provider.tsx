@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useMemo } from 'react'
 import { CommandMenu } from '@/components/command-menu'
 
 type SearchContextType = {
@@ -26,8 +26,15 @@ export function SearchProvider({ children }: SearchProviderProps) {
     return () => document.removeEventListener('keydown', down)
   }, [])
 
+  // Optimization: Memoize context value to preserve referential equality and prevent
+  // unnecessary re-renders of consumer components when SearchProvider re-renders.
+  const contextValue = useMemo<SearchContextType>(
+    () => ({ open, setOpen }),
+    [open, setOpen]
+  )
+
   return (
-    <SearchContext value={{ open, setOpen }}>
+    <SearchContext value={contextValue}>
       {children}
       <CommandMenu />
     </SearchContext>

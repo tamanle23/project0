@@ -17,8 +17,15 @@ export function UsersProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useDialogState<UsersDialogType>(null)
   const [currentRow, setCurrentRow] = useState<User | null>(null)
 
+  // Optimization: Memoize context value to preserve referential equality and prevent
+  // unnecessary re-renders of consumer components when UsersProvider re-renders.
+  const contextValue = React.useMemo<UsersContextType>(
+    () => ({ open, setOpen, currentRow, setCurrentRow }),
+    [open, setOpen, currentRow, setCurrentRow]
+  )
+
   return (
-    <UsersContext value={{ open, setOpen, currentRow, setCurrentRow }}>
+    <UsersContext value={contextValue}>
       {children}
     </UsersContext>
   )
