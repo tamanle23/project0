@@ -1,6 +1,8 @@
 import { useSandboxStore, DEFAULT_SANDBOX_PERSONAS } from '../store/sandbox-store';
 import { sandboxRegistry } from './sandbox-registry';
 import { withSimulationDecorator } from './simulation-decorator';
+import { createMockJwt } from '../handlers/auth-sandbox-handler';
+import { useSpringAuthStore } from '../../../features/spring-auth/store';
 import type {
   SandboxPersona,
   SandboxPersonaId,
@@ -42,10 +44,30 @@ export class UnifiedSandboxManager {
   }
 
   /**
-   * Switch the active persona and sync the active tenant
+   * Sync active persona tokens to useSpringAuthStore
+   */
+  public syncPersonaAuthTokens(personaId: SandboxPersonaId): void {
+    const persona = DEFAULT_SANDBOX_PERSONAS[personaId] || DEFAULT_SANDBOX_PERSONAS.admin;
+    const sub = persona.username.split('_')[0];
+
+    const accessToken = createMockJwt({
+      sub,
+      roles: persona.roles,
+      isSandbox: true,
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 60 * 15,
+    });
+    const refreshToken = `mock_refresh_token_${sub}`;
+
+    useSpringAuthStore.getState().setTokens(accessToken, refreshToken);
+  }
+
+  /**
+   * Switch the active persona, sync active tenant, and update spring auth store tokens
    */
   public switchPersona(personaId: SandboxPersonaId): void {
     useSandboxStore.getState().setActivePersona(personaId);
+    this.syncPersonaAuthTokens(personaId);
   }
 
   /**
@@ -74,6 +96,10 @@ export class UnifiedSandboxManager {
    */
   public setEnabled(enabled: boolean): void {
     useSandboxStore.getState().setEnabled(enabled);
+    if (enabled) {
+      const { activePersonaId } = useSandboxStore.getState();
+      this.syncPersonaAuthTokens(activePersonaId);
+    }
   }
 
   /**
@@ -81,6 +107,7 @@ export class UnifiedSandboxManager {
    */
   public resetConfig(): void {
     useSandboxStore.getState().resetToDefaults();
+    this.syncPersonaAuthTokens('admin');
   }
 
   /**

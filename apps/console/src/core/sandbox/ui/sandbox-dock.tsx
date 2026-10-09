@@ -30,7 +30,6 @@ export function SandboxDock() {
     activeTenantId,
     networkSimulation,
     setEnabled,
-    setActivePersona,
     setActiveTenant,
     setNetworkLatency,
     setFaultInjection,
@@ -54,7 +53,9 @@ export function SandboxDock() {
         setEnabled(true);
         const persona = search.get('persona') as SandboxPersonaId | null;
         if (persona && persona in DEFAULT_SANDBOX_PERSONAS) {
-          setActivePersona(persona);
+          sandboxManager.switchPersona(persona);
+        } else {
+          sandboxManager.syncPersonaAuthTokens(activePersonaId);
         }
         const tenant = search.get('tenant');
         if (tenant) {
@@ -64,7 +65,7 @@ export function SandboxDock() {
     } catch {
       /* ignore */
     }
-  }, [setEnabled, setActivePersona, setActiveTenant]);
+  }, [setEnabled, setActiveTenant, activePersonaId]);
 
   const toggleMinimized = () => {
     setIsMinimized((prev) => {
@@ -78,6 +79,7 @@ export function SandboxDock() {
     mockMetadataStore.resetToInitialState();
     usersSandboxRepo.reset();
     tasksSandboxRepo.reset();
+    sandboxManager.syncPersonaAuthTokens(activePersonaId);
     toast.success('Unified Sandbox: Reset all domain records to pristine baseline');
   };
 
@@ -122,7 +124,7 @@ export function SandboxDock() {
     typeof window !== 'undefined' &&
     new URLSearchParams(window.location.search).get('sandbox') === 'true';
 
-  // Only display the dock if the user is authenticated in Sandbox mode OR ?sandbox=true was explicitly passed
+  // Display dock if authenticated in sandbox mode OR ?sandbox=true was explicitly passed
   if (!hasSandboxUrlParam && (!isAuthenticated || !isSandbox)) {
     return null;
   }
