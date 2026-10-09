@@ -1,27 +1,60 @@
 package com.unipost.fw.context;
 
-import org.springframework.core.task.TaskDecorator;
-
 import com.unipost.core.context.Context;
 import com.unipost.core.io.ContextHeader;
+import com.unipost.fw.tenancy.TenantContextHolder;
+import org.slf4j.MDC;
+import org.springframework.core.task.TaskDecorator;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Map;
+
+/**
+ * Task decorator that propagates tenant identity, security context, MDC logs,
+ * and application Context across asynchronous execution boundaries (@Async and pooled executors).
+ */
 public class AsyncContextTaskDecorator implements TaskDecorator {
 
-  private Context context;
+  private final Context context;
 
-  public AsyncContextTaskDecorator(Context contextHelper){
+  public AsyncContextTaskDecorator(Context contextHelper) {
     this.context = contextHelper;
   }
 
   @Override
   public Runnable decorate(Runnable runnable) {
-    ContextHeader currentContext = context.getHeader();
+    // Snapshot calling thread's contexts
+    ContextHeader currentContext = context != null ? context.getHeader() : null;
+    String tenantId = TenantContextHolder.getTenantId();
+    SecurityContext securityContext = SecurityContextHolder.getContext();
+    Map<String, String> mdcContext = MDC.getCopyOfContextMap();
+
     return () -> {
       try {
-        context.setRequestHeader(currentContext);
+        // Restore onto worker thread
+        if (context != null && currentContext != null) {
+          context.setRequestHeader(currentContext);
+        }
+        if (tenantId != null) {
+          TenantContextHolder.setTenantId(tenantId);
+        }
+        if (securityContext != null) {
+          SecurityContextHolder.setContext(securityContext);
+        }
+        if (mdcContext != null) {
+          MDC.setContextMap(mdcContext);
+        }
+
         runnable.run();
       } finally {
-        context.clear();
+        // Guarantee clean wipe of worker thread to prevent cross-tenant pool leakage
+        TenantContextHolder.clear();
+        SecurityContextHolder.clearContext();
+        MDC.clear();
+        if (context != null) {
+          context.clear();
+        }
       }
     };
   }

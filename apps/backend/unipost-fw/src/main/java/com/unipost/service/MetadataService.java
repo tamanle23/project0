@@ -366,6 +366,11 @@ public class MetadataService {
             throw new MetadataNotFoundException("EntityType not found with id: " + entityTypeId);
         }
 
+        // If tenantId was not explicitly provided, default to the authenticated thread tenant
+        String activeTenantId = (tenantId != null && !tenantId.isBlank())
+                ? tenantId
+                : com.unipost.fw.tenancy.TenantContextHolder.getTenantId();
+
         List<AttributeDefinition> definitions = attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId);
         Map<String, AttributeDefinition> activeAttributes = definitions.stream()
                 .filter(d -> !Boolean.TRUE.equals(d.getIsArchived()))
@@ -385,7 +390,7 @@ public class MetadataService {
 
         org.springframework.data.jpa.domain.Specification<EntityRecord> spec = EntityRecordSpecifications.withFilters(
                 entityTypeId,
-                tenantId,
+                activeTenantId,
                 filterParams,
                 activeAttributes
         );
@@ -554,8 +559,14 @@ public class MetadataService {
         validateRelationPickerAttributes(entityTypeId, finalAttributes);
         schemaValidationService.validatePayload(entityTypeId, finalAttributes);
 
-        CreateRecordRequest finalRequest = new CreateRecordRequest(finalAttributes, request.tenantId());
+        String activeTenantId = com.unipost.fw.tenancy.TenantContextHolder.getTenantId();
+        String effectiveTenantId = (activeTenantId != null && !activeTenantId.isBlank()) 
+                ? activeTenantId 
+                : (request.tenantId() != null && !request.tenantId().isBlank() ? request.tenantId() : "default-tenant");
+
+        CreateRecordRequest finalRequest = new CreateRecordRequest(finalAttributes, effectiveTenantId);
         EntityRecord record = MetadataDtoMapper.toEntity(finalRequest, entityType);
+        record.setTenantId(effectiveTenantId);
         record.setSchemaVersion(entityType.getSchemaVersion() != null ? entityType.getSchemaVersion() : 1L);
         EntityRecord saved = entityRecordRepository.save(record);
         return MetadataDtoMapper.toResponse(saved);

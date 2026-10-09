@@ -1,5 +1,7 @@
 package com.unipost.fw.tenancy;
 
+import java.util.Objects;
+
 /**
  * ThreadLocal context holder for active tenant identifier.
  */
@@ -27,6 +29,20 @@ public final class TenantContextHolder {
      */
     public static String getTenantId() {
         return CURRENT_TENANT.get();
+    }
+
+    /**
+     * Get the required tenant ID from the ThreadLocal context.
+     *
+     * @return the active tenant ID
+     * @throws IllegalStateException if no tenant ID is present on current thread
+     */
+    public static String getRequiredTenantId() {
+        String tenantId = CURRENT_TENANT.get();
+        if (tenantId == null || tenantId.isBlank()) {
+            throw new IllegalStateException("Security violation: No active TenantContext found on current thread");
+        }
+        return tenantId;
     }
 
     /**

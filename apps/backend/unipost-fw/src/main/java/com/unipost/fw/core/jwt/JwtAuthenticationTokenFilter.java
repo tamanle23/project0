@@ -60,11 +60,12 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                    .map(c -> {
                      Optional<String> usernameOpt = jwtTokenHelper.getUsername(c);
                      List<GrantedAuthority> authorities = jwtTokenHelper.getAuthorities(c);
+                     String tenantId = jwtTokenHelper.getTenantId(c).orElse("default-tenant");
                      if(usernameOpt.isPresent()) {
-                       JwtAuthenticationToken authentication = new JwtAuthenticationToken(usernameOpt.get(), c, authorities);
+                       JwtAuthenticationToken authentication = new JwtAuthenticationToken(usernameOpt.get(), c, authorities, tenantId);
                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                        if(logger.isDebugEnabled()) {
-                         logger.debug("authenticated user {}, setting security context", usernameOpt.get());
+                         logger.debug("authenticated user {}, tenant {}, setting security context", usernameOpt.get(), tenantId);
                        }
                        return authentication;
                      }
@@ -107,9 +108,21 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       return;
     }
-    SecurityContextHolder.getContext().setAuthentication(authResult.get());
+    JwtAuthenticationToken authentication = authResult.get();
+    SecurityContextHolder.getContext().setAuthentication(authentication);
     context.init(authenticationToken);
-    filterChain.doFilter(request, response);
-    context.clear();
+
+    String tenantId = authentication.getTenantId();
+    try {
+      if (tenantId != null && !tenantId.isBlank()) {
+        com.unipost.fw.tenancy.TenantContextHolder.setTenantId(tenantId);
+        org.slf4j.MDC.put("tenantId", tenantId);
+      }
+      filterChain.doFilter(request, response);
+    } finally {
+      com.unipost.fw.tenancy.TenantContextHolder.clear();
+      org.slf4j.MDC.remove("tenantId");
+      context.clear();
+    }
   }
 }

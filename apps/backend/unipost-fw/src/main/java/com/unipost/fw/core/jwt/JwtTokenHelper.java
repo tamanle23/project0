@@ -40,6 +40,8 @@ public class JwtTokenHelper implements Serializable {
   public static final String CLAIM_KEY_AUDIENCE = "audience";
   public static final String CLAIM_KEY_CREATED = "created";
   public static final String CLAIM_KEY_AUTHORITIES = "authorities";
+  public static final String CLAIM_KEY_PERMISSIONS = "permissions";
+  public static final String CLAIM_KEY_TENANT_ID = "tid";
   public static final String CLAIM_KEY_USER_DETAILS = "userDetails";
   public static final String CLAIM_KEY_TYPE = "type";
   public static final String TOKEN_TYPE_REFRESH = "refresh";
@@ -82,13 +84,29 @@ public class JwtTokenHelper implements Serializable {
 
   @SuppressWarnings("unchecked")
   public List<GrantedAuthority> getAuthorities(Claims claims) {
-    return Optional.ofNullable(claims).map(c->c.get(CLAIM_KEY_AUTHORITIES))
+    if (claims == null) {
+      return List.of();
+    }
+    List<String> authorities = Optional.ofNullable(claims.get(CLAIM_KEY_AUTHORITIES))
                   .filter(Objects::nonNull)
                   .map(o -> (List<String>)o)
-                  .map(List::stream)
-                  .orElse(Stream.empty())
-                  .map(SimpleGrantedAuthority::new)
-                  .collect(Collectors.toList());
+                  .orElse(List.of());
+
+    List<String> permissions = Optional.ofNullable(claims.get(CLAIM_KEY_PERMISSIONS))
+                  .filter(Objects::nonNull)
+                  .map(o -> (List<String>)o)
+                  .orElse(List.of());
+
+    return Stream.concat(authorities.stream(), permissions.stream())
+                 .distinct()
+                 .map(SimpleGrantedAuthority::new)
+                 .collect(Collectors.toList());
+  }
+
+  public Optional<String> getTenantId(Claims claims) {
+    return Optional.ofNullable(claims)
+                   .map(c -> c.get(CLAIM_KEY_TENANT_ID, String.class))
+                   .filter(StringUtils::isNotBlank);
   }
 
   public Optional<String> getUsername(Claims claims) {
@@ -195,7 +213,7 @@ public class JwtTokenHelper implements Serializable {
         .compact();
   }
 
-  AuthenticationToken getAuthenticationToken(Map<String, Object> claims) {
+  public AuthenticationToken getAuthenticationToken(Map<String, Object> claims) {
     Date exp = getExpDate(expiration);
     String token = this.generateToken(claims, exp);
     String refreshToken = this.generateRefreshToken(claims);

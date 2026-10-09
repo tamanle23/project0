@@ -11,12 +11,18 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
   private static final long serialVersionUID = 1690534081353206927L;
   private final Object principal;
+  private final String tenantId;
   private Object credentials;
 
   public JwtAuthenticationToken(String principal, Claims credentials, Collection<? extends GrantedAuthority> authorities) {
+    this(principal, credentials, authorities, null);
+  }
+
+  public JwtAuthenticationToken(String principal, Claims credentials, Collection<? extends GrantedAuthority> authorities, String tenantId) {
     super(authorities);
     this.principal = principal;
     this.credentials = credentials;
+    this.tenantId = tenantId;
     super.setAuthenticated(true);
   }
 
@@ -26,6 +32,10 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
   public Object getPrincipal() {
     return this.principal;
+  }
+
+  public String getTenantId() {
+    return this.tenantId;
   }
 
   @Override
