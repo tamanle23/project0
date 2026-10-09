@@ -40,6 +40,7 @@ export interface EntityType {
   name: string;
   systemName: string;
   description?: string;
+  tenantId?: string;
   schemaVersion?: number;
   version?: number;
   createdDate?: string;
@@ -49,6 +50,7 @@ export interface EntityType {
 export interface AttributeDefinition {
   id: string | number;
   entityTypeId?: string | number;
+  tenantId?: string;
   name: string;
   systemName: string;
   dataType: DataType;

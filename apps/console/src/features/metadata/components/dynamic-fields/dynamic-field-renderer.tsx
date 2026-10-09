@@ -13,8 +13,8 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { X } from 'lucide-react';
 import { useEntityRecords } from '../../api/metadata-api';
+import { useMetadataUiStore } from '../../store/use-metadata-ui-store';
 
 import {
   Popover,
@@ -30,7 +30,7 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { Button } from '@/components/ui/button';
-import { Check, ChevronsUpDown, AlertTriangle, Link2 } from 'lucide-react';
+import { X, Lock, Sparkles, Check, ChevronsUpDown, AlertTriangle, Link2 } from 'lucide-react';
 
 interface RelationPickerControlProps {
   id: string;
@@ -447,13 +447,39 @@ export const DynamicFieldRenderer: React.FC<Props> = ({
     }
   };
 
+  const { workspaceMode } = useMetadataUiStore();
+  const isSystemField = attribute.tenantId === 'SYSTEM';
+
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <Label htmlFor={systemName} className="text-xs font-semibold text-foreground">
-          {name} {isRequired && <span className="text-destructive">*</span>}
-        </Label>
-        <span className="text-[10px] font-mono text-muted-foreground">{systemName}</span>
+        <div className="flex items-center gap-1.5">
+          <Label htmlFor={systemName} className="text-xs font-semibold text-foreground">
+            {name} {isRequired && <span className="text-destructive">*</span>}
+          </Label>
+
+          {/* Technical Schema Inspection Badges for Architect Mode */}
+          {workspaceMode === 'architect' && (
+            isSystemField ? (
+              <Badge variant="outline" className="text-[9px] gap-0.5 px-1 py-0 font-mono text-sky-700 dark:text-sky-300 bg-sky-500/10 border-sky-500/20">
+                <Lock className="h-2 w-2" />
+                <span>SYSTEM</span>
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="text-[9px] gap-0.5 px-1 py-0 font-mono text-purple-700 dark:text-purple-300 bg-purple-500/10 border-purple-500/20">
+                <Sparkles className="h-2 w-2" />
+                <span>CUSTOM</span>
+              </Badge>
+            )
+          )}
+        </div>
+
+        <div className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+          {workspaceMode === 'architect' && (
+            <span className="text-muted-foreground/60">{attribute.dataType.toLowerCase()} •</span>
+          )}
+          <span>{systemName}</span>
+        </div>
       </div>
 
       {renderControl()}

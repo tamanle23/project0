@@ -133,10 +133,19 @@
   "metadata": {
     "title": "Metadata Management",
     "description": "Architect flexible data schemas, enforce dynamic validation rules, and manage records.",
+    "mode": {
+      "architect": "Architect Studio",
+      "operator": "Operator View"
+    },
     "tabs": {
       "schema": "Schema Builder",
       "data": "Data Explorer",
       "relationships": "Connected Edges"
+    },
+    "badges": {
+      "systemField": "System Core Field",
+      "customField": "Custom Attribute",
+      "systemProtected": "System attributes are protected and cannot be deleted or modified"
     }
   }
 }

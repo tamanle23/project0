@@ -133,10 +133,19 @@
   "metadata": {
     "title": "Quản lý Siêu dữ liệu",
     "description": "Thiết kế lược đồ dữ liệu linh hoạt, thực thi quy tắc kiểm thực và quản lý bản ghi.",
+    "mode": {
+      "architect": "Xưởng Kiến trúc (Architect Studio)",
+      "operator": "Góc nhìn Vận hành (Operator View)"
+    },
     "tabs": {
       "schema": "Trình tạo Lược đồ",
       "data": "Trình khám phá Dữ liệu",
       "relationships": "Liên kết Đồ thị (Edges)"
+    },
+    "badges": {
+      "systemField": "Thuộc tính Hệ thống Cốt lõi",
+      "customField": "Thuộc tính Tùy biến",
+      "systemProtected": "Thuộc tính hệ thống được bảo vệ, không thể sửa đổi hoặc xóa"
     }
   }
 }

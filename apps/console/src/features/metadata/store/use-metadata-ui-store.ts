@@ -22,7 +22,24 @@ export interface GridState {
   sortDirection: 'asc' | 'desc';
 }
 
+export type WorkspaceMode = 'architect' | 'operator';
+export type TenantRole = 'TENANT_ADMIN' | 'TENANT_OPERATOR' | 'TENANT_VIEWER';
+
 interface MetadataUiState {
+  // Multi-Tenancy Context & RBAC
+  activeTenantId: string;
+  activeTenantName: string;
+  currentUserRole: TenantRole;
+  workspaceMode: WorkspaceMode;
+
+  // Mode Actions & Permission Selectors
+  setWorkspaceMode: (mode: WorkspaceMode) => void;
+  toggleWorkspaceMode: () => void;
+  setCurrentUserRole: (role: TenantRole) => void;
+  setActiveTenant: (tenantId: string, tenantName?: string) => void;
+  canManageSchema: () => boolean;
+  canMutateRecords: () => boolean;
+
   // Navigation & selection
   selectedEntityTypeId: string | null;
   setSelectedEntityTypeId: (id: string | null) => void;
@@ -96,6 +113,53 @@ interface MetadataUiState {
 }
 
 export const useMetadataUiStore = create<MetadataUiState>((set, get) => ({
+  // Multi-Tenancy & Workspace Mode
+  activeTenantId: 'default-tenant',
+  activeTenantName: 'Default Organization',
+  currentUserRole: 'TENANT_ADMIN',
+  workspaceMode: 'architect',
+
+  setWorkspaceMode: (mode: WorkspaceMode) => {
+    const { currentUserRole, activeTab } = get();
+    // Non-admins can NEVER switch to architect mode
+    if (currentUserRole !== 'TENANT_ADMIN' && mode === 'architect') {
+      return;
+    }
+    // If switching to operator mode while on schema tab, fallback safely to data tab
+    const nextTab = (mode === 'operator' && activeTab === 'schema') ? 'data' : activeTab;
+    set({ workspaceMode: mode, activeTab: nextTab });
+  },
+
+  toggleWorkspaceMode: () => {
+    const { workspaceMode, setWorkspaceMode } = get();
+    setWorkspaceMode(workspaceMode === 'architect' ? 'operator' : 'architect');
+  },
+
+  setCurrentUserRole: (role: TenantRole) => {
+    const { activeTab } = get();
+    const isNowAdmin = role === 'TENANT_ADMIN';
+    const nextMode = isNowAdmin ? get().workspaceMode : 'operator';
+    const nextTab = (!isNowAdmin && activeTab === 'schema') ? 'data' : activeTab;
+    set({ currentUserRole: role, workspaceMode: nextMode, activeTab: nextTab });
+  },
+
+  setActiveTenant: (tenantId: string, tenantName?: string) => {
+    set({
+      activeTenantId: tenantId,
+      activeTenantName: tenantName || tenantId,
+    });
+  },
+
+  canManageSchema: () => {
+    const { currentUserRole, workspaceMode } = get();
+    return currentUserRole === 'TENANT_ADMIN' && workspaceMode === 'architect';
+  },
+
+  canMutateRecords: () => {
+    const { currentUserRole } = get();
+    return currentUserRole !== 'TENANT_VIEWER';
+  },
+
   selectedEntityTypeId: '1',
   setSelectedEntityTypeId: (id) => set({ selectedEntityTypeId: id }),
   activeTab: 'schema',

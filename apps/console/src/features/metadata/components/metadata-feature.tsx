@@ -19,9 +19,10 @@ import { LanguageSwitch } from '@/components/language-switch';
 import { ThemeSwitch } from '@/components/theme-switch';
 import { ConfigDrawer } from '@/components/config-drawer';
 import { ProfileDropdown } from '@/components/profile-dropdown';
+import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getRouteApi } from '@tanstack/react-router';
-import { Layers, Database, Sparkles, GitFork, Cpu } from 'lucide-react';
+import { Layers, Database, Sparkles, GitFork, Cpu, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const route = getRouteApi('/_authenticated/metadata/');
@@ -31,8 +32,16 @@ export const MetadataFeature: React.FC = () => {
   const navigate = route.useNavigate();
   const searchParams = route.useSearch();
 
-  const { selectedEntityTypeId, setSelectedEntityTypeId, activeTab, setActiveTab } =
-    useMetadataUiStore();
+  const {
+    selectedEntityTypeId,
+    setSelectedEntityTypeId,
+    activeTab,
+    setActiveTab,
+    workspaceMode,
+    toggleWorkspaceMode,
+    currentUserRole,
+    canManageSchema,
+  } = useMetadataUiStore();
 
   // 1. Initial Sync from URL to Store
   React.useEffect(() => {
@@ -92,8 +101,8 @@ export const MetadataFeature: React.FC = () => {
       </Header>
 
       <Main fixed fluid className="flex flex-1 flex-col gap-4 sm:gap-6 min-w-0 w-full lg:overflow-hidden">
-        {/* Page Title & Intro */}
-        <div className="flex flex-wrap items-end justify-between gap-2 shrink-0">
+        {/* Page Title & Intro + Dual-Mode Switcher */}
+        <div className="flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">
               {t('metadata.title', 'Metadata Management')}
@@ -105,6 +114,29 @@ export const MetadataFeature: React.FC = () => {
               )}
             </p>
           </div>
+
+          {/* Liquid Glass Workspace Mode Switcher (Visible to Admins) */}
+          {currentUserRole === 'TENANT_ADMIN' && (
+            <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/60 dark:bg-slate-900/60 border border-white/30 dark:border-white/10 backdrop-blur-xl shadow-sm">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground select-none">
+                {workspaceMode === 'architect' ? (
+                  <span className="text-amber-500 dark:text-amber-400 flex items-center gap-1.5 font-bold">
+                    <Sparkles className="h-3.5 w-3.5" /> {t('metadata.mode.architect', 'Architect Studio')}
+                  </span>
+                ) : (
+                  <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 font-bold">
+                    <User className="h-3.5 w-3.5" /> {t('metadata.mode.operator', 'Operator View')}
+                  </span>
+                )}
+              </span>
+              <Switch
+                checked={workspaceMode === 'architect'}
+                onCheckedChange={toggleWorkspaceMode}
+                aria-label="Toggle Architect / Operator Mode"
+                className="data-[state=checked]:bg-amber-500"
+              />
+            </div>
+          )}
         </div>
 
         {/* Liquid Glass Split Workspace */}
@@ -145,29 +177,31 @@ export const MetadataFeature: React.FC = () => {
                   >
                     <div className="w-full xl:w-auto overflow-x-auto no-scrollbar py-0.5">
                       <TabsList className="flex w-full xl:w-auto min-w-0 items-center justify-between sm:justify-start xl:justify-end gap-1 sm:gap-1.5 p-1 sm:p-1.5 h-auto rounded-xl bg-slate-200/50 dark:bg-slate-950/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-inner shadow-black/5">
-                        {/* Schema Builder Tab */}
-                        <TabsTrigger
-                          value="schema"
-                          className={cn(
-                            'relative flex-1 xl:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-2.5 sm:px-3 text-xs font-medium rounded-lg transition-all duration-200 min-w-0 whitespace-nowrap',
-                            'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5',
-                            'data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:text-foreground data-[state=active]:font-semibold',
-                            'data-[state=active]:shadow-md data-[state=active]:shadow-black/10 data-[state=active]:border data-[state=active]:border-white/60 dark:data-[state=active]:border-white/10'
-                          )}
-                        >
-                          <Layers className="h-3.5 w-3.5 shrink-0 text-sky-500" />
-                          <span className="truncate">{t('metadata.tabs.schema', 'Schema')}</span>
-                          <span
+                        {/* Schema Builder Tab (Architect Mode Only) */}
+                        {canManageSchema() && (
+                          <TabsTrigger
+                            value="schema"
                             className={cn(
-                              'inline-flex items-center px-1.5 py-0.2 rounded-full text-[10px] font-mono font-medium transition-colors shrink-0',
-                              activeTab === 'schema'
-                                ? 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/20'
-                                : 'bg-muted/80 text-muted-foreground'
+                              'relative flex-1 xl:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-2.5 sm:px-3 text-xs font-medium rounded-lg transition-all duration-200 min-w-0 whitespace-nowrap',
+                              'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5',
+                              'data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:text-foreground data-[state=active]:font-semibold',
+                              'data-[state=active]:shadow-md data-[state=active]:shadow-black/10 data-[state=active]:border data-[state=active]:border-white/60 dark:data-[state=active]:border-white/10'
                             )}
                           >
-                            {attributeCount}
-                          </span>
-                        </TabsTrigger>
+                            <Layers className="h-3.5 w-3.5 shrink-0 text-sky-500" />
+                            <span className="truncate">{t('metadata.tabs.schema', 'Schema')}</span>
+                            <span
+                              className={cn(
+                                'inline-flex items-center px-1.5 py-0.2 rounded-full text-[10px] font-mono font-medium transition-colors shrink-0',
+                                activeTab === 'schema'
+                                  ? 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/20'
+                                  : 'bg-muted/80 text-muted-foreground'
+                              )}
+                            >
+                              {attributeCount}
+                            </span>
+                          </TabsTrigger>
+                        )}
 
                         {/* Data Explorer Tab */}
                         <TabsTrigger
