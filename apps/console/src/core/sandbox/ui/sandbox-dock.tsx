@@ -175,7 +175,7 @@ export function SandboxDock() {
             variant="ghost"
             size="icon"
             onClick={handleResetAllData}
-            className="h-6 w-6 rounded-md hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground"
+            className="h-7 w-7 rounded-md hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground"
             title="Reset all mock data across all features"
           >
             <RotateCcw className="size-3.5" />
@@ -184,7 +184,7 @@ export function SandboxDock() {
             variant="ghost"
             size="icon"
             onClick={toggleMinimized}
-            className="h-6 w-6 rounded-md hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground"
+            className="h-7 w-7 rounded-md hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground"
             title="Minimize dock"
           >
             <Minus className="size-3.5" />
