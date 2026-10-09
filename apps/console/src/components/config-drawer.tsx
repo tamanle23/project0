@@ -122,6 +122,7 @@ function SectionTitle({
           variant='secondary'
           className='size-4 rounded-full'
           onClick={onReset}
+          aria-label={`Reset ${title.toLowerCase()} setting`}
         >
           <RotateCcw className='size-3' />
         </Button>
