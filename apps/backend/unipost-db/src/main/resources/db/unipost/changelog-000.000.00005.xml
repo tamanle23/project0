@@ -41,23 +41,23 @@
         <sql dbms="postgresql">
             -- 2.1 Entity Types: Tenant + System Name
             DROP INDEX IF EXISTS uk_entity_type_sysname_active;
-            
-            CREATE UNIQUE INDEX uk_entity_type_tenant_sysname_active 
-            ON UNIPOST_ENTITY_TYPES (tenant_id, system_name) 
+
+            CREATE UNIQUE INDEX uk_entity_type_tenant_sysname_active
+            ON UNIPOST_ENTITY_TYPES (tenant_id, system_name)
             WHERE "deletedDate" IS NULL;
 
             -- 2.2 Attribute Definitions: Tenant + Entity Type + System Name
             DROP INDEX IF EXISTS uk_attr_def_type_sysname_active;
 
-            CREATE UNIQUE INDEX uk_attr_def_tenant_type_sysname_active 
-            ON UNIPOST_ATTRIBUTE_DEFINITIONS (tenant_id, entity_type_id, system_name) 
+            CREATE UNIQUE INDEX uk_attr_def_tenant_type_sysname_active
+            ON UNIPOST_ATTRIBUTE_DEFINITIONS (tenant_id, entity_type_id, system_name)
             WHERE "deletedDate" IS NULL;
 
             -- 2.3 Relationship Types: Tenant + System Name
             DROP INDEX IF EXISTS uk_rel_type_sysname_active;
 
-            CREATE UNIQUE INDEX uk_rel_type_tenant_sysname_active 
-            ON UNIPOST_RELATIONSHIP_TYPES (tenant_id, system_name) 
+            CREATE UNIQUE INDEX uk_rel_type_tenant_sysname_active
+            ON UNIPOST_RELATIONSHIP_TYPES (tenant_id, system_name)
             WHERE "deletedDate" IS NULL;
         </sql>
 
@@ -65,16 +65,16 @@
         <!-- STEP 3: Composite Performance Indexes for Tenant-Scoped Queries            -->
         <!-- ========================================================================= -->
         <sql dbms="postgresql">
-            CREATE INDEX IF NOT EXISTS idx_entities_tenant_type_active 
-            ON UNIPOST_ENTITIES (tenant_id, entity_type_id) 
+            CREATE INDEX IF NOT EXISTS idx_entities_tenant_type_active
+            ON UNIPOST_ENTITIES (tenant_id, entity_type_id)
             WHERE "deletedDate" IS NULL;
 
-            CREATE INDEX IF NOT EXISTS idx_entity_rels_tenant_source_active 
-            ON UNIPOST_ENTITY_RELATIONSHIPS (tenant_id, source_entity_id) 
+            CREATE INDEX IF NOT EXISTS idx_entity_rels_tenant_source_active
+            ON UNIPOST_ENTITY_RELATIONSHIPS (tenant_id, source_entity_id)
             WHERE "deletedDate" IS NULL;
 
-            CREATE INDEX IF NOT EXISTS idx_entity_rels_tenant_target_active 
-            ON UNIPOST_ENTITY_RELATIONSHIPS (tenant_id, target_entity_id) 
+            CREATE INDEX IF NOT EXISTS idx_entity_rels_tenant_target_active
+            ON UNIPOST_ENTITY_RELATIONSHIPS (tenant_id, target_entity_id)
             WHERE "deletedDate" IS NULL;
         </sql>
 
@@ -82,7 +82,7 @@
         <!-- STEP 4: PostgreSQL Row-Level Security (RLS) Safety Nets                    -->
         <!-- ========================================================================= -->
         <sql dbms="postgresql">
-            -- 4.1 Enable and Force RLS on all Dynamic Metadata & Record tables
+            -- 4.1 Enable and Force RLS on all Dynamic Metadata &amp; Record tables
             ALTER TABLE UNIPOST_ENTITY_TYPES ENABLE ROW LEVEL SECURITY;
             ALTER TABLE UNIPOST_ENTITY_TYPES FORCE ROW LEVEL SECURITY;
 

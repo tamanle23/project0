@@ -18,55 +18,60 @@
         </addColumn>
 
         <!-- 2. Replace UNIPOST_RELATIONSHIP_TYPES system_name unique constraint with partial index for soft-delete support -->
-        <sql dbms="postgresql">
+        <sql dbms="postgresql" splitStatements="false">
+         <![CDATA[
             DO $$
             DECLARE
                 r RECORD;
             BEGIN
                 FOR r IN (
-                    SELECT conname 
-                    FROM pg_constraint 
-                    WHERE conrelid = 'UNIPOST_RELATIONSHIP_TYPES'::regclass 
-                      AND contype = 'u' 
+                    SELECT conname
+                    FROM pg_constraint
+                    WHERE conrelid = 'UNIPOST_RELATIONSHIP_TYPES'::regclass
+                      AND contype = 'u'
                       AND pg_get_constraintdef(oid) LIKE '%system_name%'
                 ) LOOP
                     EXECUTE 'ALTER TABLE UNIPOST_RELATIONSHIP_TYPES DROP CONSTRAINT ' || quote_ident(r.conname);
                 END LOOP;
             END $$;
-
-            CREATE UNIQUE INDEX IF NOT EXISTS uk_rel_type_sysname_active 
-            ON UNIPOST_RELATIONSHIP_TYPES (system_name) 
-            WHERE "deletedDate" IS NULL;
+         ]]>
         </sql>
-
-        <!-- 3. Replace uk_entity_rel_triplet on UNIPOST_ENTITY_RELATIONSHIPS with partial unique index for soft-delete support -->
         <sql dbms="postgresql">
+          CREATE UNIQUE INDEX IF NOT EXISTS uk_rel_type_sysname_active
+                      ON UNIPOST_RELATIONSHIP_TYPES (system_name)
+                      WHERE "deletedDate" IS NULL;
+        </sql>
+        <!-- 3. Replace uk_entity_rel_triplet on UNIPOST_ENTITY_RELATIONSHIPS with partial unique index for soft-delete support -->
+        <sql dbms="postgresql" splitStatements="false">
+            <![CDATA[
             DO $$
             DECLARE
                 r RECORD;
             BEGIN
                 FOR r IN (
-                    SELECT conname 
-                    FROM pg_constraint 
-                    WHERE conrelid = 'UNIPOST_ENTITY_RELATIONSHIPS'::regclass 
-                      AND contype = 'u' 
+                    SELECT conname
+                    FROM pg_constraint
+                    WHERE conrelid = 'UNIPOST_ENTITY_RELATIONSHIPS'::regclass
+                      AND contype = 'u'
                       AND pg_get_constraintdef(oid) LIKE '%source_entity_id%'
                 ) LOOP
                     EXECUTE 'ALTER TABLE UNIPOST_ENTITY_RELATIONSHIPS DROP CONSTRAINT ' || quote_ident(r.conname);
                 END LOOP;
             END $$;
+            ]]>
+        </sql>
+        <sql dbms="postgresql">
+          CREATE UNIQUE INDEX IF NOT EXISTS uk_entity_rel_triplet_active
+          ON UNIPOST_ENTITY_RELATIONSHIPS (source_entity_id, target_entity_id, relationship_type_id)
+          WHERE "deletedDate" IS NULL;
 
-            CREATE UNIQUE INDEX IF NOT EXISTS uk_entity_rel_triplet_active 
-            ON UNIPOST_ENTITY_RELATIONSHIPS (source_entity_id, target_entity_id, relationship_type_id) 
-            WHERE "deletedDate" IS NULL;
+          CREATE INDEX IF NOT EXISTS idx_entity_rel_source_active
+          ON UNIPOST_ENTITY_RELATIONSHIPS (source_entity_id)
+          WHERE "deletedDate" IS NULL;
 
-            CREATE INDEX IF NOT EXISTS idx_entity_rel_source_active 
-            ON UNIPOST_ENTITY_RELATIONSHIPS (source_entity_id) 
-            WHERE "deletedDate" IS NULL;
-
-            CREATE INDEX IF NOT EXISTS idx_entity_rel_target_active 
-            ON UNIPOST_ENTITY_RELATIONSHIPS (target_entity_id) 
-            WHERE "deletedDate" IS NULL;
+          CREATE INDEX IF NOT EXISTS idx_entity_rel_target_active
+          ON UNIPOST_ENTITY_RELATIONSHIPS (target_entity_id)
+          WHERE "deletedDate" IS NULL;
         </sql>
     </changeSet>
 

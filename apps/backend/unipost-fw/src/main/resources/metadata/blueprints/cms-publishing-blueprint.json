@@ -1,0 +1,177 @@
+{
+  "id": "bp_cms_publishing_v1",
+  "name": "Headless CMS & Digital Publishing",
+  "category": "MEDIA_PUBLISHING",
+  "description": "Multi-channel content authoring, articles, category taxonomy, SEO metadata, and media asset management.",
+  "icon": "Newspaper",
+  "entityTypes": [
+    {
+      "systemName": "ent_cms_article",
+      "name": "Article & Editorial Post",
+      "description": "Long-form editorial articles, news items, and blog posts",
+      "attributes": [
+        {
+          "systemName": "title",
+          "name": "Article Title",
+          "dataType": "STRING",
+          "uiComponent": "text",
+          "isRequired": true,
+          "displayOrder": 1
+        },
+        {
+          "systemName": "slug",
+          "name": "URL Slug",
+          "dataType": "STRING",
+          "uiComponent": "text",
+          "isRequired": true,
+          "displayOrder": 2
+        },
+        {
+          "systemName": "summary",
+          "name": "Excerpt Summary",
+          "dataType": "STRING",
+          "uiComponent": "textarea",
+          "isRequired": false,
+          "displayOrder": 3
+        },
+        {
+          "systemName": "body_content",
+          "name": "Body Content (Markdown / HTML)",
+          "dataType": "STRING",
+          "uiComponent": "textarea",
+          "isRequired": true,
+          "displayOrder": 4
+        },
+        {
+          "systemName": "status",
+          "name": "Publishing Status",
+          "dataType": "STRING",
+          "uiComponent": "select",
+          "isRequired": true,
+          "displayOrder": 5,
+          "options": {
+            "choices": ["DRAFT", "IN_REVIEW", "SCHEDULED", "PUBLISHED", "ARCHIVED"]
+          },
+          "defaultValue": "DRAFT"
+        },
+        {
+          "systemName": "featured_flag",
+          "name": "Featured Headline",
+          "dataType": "BOOLEAN",
+          "uiComponent": "switch",
+          "isRequired": false,
+          "displayOrder": 6,
+          "defaultValue": "false"
+        },
+        {
+          "systemName": "meta_title",
+          "name": "SEO Meta Title",
+          "dataType": "STRING",
+          "uiComponent": "text",
+          "isRequired": false,
+          "displayOrder": 7
+        },
+        {
+          "systemName": "meta_description",
+          "name": "SEO Meta Description",
+          "dataType": "STRING",
+          "uiComponent": "textarea",
+          "isRequired": false,
+          "displayOrder": 8
+        }
+      ]
+    },
+    {
+      "systemName": "ent_cms_category",
+      "name": "Content Category",
+      "description": "Taxonomy topic and categorization hierarchy",
+      "attributes": [
+        {
+          "systemName": "category_name",
+          "name": "Category Name",
+          "dataType": "STRING",
+          "uiComponent": "text",
+          "isRequired": true,
+          "displayOrder": 1
+        },
+        {
+          "systemName": "slug",
+          "name": "Category Slug",
+          "dataType": "STRING",
+          "uiComponent": "text",
+          "isRequired": true,
+          "displayOrder": 2
+        },
+        {
+          "systemName": "description",
+          "name": "Category Description",
+          "dataType": "STRING",
+          "uiComponent": "textarea",
+          "isRequired": false,
+          "displayOrder": 3
+        }
+      ]
+    },
+    {
+      "systemName": "ent_cms_media_asset",
+      "name": "Media Asset",
+      "description": "Digital media assets, hero banners, and cover photography",
+      "attributes": [
+        {
+          "systemName": "asset_title",
+          "name": "Asset Title",
+          "dataType": "STRING",
+          "uiComponent": "text",
+          "isRequired": true,
+          "displayOrder": 1
+        },
+        {
+          "systemName": "asset_url",
+          "name": "Storage URL / CDN Link",
+          "dataType": "STRING",
+          "uiComponent": "text",
+          "isRequired": true,
+          "displayOrder": 2
+        },
+        {
+          "systemName": "media_type",
+          "name": "MIME / Media Format",
+          "dataType": "STRING",
+          "uiComponent": "select",
+          "isRequired": true,
+          "displayOrder": 3,
+          "options": {
+            "choices": ["IMAGE_JPEG", "IMAGE_PNG", "IMAGE_WEBP", "VIDEO_MP4", "DOCUMENT_PDF"]
+          },
+          "defaultValue": "IMAGE_WEBP"
+        },
+        {
+          "systemName": "alt_text",
+          "name": "Accessibility Alt Text",
+          "dataType": "STRING",
+          "uiComponent": "text",
+          "isRequired": false,
+          "displayOrder": 4
+        }
+      ]
+    }
+  ],
+  "relationshipTypes": [
+    {
+      "systemName": "rel_article_primary_category",
+      "name": "Article Primary Category",
+      "description": "Assigns an editorial article to its primary category taxon",
+      "sourceEntityType": "ent_cms_article",
+      "targetEntityType": "ent_cms_category",
+      "cardinality": "MANY_TO_ONE"
+    },
+    {
+      "systemName": "rel_article_cover_media",
+      "name": "Article Cover Media",
+      "description": "Links a hero cover image or thumbnail asset to an article",
+      "sourceEntityType": "ent_cms_article",
+      "targetEntityType": "ent_cms_media_asset",
+      "cardinality": "MANY_TO_ONE"
+    }
+  ]
+}

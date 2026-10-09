@@ -26,30 +26,32 @@
         <!-- 4. Replace AttributeDefinition unique constraint with partial unique index for soft-delete support -->
         <dropUniqueConstraint tableName="UNIPOST_ATTRIBUTE_DEFINITIONS" constraintName="uk_attr_def_type_sysname"/>
         <sql dbms="postgresql">
-            CREATE UNIQUE INDEX uk_attr_def_type_sysname_active 
-            ON UNIPOST_ATTRIBUTE_DEFINITIONS (entity_type_id, system_name) 
+            CREATE UNIQUE INDEX uk_attr_def_type_sysname_active
+            ON UNIPOST_ATTRIBUTE_DEFINITIONS (entity_type_id, system_name)
             WHERE "deletedDate" IS NULL;
         </sql>
 
         <!-- 5. Replace EntityType system_name unique constraint with partial unique index for soft-delete support -->
+        <sql dbms="postgresql" endDelimiter="END $$;">
+          <![CDATA[
+              DO $$
+              DECLARE r RECORD;
+              BEGIN
+                  FOR r IN (
+                      SELECT conname
+                      FROM pg_constraint
+                      WHERE conrelid = 'UNIPOST_ENTITY_TYPES'::regclass
+                        AND contype = 'u'
+                        AND pg_get_constraintdef(oid) LIKE '%system_name%'
+                  ) LOOP
+                      EXECUTE 'ALTER TABLE UNIPOST_ENTITY_TYPES DROP CONSTRAINT ' || quote_ident(r.conname);
+                  END LOOP;
+              END $$;
+          ]]>
+        </sql>
         <sql dbms="postgresql">
-            DO $$
-            DECLARE
-                r RECORD;
-            BEGIN
-                FOR r IN (
-                    SELECT conname 
-                    FROM pg_constraint 
-                    WHERE conrelid = 'UNIPOST_ENTITY_TYPES'::regclass 
-                      AND contype = 'u' 
-                      AND pg_get_constraintdef(oid) LIKE '%system_name%'
-                ) LOOP
-                    EXECUTE 'ALTER TABLE UNIPOST_ENTITY_TYPES DROP CONSTRAINT ' || quote_ident(r.conname);
-                END LOOP;
-            END $$;
-
-            CREATE UNIQUE INDEX uk_entity_type_sysname_active 
-            ON UNIPOST_ENTITY_TYPES (system_name) 
+            CREATE UNIQUE INDEX uk_entity_type_sysname_active
+            ON UNIPOST_ENTITY_TYPES (system_name)
             WHERE "deletedDate" IS NULL;
         </sql>
     </changeSet>
