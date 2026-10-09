@@ -1,6 +1,9 @@
 import type { MetadataDataSource } from '../api/metadata-data-source';
 import type {
   AttributeDefinition,
+  BlueprintProvisionRequest,
+  BlueprintProvisionResult,
+  BlueprintSummary,
   CompiledSchema,
   CreateAttributeDefinitionDto,
   CreateEntityRecordDto,
@@ -1328,6 +1331,64 @@ export class MockMetadataService implements MetadataDataSource {
     const beforeCount = this.relationships.length;
     this.relationships = this.relationships.filter((r) => String(r.id) !== strId);
     return this.relationships.length < beforeCount;
+  }
+
+  // ==========================================
+  // 6. Domain Blueprints & Tenant Provisioning
+  // ==========================================
+  async getBlueprints(): Promise<BlueprintSummary[]> {
+    return [
+      {
+        id: 'bp_cms_publishing_v1',
+        name: 'Headless CMS & Digital Publishing',
+        category: 'Publishing',
+        description: 'Multi-channel editorial workflow with Articles, Categories, and Media Assets.',
+        icon: 'Newspaper',
+        entityTypesCount: 3,
+        relationshipsCount: 2,
+      },
+      {
+        id: 'bp_logistics_v1',
+        name: 'Logistics & Fleet Management',
+        category: 'Operations',
+        description: 'Fleet dispatching, vehicle tracking, delivery orders, and status monitoring.',
+        icon: 'Truck',
+        entityTypesCount: 2,
+        relationshipsCount: 1,
+      },
+      {
+        id: 'bp_crm_billing_v1',
+        name: 'B2B CRM & Invoicing',
+        category: 'Commerce',
+        description: 'Corporate client accounts, contract tiers, and cloud compute specifications.',
+        icon: 'Briefcase',
+        entityTypesCount: 2,
+        relationshipsCount: 1,
+      },
+      {
+        id: 'bp_blank_v1',
+        name: 'Blank Canvas',
+        category: 'General',
+        description: 'Clean slate workspace. Design custom models and attributes from scratch.',
+        icon: 'Layers',
+        entityTypesCount: 0,
+        relationshipsCount: 0,
+      },
+    ];
+  }
+
+  async provisionTenant(dto: BlueprintProvisionRequest): Promise<BlueprintProvisionResult> {
+    return {
+      tenantId: dto.tenantId,
+      tenantName: dto.tenantName,
+      blueprintId: dto.blueprintId,
+      blueprintName: 'Provisioned Workspace Blueprint',
+      createdEntityTypesCount: 2,
+      createdAttributesCount: 8,
+      createdRelationshipsCount: 1,
+      createdEntityTypeNames: ['Model A', 'Model B'],
+      executionTimeMs: 120,
+    };
   }
 
   private bumpEntityTypeSchemaVersion(entityTypeId: string) {

@@ -13,3 +13,6 @@ export * from './components/metadata-feature';
 export * from './components/customer-accounts-explorer';
 export { MetadataFeature as Metadata } from './components/metadata-feature';
 
+export * from './api/use-blueprint-catalog';
+export * from './components/blueprint-card';
+export * from './components/blueprint-gallery-dialog';

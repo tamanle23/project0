@@ -202,3 +202,31 @@ export interface EntityFacetsResponse {
   totalRecords: number;
   facets: FacetGroupDto[];
 }
+
+export interface BlueprintSummary {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  icon: string;
+  entityTypesCount: number;
+  relationshipsCount: number;
+}
+
+export interface BlueprintProvisionRequest {
+  tenantId: string;
+  tenantName: string;
+  blueprintId: string;
+}
+
+export interface BlueprintProvisionResult {
+  tenantId: string;
+  tenantName: string;
+  blueprintId: string;
+  blueprintName: string;
+  createdEntityTypesCount: number;
+  createdAttributesCount: number;
+  createdRelationshipsCount: number;
+  createdEntityTypeNames: string[];
+  executionTimeMs: number;
+}
