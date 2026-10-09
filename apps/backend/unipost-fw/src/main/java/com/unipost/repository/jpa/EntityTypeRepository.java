@@ -12,4 +12,5 @@ public interface EntityTypeRepository extends BaseRepository<EntityType> {
     Optional<EntityType> findByIdAndDeletedDateIsNull(Long id);
     boolean existsBySystemNameAndDeletedDateIsNull(String systemName);
     Page<EntityType> findAllByDeletedDateIsNull(Pageable pageable);
+    long countByDeletedDateIsNull();
 }

@@ -185,7 +185,8 @@ class CompositeCacheFabricTest {
                 null,
                 schemaValidationService,
                 eventPublisher,
-                null
+                null,
+                new com.fasterxml.jackson.databind.ObjectMapper()
         );
 
         CreateAttributeRequest newAttrRequest = new CreateAttributeRequest(
@@ -226,7 +227,8 @@ class CompositeCacheFabricTest {
                 null,
                 schemaValidationService,
                 eventPublisher,
-                null
+                null,
+                new com.fasterxml.jackson.databind.ObjectMapper()
         );
 
         // Attempt update

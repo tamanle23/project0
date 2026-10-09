@@ -45,6 +45,9 @@ public class SchemaValidationService {
     // L1 in-memory cache holding parsed JsonSchema objects for maximum throughput
     private final Map<String, JsonSchema> l1ParsedSchemaCache = new ConcurrentHashMap<>();
 
+    // Dedicated bounded thread pool for schema validation with strict timeout guards
+    private final java.util.concurrent.ExecutorService validationExecutor = java.util.concurrent.Executors.newCachedThreadPool();
+
     private IMap<String, String> getHazelcastSchemaMap() {
         if (hazelcastInstance != null) {
             return hazelcastInstance.getMap(HazelcastConfiguration.METADATA_SCHEMAS_MAP);
@@ -143,9 +146,20 @@ public class SchemaValidationService {
 
         try {
             JsonNode payloadNode = objectMapper.valueToTree(payload != null ? payload : Map.of());
-            Set<ValidationMessage> validationResult = schema.validate(payloadNode);
 
-            if (validationResult.isEmpty()) {
+            // Tier 2 ReDoS Defense: strictly cap computational validation budget to 50 milliseconds
+            java.util.concurrent.Future<Set<ValidationMessage>> future = validationExecutor.submit(() -> schema.validate(payloadNode));
+
+            Set<ValidationMessage> validationResult;
+            try {
+                validationResult = future.get(50, TimeUnit.MILLISECONDS);
+            } catch (java.util.concurrent.TimeoutException te) {
+                future.cancel(true);
+                throw new com.unipost.service.exception.ValidationTimeoutException(
+                        "Schema validation timed out (>50ms); evaluation aborted to mitigate catastrophic regex backtracking (ReDoS)");
+            }
+
+            if (validationResult == null || validationResult.isEmpty()) {
                 return List.of();
             }
 
@@ -162,6 +176,8 @@ public class SchemaValidationService {
                         .build());
             }
             return errorList;
+        } catch (com.unipost.service.exception.ValidationTimeoutException vte) {
+            throw vte;
         } catch (Exception e) {
             log.error("Error dry-run validating payload against schema for entityTypeId {}", entityTypeId, e);
             return List.of(Error.builder()

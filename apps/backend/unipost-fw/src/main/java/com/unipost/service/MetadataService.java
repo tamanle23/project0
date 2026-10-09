@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,6 +41,10 @@ public class MetadataService {
     private final SchemaValidationService schemaValidationService;
     private final ApplicationEventPublisher eventPublisher;
     private final PageBuilder pageBuilder;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+
+    private static final long MAX_RECORD_PAYLOAD_BYTES = 1024 * 1024; // 1 MB limit
+    private static final Pattern DANGEROUS_REGEX_PATTERN = Pattern.compile("(\\(.*[+*]\\)[+*]|\\([a-zA-Z0-9_\\[\\]|-]+[+*]\\)[+*])");
 
     private org.springframework.data.domain.PageRequest toSpringPageRequest(PageRequest request) {
         int page = (request != null && request.getNumber() != null && request.getNumber() > 0) ? request.getNumber() - 1 : 0;
@@ -84,6 +89,12 @@ public class MetadataService {
 
     @Transactional
     public EntityTypeResponse createEntityType(CreateEntityTypeRequest request) {
+        // Tier 2 Resource Quotas: Cap maximum entity types per tenant to 50
+        long currentEntityCount = entityTypeRepository.countByDeletedDateIsNull();
+        if (currentEntityCount >= 50) {
+            throw new MetadataConflictException("Tenant entity quota exceeded: Maximum of 50 EntityTypes allowed per workspace");
+        }
+
         if (entityTypeRepository.existsBySystemNameAndDeletedDateIsNull(request.systemName().trim())) {
             throw new MetadataConflictException("EntityType with systemName '" + request.systemName() + "' already exists");
         }
@@ -172,6 +183,22 @@ public class MetadataService {
 
         String reqSysName = request.systemName().trim();
         List<AttributeDefinition> existingAttrs = attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNullOrderByDisplayOrderAsc(entityTypeId);
+
+        // Tier 2 Resource Quotas: Cap maximum attributes per entity type to 100
+        if (existingAttrs.size() >= 100) {
+            throw new MetadataConflictException("Entity attribute quota exceeded: Maximum of 100 attributes allowed per EntityType");
+        }
+
+        // Tier 2 ReDoS Mitigation: Pre-flight static regex inspection for dangerous nested quantifiers
+        if (request.options() != null && request.options().containsKey("pattern")) {
+            Object patternObj = request.options().get("pattern");
+            if (patternObj != null) {
+                String patternStr = patternObj.toString();
+                if (isDangerousRegex(patternStr)) {
+                    throw new MetadataConflictException("Regular expression pattern rejected: Catastrophic nested quantifier detected (potential ReDoS vulnerability)");
+                }
+            }
+        }
         
         // Check collision against any active attribute (including SYSTEM base attributes)
         boolean nameExists = existingAttrs.stream()
@@ -584,6 +611,7 @@ public class MetadataService {
         EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId)
                 .orElseThrow(() -> new MetadataNotFoundException("EntityType not found with id: " + entityTypeId));
 
+        validatePayloadSize(request.attributes());
         Map<String, Object> finalAttributes = applyAttributeDefaults(entityTypeId, request.attributes());
         validateRelationPickerAttributes(entityTypeId, finalAttributes);
         schemaValidationService.validatePayload(entityTypeId, finalAttributes);
@@ -615,6 +643,7 @@ public class MetadataService {
                     + record.getVersion() + ", actual: " + request.version() + ")");
         }
 
+        validatePayloadSize(request.attributes());
         Map<String, Object> finalAttributes = applyAttributeDefaults(entityTypeId, request.attributes());
         validateRelationPickerAttributes(entityTypeId, finalAttributes);
         schemaValidationService.validatePayload(entityTypeId, finalAttributes);
@@ -644,6 +673,7 @@ public class MetadataService {
             merged.putAll(request.attributes());
         }
 
+        validatePayloadSize(merged);
         validateRelationPickerAttributes(entityTypeId, merged);
         schemaValidationService.validatePayload(entityTypeId, merged);
 
@@ -883,5 +913,27 @@ public class MetadataService {
 
         rel.setDeletedDate(LocalDateTime.now());
         entityRelationshipRepository.save(rel);
+    }
+
+    private void validatePayloadSize(Map<String, Object> attributes) {
+        if (attributes == null || attributes.isEmpty()) {
+            return;
+        }
+        try {
+            byte[] bytes = objectMapper.writeValueAsBytes(attributes);
+            if (bytes.length > MAX_RECORD_PAYLOAD_BYTES) {
+                throw new MetadataConflictException(
+                        "Payload size limit exceeded: Maximum 1MB allowed per record payload (received: " + bytes.length + " bytes)");
+            }
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            log.warn("Failed to calculate payload byte size: {}", e.getMessage());
+        }
+    }
+
+    public static boolean isDangerousRegex(String regex) {
+        if (regex == null || regex.isBlank()) {
+            return false;
+        }
+        return DANGEROUS_REGEX_PATTERN.matcher(regex).find();
     }
 }

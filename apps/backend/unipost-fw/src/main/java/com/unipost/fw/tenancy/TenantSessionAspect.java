@@ -41,8 +41,10 @@ public class TenantSessionAspect {
             }
             try {
                 jdbcTemplate.execute("SET LOCAL app.current_tenant_id = '" + trimmedTenantId + "'");
+                // Tier 3 Database Circuit Breaker: Strict 3000ms query timeout to prevent runaway queries from locking connection pools
+                jdbcTemplate.execute("SET LOCAL statement_timeout = '3000ms'");
             } catch (Exception e) {
-                log.warn("Could not set PostgreSQL tenant session setting 'app.current_tenant_id': {}", e.getMessage());
+                log.warn("Could not set PostgreSQL tenant session settings: {}", e.getMessage());
             }
         }
     }
