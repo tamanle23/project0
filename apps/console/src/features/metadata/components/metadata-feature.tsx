@@ -104,9 +104,9 @@ export const MetadataFeature: React.FC = () => {
         {/* Page Title & Intro + Dual-Mode Switcher */}
         <div className="flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">
+            <h1 className="text-2xl font-bold tracking-tight">
               {t('metadata.title', 'Metadata Management')}
-            </h2>
+            </h1>
             <p className="text-muted-foreground text-xs md:text-sm">
               {t(
                 'metadata.description',
@@ -269,9 +269,9 @@ export const MetadataFeature: React.FC = () => {
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary mb-3">
                   <Sparkles className="h-6 w-6" />
                 </div>
-                <h4 className="font-semibold text-foreground mb-1 text-sm md:text-base">
+                <h3 className="font-semibold text-foreground mb-1 text-sm md:text-base">
                   No Entity Model Selected
-                </h4>
+                </h3>
                 <p className="text-xs max-w-sm">
                   Select an entity model from the left rail or create a new model to configure its schema and explore data records.
                 </p>
