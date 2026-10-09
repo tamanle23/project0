@@ -18,6 +18,9 @@ import java.util.Map;
 @Table(name = "UNIPOST_ENTITY_RELATIONSHIPS")
 public class EntityRelationship extends BaseModel {
 
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId = "default-tenant";
+
     @ManyToOne
     @JoinColumn(name = "source_entity_id", nullable = false)
     private EntityRecord sourceEntity;

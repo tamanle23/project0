@@ -23,6 +23,9 @@ public class AttributeDefinition extends BaseModel {
     @JoinColumn(name = "entity_type_id", nullable = false)
     private EntityType entityType;
 
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId = "default-tenant";
+
     @Column(nullable = false)
     private String name;
 

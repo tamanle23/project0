@@ -15,6 +15,9 @@ import com.unipost.domain.BaseModel;
 @Table(name = "UNIPOST_RELATIONSHIP_TYPES")
 public class RelationshipType extends BaseModel {
 
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId = "default-tenant";
+
     @Column(name = "system_name", nullable = false)
     private String systemName;
 

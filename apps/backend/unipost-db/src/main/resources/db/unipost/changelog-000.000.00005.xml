@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="hybrid-metadata-tenant-scoped-rls-05" author="antigravity">
+        <comment>Enforce pure tenant-scoped uniqueness, denormalized tenant_id, and PostgreSQL RLS</comment>
+
+        <!-- ========================================================================= -->
+        <!-- STEP 1: Add tenant_id to Metadata Plane Tables                            -->
+        <!-- ========================================================================= -->
+        <addColumn tableName="UNIPOST_ENTITY_TYPES">
+            <column name="tenant_id" type="VARCHAR(255)" defaultValue="default-tenant">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="UNIPOST_ATTRIBUTE_DEFINITIONS">
+            <column name="tenant_id" type="VARCHAR(255)" defaultValue="default-tenant">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="UNIPOST_RELATIONSHIP_TYPES">
+            <column name="tenant_id" type="VARCHAR(255)" defaultValue="default-tenant">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="UNIPOST_ENTITY_RELATIONSHIPS">
+            <column name="tenant_id" type="VARCHAR(255)" defaultValue="default-tenant">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!-- ========================================================================= -->
+        <!-- STEP 2: Replace Global Unique Indexes with Tenant-Scoped Partial Indexes   -->
+        <!-- ========================================================================= -->
+        <sql dbms="postgresql">
+            -- 2.1 Entity Types: Tenant + System Name
+            DROP INDEX IF EXISTS uk_entity_type_sysname_active;
+            
+            CREATE UNIQUE INDEX uk_entity_type_tenant_sysname_active 
+            ON UNIPOST_ENTITY_TYPES (tenant_id, system_name) 
+            WHERE "deletedDate" IS NULL;
+
+            -- 2.2 Attribute Definitions: Tenant + Entity Type + System Name
+            DROP INDEX IF EXISTS uk_attr_def_type_sysname_active;
+
+            CREATE UNIQUE INDEX uk_attr_def_tenant_type_sysname_active 
+            ON UNIPOST_ATTRIBUTE_DEFINITIONS (tenant_id, entity_type_id, system_name) 
+            WHERE "deletedDate" IS NULL;
+
+            -- 2.3 Relationship Types: Tenant + System Name
+            DROP INDEX IF EXISTS uk_rel_type_sysname_active;
+
+            CREATE UNIQUE INDEX uk_rel_type_tenant_sysname_active 
+            ON UNIPOST_RELATIONSHIP_TYPES (tenant_id, system_name) 
+            WHERE "deletedDate" IS NULL;
+        </sql>
+
+        <!-- ========================================================================= -->
+        <!-- STEP 3: Composite Performance Indexes for Tenant-Scoped Queries            -->
+        <!-- ========================================================================= -->
+        <sql dbms="postgresql">
+            CREATE INDEX IF NOT EXISTS idx_entities_tenant_type_active 
+            ON UNIPOST_ENTITIES (tenant_id, entity_type_id) 
+            WHERE "deletedDate" IS NULL;
+
+            CREATE INDEX IF NOT EXISTS idx_entity_rels_tenant_source_active 
+            ON UNIPOST_ENTITY_RELATIONSHIPS (tenant_id, source_entity_id) 
+            WHERE "deletedDate" IS NULL;
+
+            CREATE INDEX IF NOT EXISTS idx_entity_rels_tenant_target_active 
+            ON UNIPOST_ENTITY_RELATIONSHIPS (tenant_id, target_entity_id) 
+            WHERE "deletedDate" IS NULL;
+        </sql>
+
+        <!-- ========================================================================= -->
+        <!-- STEP 4: PostgreSQL Row-Level Security (RLS) Safety Nets                    -->
+        <!-- ========================================================================= -->
+        <sql dbms="postgresql">
+            -- 4.1 Enable and Force RLS on all Dynamic Metadata & Record tables
+            ALTER TABLE UNIPOST_ENTITY_TYPES ENABLE ROW LEVEL SECURITY;
+            ALTER TABLE UNIPOST_ENTITY_TYPES FORCE ROW LEVEL SECURITY;
+
+            ALTER TABLE UNIPOST_ATTRIBUTE_DEFINITIONS ENABLE ROW LEVEL SECURITY;
+            ALTER TABLE UNIPOST_ATTRIBUTE_DEFINITIONS FORCE ROW LEVEL SECURITY;
+
+            ALTER TABLE UNIPOST_RELATIONSHIP_TYPES ENABLE ROW LEVEL SECURITY;
+            ALTER TABLE UNIPOST_RELATIONSHIP_TYPES FORCE ROW LEVEL SECURITY;
+
+            ALTER TABLE UNIPOST_ENTITIES ENABLE ROW LEVEL SECURITY;
+            ALTER TABLE UNIPOST_ENTITIES FORCE ROW LEVEL SECURITY;
+
+            ALTER TABLE UNIPOST_ENTITY_RELATIONSHIPS ENABLE ROW LEVEL SECURITY;
+            ALTER TABLE UNIPOST_ENTITY_RELATIONSHIPS FORCE ROW LEVEL SECURITY;
+
+            -- 4.2 Define RLS Policies for Metadata Plane (Allows Reading SYSTEM Schemas)
+            DROP POLICY IF EXISTS tenant_isolation_entity_types ON UNIPOST_ENTITY_TYPES;
+            CREATE POLICY tenant_isolation_entity_types ON UNIPOST_ENTITY_TYPES
+                FOR ALL
+                USING (
+                    tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')
+                    OR tenant_id = 'SYSTEM'
+                )
+                WITH CHECK (
+                    tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')
+                    AND tenant_id != 'SYSTEM'
+                );
+
+            DROP POLICY IF EXISTS tenant_isolation_attribute_defs ON UNIPOST_ATTRIBUTE_DEFINITIONS;
+            CREATE POLICY tenant_isolation_attribute_defs ON UNIPOST_ATTRIBUTE_DEFINITIONS
+                FOR ALL
+                USING (
+                    tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')
+                    OR tenant_id = 'SYSTEM'
+                )
+                WITH CHECK (
+                    tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')
+                    AND tenant_id != 'SYSTEM'
+                );
+
+            DROP POLICY IF EXISTS tenant_isolation_rel_types ON UNIPOST_RELATIONSHIP_TYPES;
+            CREATE POLICY tenant_isolation_rel_types ON UNIPOST_RELATIONSHIP_TYPES
+                FOR ALL
+                USING (
+                    tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')
+                    OR tenant_id = 'SYSTEM'
+                )
+                WITH CHECK (
+                    tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')
+                    AND tenant_id != 'SYSTEM'
+                );
+
+            -- 4.3 Define RLS Policies for Data Plane
+            DROP POLICY IF EXISTS tenant_isolation_entities ON UNIPOST_ENTITIES;
+            CREATE POLICY tenant_isolation_entities ON UNIPOST_ENTITIES
+                FOR ALL
+                USING (tenant_id = NULLIF(current_setting('app.current_tenant_id', true), ''))
+                WITH CHECK (tenant_id = NULLIF(current_setting('app.current_tenant_id', true), ''));
+
+            DROP POLICY IF EXISTS tenant_isolation_entity_rels ON UNIPOST_ENTITY_RELATIONSHIPS;
+            CREATE POLICY tenant_isolation_entity_rels ON UNIPOST_ENTITY_RELATIONSHIPS
+                FOR ALL
+                USING (tenant_id = NULLIF(current_setting('app.current_tenant_id', true), ''))
+                WITH CHECK (tenant_id = NULLIF(current_setting('app.current_tenant_id', true), ''));
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

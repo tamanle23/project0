@@ -23,8 +23,8 @@ public class EntityRecord extends BaseModel {
     @JoinColumn(name = "entity_type_id", nullable = false)
     private EntityType entityType;
 
-    @Column(name = "tenant_id")
-    private String tenantId;
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId = "default-tenant";
 
     @Column(name = "schema_version")
     private Long schemaVersion = 1L;

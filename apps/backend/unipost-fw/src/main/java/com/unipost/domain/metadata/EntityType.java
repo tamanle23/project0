@@ -22,6 +22,9 @@ public class EntityType extends BaseModel {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId = "default-tenant";
+
     @Column(name = "schema_version", nullable = false)
     private Long schemaVersion = 1L;
 }
