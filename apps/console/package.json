@@ -44,6 +44,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@unipost/i18n": "workspace:^",
     "@unipost/ui": "workspace:^",
+    "@xyflow/react": "^12.12.0",
     "axios": "^1.13.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

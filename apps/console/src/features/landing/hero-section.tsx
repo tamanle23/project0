@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sparkles, ArrowRight, Layers, Cpu, ShieldCheck, Zap } from 'lucide-react';
 import { OnboardingModal } from './onboarding-modal';
-import { useBlueprintCatalog, BlueprintCard, type BlueprintSummary } from '@/features/metadata';
+import { useBlueprintCatalog, BlueprintCard, TemplatePreviewModal, type BlueprintSummary } from '@/features/metadata';
 
 export const HeroSection: React.FC = () => {
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [selectedBlueprintId, setSelectedBlueprintId] = useState('bp_cms_publishing_v1');
+  const [previewBlueprint, setPreviewBlueprint] = useState<BlueprintSummary | null>(null);
 
   const { data: blueprints = [] } = useBlueprintCatalog();
 
@@ -84,7 +85,7 @@ export const HeroSection: React.FC = () => {
             <Layers className="w-5 h-5 text-sky-500" />
             <span>Thư viện Domain Blueprints Trực quan</span>
           </h3>
-          <span className="text-xs text-slate-400 font-mono">Select a blueprint to preview</span>
+          <span className="text-xs text-slate-400 font-mono">Select a blueprint to preview graph diagram</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto text-left">
@@ -94,6 +95,7 @@ export const HeroSection: React.FC = () => {
               blueprint={bp}
               isSelected={selectedBlueprintId === bp.id}
               onSelect={setSelectedBlueprintId}
+              onPreview={setPreviewBlueprint}
             />
           ))}
         </div>
@@ -102,6 +104,17 @@ export const HeroSection: React.FC = () => {
       <OnboardingModal
         open={isOnboardingOpen}
         onOpenChange={setIsOnboardingOpen}
+      />
+
+      <TemplatePreviewModal
+        blueprint={previewBlueprint}
+        open={Boolean(previewBlueprint)}
+        onOpenChange={(openState) => {
+          if (!openState) setPreviewBlueprint(null);
+        }}
+        onSelectAndProvision={() => {
+          setIsOnboardingOpen(true);
+        }}
       />
     </section>
   );
