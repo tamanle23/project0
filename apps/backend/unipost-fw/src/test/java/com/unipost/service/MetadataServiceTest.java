@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -54,6 +55,8 @@ class MetadataServiceTest {
     private ApplicationEventPublisher eventPublisher;
     @Mock
     private PageBuilder pageBuilder;
+    @Spy
+    private com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
 
     @InjectMocks
     private MetadataService metadataService;
@@ -127,7 +130,7 @@ class MetadataServiceTest {
         savedAttr.setSystemName("email");
 
         when(entityTypeRepository.findByIdAndDeletedDateIsNull(typeId)).thenReturn(Optional.of(type));
-        when(attributeDefinitionRepository.existsByEntityTypeIdAndSystemNameAndDeletedDateIsNull(typeId, "email")).thenReturn(false);
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNullOrderByDisplayOrderAsc(typeId)).thenReturn(Collections.emptyList());
         when(attributeDefinitionRepository.save(any(AttributeDefinition.class))).thenReturn(savedAttr);
 
         AttributeDefinitionResponse result = metadataService.createAttributeDefinition(typeId, request);
@@ -148,7 +151,8 @@ class MetadataServiceTest {
         CreateAttributeRequest request = new CreateAttributeRequest("email", "Email", "string", "text", true, false, null, null);
 
         when(entityTypeRepository.findByIdAndDeletedDateIsNull(typeId)).thenReturn(Optional.of(type));
-        when(attributeDefinitionRepository.existsByEntityTypeIdAndSystemNameAndDeletedDateIsNull(typeId, "email")).thenReturn(true);
+        AttributeDefinition existingAttr = new AttributeDefinition(); existingAttr.setSystemName("email");
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNullOrderByDisplayOrderAsc(typeId)).thenReturn(List.of(existingAttr));
 
         assertThrows(MetadataConflictException.class, () -> metadataService.createAttributeDefinition(typeId, request));
         verify(attributeDefinitionRepository, never()).save(any());

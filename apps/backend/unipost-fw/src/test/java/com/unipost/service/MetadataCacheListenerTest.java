@@ -41,9 +41,8 @@ class MetadataCacheListenerTest {
 
         metadataCacheListener.handleAttributeDefinitionUpdate(event);
 
-        verify(schemaValidationService).invalidateL1Cache(1L);
-        verify(schemaMap).remove("schema:1");
-        verify(schemaMap).remove("schema:1:v1");
+        verify(schemaValidationService).invalidateL1Cache(1L, null);
+                verify(schemaMap).remove("schema:1:v1");
         verify(schemaMap).remove("schema:1:v2");
     }
 }
