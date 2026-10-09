@@ -6,6 +6,7 @@ import {
   tasksSandboxRepo,
 } from '../index';
 import { mockMetadataStore } from '@/features/metadata/data/mock-metadata';
+import { useSpringAuthStore } from '@/features/spring-auth/store';
 
 describe('Unified Sandbox Full Platform Integration (Phases 2-4)', () => {
   beforeEach(() => {
@@ -14,6 +15,19 @@ describe('Unified Sandbox Full Platform Integration (Phases 2-4)', () => {
     mockMetadataStore.resetToInitialState();
     usersSandboxRepo.reset();
     tasksSandboxRepo.reset();
+  });
+
+  describe('Persona Synchronization with Auth Store', () => {
+    it('should update spring auth tokens when persona is switched', () => {
+      sandboxManager.switchPersona('creator');
+      const authState = useSpringAuthStore.getState();
+
+      expect(authState.isAuthenticated).toBe(true);
+      expect(authState.isSandbox).toBe(true);
+      expect(authState.user?.sub).toBe('creator');
+      expect(authState.user?.roles).toContain('ROLE_CREATOR');
+      expect(useSandboxStore.getState().activeTenantId).toBe('tenant-eu-central-1');
+    });
   });
 
   describe('Auth Sandbox Handler', () => {
@@ -79,7 +93,7 @@ describe('Unified Sandbox Full Platform Integration (Phases 2-4)', () => {
     });
   });
 
-  describe('Metadata Sandbox Adapter', () => {
+  describe('Metadata Sandbox Adapter (Expanded Route Coverage)', () => {
     it('should route /api/metadata/entity-types and return mock entity types', async () => {
       const res = await sandboxManager.handleRequest({
         url: '/api/metadata/entity-types',
@@ -89,6 +103,36 @@ describe('Unified Sandbox Full Platform Integration (Phases 2-4)', () => {
       expect(res?.status).toBe(200);
       expect(res?.data.content.length).toBeGreaterThan(0);
       expect(res?.data.content.some((et: any) => et.name === 'Customer Account')).toBe(true);
+    });
+
+    it('should route /v1/metadata/relationship-types and return relationship types', async () => {
+      const res = await sandboxManager.handleRequest({
+        url: '/v1/metadata/relationship-types',
+        method: 'GET',
+      });
+
+      expect(res?.status).toBe(200);
+      expect(Array.isArray(res?.data.content)).toBe(true);
+    });
+
+    it('should route /v1/metadata/entity-types/1/attributes and return attribute definitions', async () => {
+      const res = await sandboxManager.handleRequest({
+        url: '/v1/metadata/entity-types/1/attributes',
+        method: 'GET',
+      });
+
+      expect(res?.status).toBe(200);
+      expect(res?.data.content.length).toBeGreaterThan(0);
+    });
+
+    it('should route /v1/metadata/entity-types/1/facets', async () => {
+      const res = await sandboxManager.handleRequest({
+        url: '/v1/metadata/entity-types/1/facets',
+        method: 'GET',
+      });
+
+      expect(res?.status).toBe(200);
+      expect(res?.data.entityTypeId).toBe('1');
     });
 
     it('should query entity records filtered by active tenant and facets', async () => {
@@ -105,6 +149,17 @@ describe('Unified Sandbox Full Platform Integration (Phases 2-4)', () => {
         expect(record.tenantId).toBe('tenant-us-east-1');
         expect(record.attributes.is_multi_region_ha).toBe(true);
       });
+    });
+  });
+
+  describe('Fetch Interceptor Integration', () => {
+    it('should intercept native window.fetch requests when sandbox is enabled', async () => {
+      const res = await window.fetch('/api/users');
+      expect(res.status).toBe(200);
+
+      const users = await res.json();
+      expect(Array.isArray(users)).toBe(true);
+      expect(users.length).toBeGreaterThan(0);
     });
   });
 

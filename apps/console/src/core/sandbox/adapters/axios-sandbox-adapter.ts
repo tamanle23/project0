@@ -8,8 +8,7 @@ import { sandboxManager } from '../manager/sandbox-manager';
  * the real network without modification.
  */
 export function attachSandboxAxiosInterceptor(apiClient: AxiosInstance): void {
-  // Never intercept requests in production builds
-  if (!import.meta.env.DEV) {
+  if (import.meta.env.MODE === 'production') {
     return;
   }
 
@@ -18,7 +17,16 @@ export function attachSandboxAxiosInterceptor(apiClient: AxiosInstance): void {
       return config;
     }
 
-    const url = config.url || '';
+    const rawUrl = config.url || '';
+    const baseURL = config.baseURL || '';
+    const isAbsolute = /^https?:\/\//i.test(rawUrl);
+
+    // Resolve full path considering baseURL
+    const fullUrl =
+      isAbsolute || !baseURL
+        ? rawUrl
+        : `${baseURL.replace(/\/$/, '')}/${rawUrl.replace(/^\//, '')}`;
+
     const method = config.method?.toUpperCase() || 'GET';
 
     const headers: Record<string, string> = {};
@@ -32,7 +40,7 @@ export function attachSandboxAxiosInterceptor(apiClient: AxiosInstance): void {
 
     // Check if unified sandbox handles this route
     const mockRes = await sandboxManager.handleRequest({
-      url,
+      url: fullUrl,
       method,
       headers,
       data: config.data,

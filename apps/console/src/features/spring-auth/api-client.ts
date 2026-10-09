@@ -10,7 +10,7 @@ export const springApiClient = axios.create({
   withCredentials: true,
 });
 
-// Only initialize Sandbox mock intercepts in development mode
+// Attach Unified Sandbox Interceptor in development mode
 if (import.meta.env.DEV) {
   enableSandboxMockEngine(springApiClient);
 }
@@ -49,11 +49,10 @@ springApiClient.interceptors.response.use(
     const originalRequest = error.config;
 
     if (
-      error.response?.status === 401 && 
-      !originalRequest._retry && 
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
       !['/auth/refresh', '/auth/token'].includes(originalRequest.url)
     ) {
-      
       if (isRefreshing) {
         return new Promise<string | undefined>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -72,18 +71,17 @@ springApiClient.interceptors.response.use(
 
       try {
         const payload = { refreshToken: state.refreshToken };
-        
+
         const { data } = await springApiClient.post('/auth/refresh', payload);
-        
+
         const newAccess = data.accessToken;
         const newRefresh = data.refreshToken || state.refreshToken;
-        
+
         state.setTokens(newAccess, newRefresh);
         processQueue(null, newAccess);
 
         originalRequest.headers['Authorization'] = `Bearer ${newAccess}`;
         return springApiClient(originalRequest);
-        
       } catch (refreshError) {
         processQueue(refreshError as Error, null);
         state.clearTokens();
