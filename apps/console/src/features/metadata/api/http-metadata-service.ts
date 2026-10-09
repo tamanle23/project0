@@ -2,6 +2,9 @@ import { springApiClient } from '@/features/spring-auth/api-client';
 import type { MetadataDataSource } from './metadata-data-source';
 import type {
   AttributeDefinition,
+  BlueprintProvisionRequest,
+  BlueprintProvisionResult,
+  BlueprintSummary,
   CompiledSchema,
   CreateAttributeDefinitionDto,
   CreateEntityRecordDto,
@@ -392,6 +395,19 @@ export class HttpMetadataService implements MetadataDataSource {
       `${BASE_URL}/records/${recordId}/relationships/${relationshipId}`
     );
     return true;
+  }
+
+  // ==========================================
+  // 6. Domain Blueprints & Tenant Provisioning
+  // ==========================================
+  async getBlueprints(): Promise<BlueprintSummary[]> {
+    const res = await springApiClient.get(`${BASE_URL}/blueprints`);
+    return unwrapResponse(res.data);
+  }
+
+  async provisionTenant(dto: BlueprintProvisionRequest): Promise<BlueprintProvisionResult> {
+    const res = await springApiClient.post(`${BASE_URL}/tenants/provision`, dto);
+    return unwrapResponse(res.data);
   }
 }
 

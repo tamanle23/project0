@@ -7,6 +7,7 @@ interface AuthUser {
   accountNo: string
   email: string
   role: string[]
+  tenantId?: string
   exp: number
 }
 
