@@ -216,8 +216,9 @@ In accordance with user directives, the implementation plan prioritizes the **Pu
 
 ---
 
-## 10. Phase 9: payOS Webhook Synchronization & Dynamic Feature Entitlements
-> **Priority:** 🟢 P3 (Commercial Monetization)  
+## 10. Phase 9: payOS Webhook Synchronization & Dynamic Feature Entitlements (Backlog)
+> **Priority:** 🟢 P3 (Commercial Monetization) — ⏳ **MOVED TO BACKLOG**  
+> **Consolidated Location:** [`docs/multi-tenants/domain_blueprints_fullstack_guide.md` (Part 5)](file:///c:/Users/Admin/workspace/git/unipost/docs/multi-tenants/domain_blueprints_fullstack_guide.md#6-part-5-public-landing-page-subscriptions--payos-onboarding-funnel-backlog)  
 > **Reference Document:** [`docs/multi-tenants/09_tenant_billing_payos_and_feature_entitlements.md`](file:///c:/Users/Admin/workspace/git/unipost/docs/multi-tenants/09_tenant_billing_payos_and_feature_entitlements.md)  
 > **Goal:** Wire real-time payOS payment confirmations to unlock dynamic feature keys.
 

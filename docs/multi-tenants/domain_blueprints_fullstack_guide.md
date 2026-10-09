@@ -261,30 +261,65 @@ export function BlueprintCard({ blueprint, isSelected, onSelect }: BlueprintCard
 ## 6. Part 5: Public Landing Page, Subscriptions & payOS Onboarding Funnel (Backlog)
 
 > **Status:** ⏳ **BACKLOG (To be implemented later)**  
-> **Source:** Phase 1 from Master Multi-Tenant Implementation Plan  
-> **Reference Documents:** [`docs/multi-tenants/10_landing_page_and_onboarding_funnel.md`](file:///c:/Users/Admin/workspace/git/unipost/docs/multi-tenants/10_landing_page_and_onboarding_funnel.md) & [`docs/multi-tenants/09_tenant_billing_payos_and_feature_entitlements.md`](file:///c:/Users/Admin/workspace/git/unipost/docs/multi-tenants/09_tenant_billing_payos_and_feature_entitlements.md)  
-> **Goal:** Build the public marketing landing page (`/`), showcase the 3 subscription tiers, integrate the Blueprint Template Carousel into the registration flow, and provide instant payOS VietQR checkout.
+> **Source:** Phase 1 (Landing & Funnel), Phase 6 UI Wiring (Blueprint Gallery in Console), and Phase 9 (payOS & Feature Entitlements) from Master Multi-Tenant Implementation Plan  
+> **Reference Documents:**
+> - [`docs/multi-tenants/10_landing_page_and_onboarding_funnel.md`](file:///c:/Users/Admin/workspace/git/unipost/docs/multi-tenants/10_landing_page_and_onboarding_funnel.md)
+> - [`docs/multi-tenants/05_tenant_onboarding_and_template_provisioning.md`](file:///c:/Users/Admin/workspace/git/unipost/docs/multi-tenants/05_tenant_onboarding_and_template_provisioning.md)
+> - [`docs/multi-tenants/09_tenant_billing_payos_and_feature_entitlements.md`](file:///c:/Users/Admin/workspace/git/unipost/docs/multi-tenants/09_tenant_billing_payos_and_feature_entitlements.md)  
+> **Goal:** Complete the full-stack commercialization and UI wiring: public marketing landing page (`/`), 3 subscription tiers, integrated payOS VietQR checkout, in-app `<FeatureGate />` component, and Console UI Blueprint Catalog Gallery Dialog.
 
-### Tasks & Deliverables (Backlog Specification):
-- [ ] **Task 1.1: Public Landing Route Setup (`apps/console/src/routes/index.tsx`)**:
+---
+
+### Backlog Component 1: Public Landing Page & payOS Checkout Funnel (Phase 1)
+- [ ] **Task B1.1: Public Landing Route Setup (`apps/console/src/routes/index.tsx`)**:
   - Implement public index route (`/`) using TanStack Router with auth guard redirection (authenticated users auto-redirected to `/_authenticated`).
-- [ ] **Task 1.2: Liquid Glass Hero & Interactive Showcase (`@unipost/console`)**:
+- [ ] **Task B1.2: Liquid Glass Hero & Interactive Showcase (`@unipost/console`)**:
   - Build `HeroSection` with dynamic animated value propositions ("Nền tảng Quản trị Dữ liệu Động & Metadata Đa Khách Hàng").
   - Create interactive preview mockup showcasing dynamic form generation, blueprint templates, and graph edge connections.
-- [ ] **Task 1.3: Subscription & Pricing Section**:
+- [ ] **Task B1.3: Subscription & Pricing Section**:
   - Build `PricingSection` with Monthly / Yearly billing toggle (with 2 months free badge on annual).
   - Implement 3 transparent plan cards:
     - **🆓 Basic (Cơ bản)**: Miễn phí (Free) | 1 User duy nhất | Unlimited Records.
     - **⚡ Pro (Pro)**: 199,000 VND / tháng | Lên đến 5 Users | Unlimited Records.
     - **👑 Pro Max (Pro Max)**: 499,000 VND / tháng | Không giới hạn Users | Unlimited Records.
-- [ ] **Task 1.4: Integrated Register / Login Modal Flow with Blueprint Selection**:
+- [ ] **Task B1.4: Integrated Register / Login Modal Flow with Blueprint Selection**:
   - Implement modal allowing direct user and workspace registration from plan CTA buttons.
   - Step 1: Account credentials (email, password, tenant name).
   - Step 2: **Blueprint Selection Carousel** (CMS, Logistics, CRM, Blank).
   - Basic tier provisions chosen blueprint and redirects directly into the workspace upon registration.
-- [ ] **Task 1.5: payOS VietQR Checkout Modal**:
+- [ ] **Task B1.5: payOS VietQR Checkout Modal**:
   - When clicking upgrade to Pro or Pro Max, open `PayOsQrModal` rendering a dynamic VietQR code for 1-click mobile banking transfer.
   - Setup frontend status polling / SSE confirmation to immediately redirect upon payment receipt.
 
+---
+
+### Backlog Component 2: Console UI Blueprint Catalog Wiring (Phase 6 UI)
+- [ ] **Task B2.1: TanStack Query Blueprint Hooks**:
+  - Implement `useBlueprintCatalog()` fetching `GET /api/v1/metadata/blueprints` with 30-minute stale time.
+  - Implement `useProvisionTenant()` submitting `POST /api/v1/metadata/tenants/provision` and invalidating `['entity-types']` cache.
+- [ ] **Task B2.2: Liquid Glass Blueprint Gallery Dialog (`blueprint-gallery-dialog.tsx`)**:
+  - Modal opened via **"Import Blueprint"** button located on `EntityTypeSidebar` header and on blank workspace empty states.
+  - Renders category tabs (*All*, *Operations*, *Publishing*, *Commerce*) and responsive Bento grid of blueprint cards.
+  - Shows preview drawer: entity models list, field counts, and graph relationships schema diagram.
+  - Confirmation triggers atomic cloning stamped with target `tenant_id` without page reload.
+
+---
+
+### Backlog Component 3: payOS Webhooks & Dynamic Feature Entitlements (Phase 9)
+- [ ] **Task B3.1: Backend Dynamic Entitlements Registry (`UNIPOST_TENANT_FEATURES`)**:
+  - Create table modeling tenant dynamic capability keys (`FEATURE_SCHEMA_STUDIO`, `FEATURE_PATTERN_C_GRAPH`, `FEATURE_AI_AGENT_MCP`, `FEATURE_DATA_EXPORT`).
+  - Implement `@RequireFeature` annotation and Spring Modulith aspect intercepting unentitled calls with HTTP 403 Forbidden.
+- [ ] **Task B3.2: payOS Webhook Integration (`PayOsWebhookController`)**:
+  - Verify HMAC-SHA256 signatures on incoming payOS webhooks.
+  - Dynamically activate tenant subscription tier entitlements upon transfer confirmation (`PAID`).
+- [ ] **Task B3.3: Console UI In-App Feature Guards (`<FeatureGate />`)**:
+  - Reusable React component wrapping premium features (e.g. Graph Relationships Tab, Schema Studio, AI Assistant).
+  - Unentitled tenants see a frosted Liquid Glass teaser banner with 1-click upgrade button opening the payOS VietQR modal.
+
+---
+
 ### Verification Gate (When Implemented):
-- Load `http://localhost:5173/` in an incognito window: verify the landing page renders smoothly with Liquid Glass aesthetic. Select a Blueprint from the carousel, complete sign-up, and verify the workspace is created and provisioned with the selected models in $< 250\text{ ms}$.
+- Load `http://localhost:5173/` in incognito: landing page renders with pricing tiers.
+- Select a Blueprint from the carousel, complete sign-up, and verify workspace seeds immediately.
+- In Console `/metadata`, open Blueprint Gallery Dialog, import a template, and verify new models appear in `< 250ms`.
+- Simulate payOS VietQR webhook; verify premium feature unlocks immediately without service reboot.
