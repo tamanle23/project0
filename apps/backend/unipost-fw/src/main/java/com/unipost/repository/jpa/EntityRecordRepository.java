@@ -19,4 +19,8 @@ public interface EntityRecordRepository extends BaseRepository<EntityRecord> {
     boolean existsByEntityTypeIdAndDeletedDateIsNull(Long entityTypeId);
     long countByEntityTypeIdAndSchemaVersionLessThanAndDeletedDateIsNull(Long entityTypeId, Long schemaVersion);
     Page<EntityRecord> findByEntityTypeIdAndSchemaVersionLessThanAndDeletedDateIsNull(Long entityTypeId, Long schemaVersion, Pageable pageable);
+
+    List<EntityRecord> findByTenantIdAndDeletedDateIsNull(String tenantId);
+    Page<EntityRecord> findByTenantIdAndDeletedDateIsNull(String tenantId, Pageable pageable);
+    long countByTenantIdAndDeletedDateIsNull(String tenantId);
 }

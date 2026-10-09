@@ -20,4 +20,6 @@ public interface AttributeDefinitionRepository extends BaseRepository<AttributeD
     Optional<AttributeDefinition> findByEntityTypeIdAndIdAndDeletedDateIsNull(Long entityTypeId, Long id);
     boolean existsByEntityTypeIdAndSystemNameAndDeletedDateIsNull(Long entityTypeId, String systemName);
     List<AttributeDefinition> findAllByIdInAndEntityTypeIdAndDeletedDateIsNull(List<Long> ids, Long entityTypeId);
+    List<AttributeDefinition> findByTenantIdAndDeletedDateIsNull(String tenantId);
+    long countByTenantIdAndDeletedDateIsNull(String tenantId);
 }

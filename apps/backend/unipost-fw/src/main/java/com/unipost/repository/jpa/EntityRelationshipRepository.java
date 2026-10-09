@@ -33,4 +33,8 @@ public interface EntityRelationshipRepository extends BaseRepository<EntityRelat
     List<EntityRelationship> findBySourceEntityIdAndDeletedDateIsNull(Long sourceEntityId);
 
     List<EntityRelationship> findByTargetEntityIdAndDeletedDateIsNull(Long targetEntityId);
+
+    List<EntityRelationship> findByTenantIdAndDeletedDateIsNull(String tenantId);
+    Page<EntityRelationship> findByTenantIdAndDeletedDateIsNull(String tenantId, Pageable pageable);
+    long countByTenantIdAndDeletedDateIsNull(String tenantId);
 }

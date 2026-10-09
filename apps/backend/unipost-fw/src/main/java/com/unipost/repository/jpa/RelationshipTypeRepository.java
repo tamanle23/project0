@@ -12,4 +12,6 @@ public interface RelationshipTypeRepository extends BaseRepository<RelationshipT
     Optional<RelationshipType> findByIdAndDeletedDateIsNull(Long id);
     boolean existsBySystemNameAndDeletedDateIsNull(String systemName);
     Page<RelationshipType> findAllByDeletedDateIsNull(Pageable pageable);
+    java.util.List<RelationshipType> findByTenantIdAndDeletedDateIsNull(String tenantId);
+    long countByTenantIdAndDeletedDateIsNull(String tenantId);
 }
