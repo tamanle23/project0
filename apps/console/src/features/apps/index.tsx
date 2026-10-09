@@ -1,4 +1,4 @@
-import { type ChangeEvent, useState } from 'react'
+import { type ChangeEvent, useState, useMemo } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { SlidersHorizontal, ArrowUpAZ, ArrowDownAZ, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -59,58 +59,73 @@ export function Apps() {
   const [appType, setAppType] = useState(type)
   const [searchTerm, setSearchTerm] = useState(filter)
 
-  const dynamicApps = apps.map((app) => {
-    if (app.name === 'Facebook') {
-      return {
-        ...app,
-        connected: isFacebookConnected,
-        desc:
-          isFacebookConnected && connectedPage
-            ? `Connected to Page: "${connectedPage.name}" (${
-                connectedPage.isLongLived
-                  ? 'Permanent Long-Lived Token'
-                  : 'Short-Lived Token'
-              })`
-            : app.desc,
+  // Optimization: Memoize dynamic app mapping, sorting, and multi-stage filtering
+  // to avoid re-evaluating array operations, string comparisons, and object cloning on every render.
+  const filteredApps = useMemo(() => {
+    const dynamicApps = apps.map((app) => {
+      if (app.name === 'Facebook') {
+        return {
+          ...app,
+          connected: isFacebookConnected,
+          desc:
+            isFacebookConnected && connectedPage
+              ? `Connected to Page: "${connectedPage.name}" (${
+                  connectedPage.isLongLived
+                    ? 'Permanent Long-Lived Token'
+                    : 'Short-Lived Token'
+                })`
+              : app.desc,
+        }
       }
-    }
-    if (app.name === 'Tiktok') {
-      return {
-        ...app,
-        connected: isTikTokConnected,
-        desc:
-          isTikTokConnected && connectedProfile
-            ? `Connected to Profile: "${connectedProfile.display_name}"`
-            : app.desc,
+      if (app.name === 'Tiktok') {
+        return {
+          ...app,
+          connected: isTikTokConnected,
+          desc:
+            isTikTokConnected && connectedProfile
+              ? `Connected to Profile: "${connectedProfile.display_name}"`
+              : app.desc,
+        }
       }
-    }
-    if (app.name === 'Youtube') {
-      return {
-        ...app,
-        connected: isYouTubeConnected,
-        desc:
-          isYouTubeConnected && connectedChannel
-            ? `Connected to Channel: "${connectedChannel.title}" (Has Refresh Token)`
-            : app.desc,
+      if (app.name === 'Youtube') {
+        return {
+          ...app,
+          connected: isYouTubeConnected,
+          desc:
+            isYouTubeConnected && connectedChannel
+              ? `Connected to Channel: "${connectedChannel.title}" (Has Refresh Token)`
+              : app.desc,
+        }
       }
-    }
-    return app
-  })
+      return app
+    })
 
-  const filteredApps = dynamicApps
-    .sort((a, b) =>
-      sort === 'asc'
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name)
-    )
-    .filter((app) =>
-      appType === 'connected'
-        ? app.connected
-        : appType === 'notConnected'
-          ? !app.connected
-          : true
-    )
-    .filter((app) => app.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    return dynamicApps
+      .slice()
+      .sort((a, b) =>
+        sort === 'asc'
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name)
+      )
+      .filter((app) =>
+        appType === 'connected'
+          ? app.connected
+          : appType === 'notConnected'
+            ? !app.connected
+            : true
+      )
+      .filter((app) => app.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  }, [
+    isFacebookConnected,
+    connectedPage,
+    isTikTokConnected,
+    connectedProfile,
+    isYouTubeConnected,
+    connectedChannel,
+    sort,
+    appType,
+    searchTerm,
+  ])
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
