@@ -32,26 +32,28 @@ export const authSandboxHandler: SandboxRouteHandler = {
   description: 'Handles /auth/token, /auth/refresh, /auth/logout, and /admin/dashboard in sandbox mode',
   priority: 100,
   matcher: (ctx) => {
+    const cleanPath = ctx.pathname.replace(/^\/(api\/v1|api|v1)/, '');
     const isMockRequest = ctx.headers['x-sandbox-mock'] === 'true';
     const authHeader = ctx.headers['authorization'];
     const isMockToken = Boolean(authHeader && authHeader.includes('mock_signature'));
 
-    if (ctx.pathname === '/auth/token' && ctx.method === 'POST') {
+    if (cleanPath === '/auth/token' && ctx.method === 'POST') {
       return isMockRequest || true; // In sandbox mode, handles mock logins
     }
-    if (ctx.pathname === '/auth/refresh' && ctx.method === 'POST') {
+    if (cleanPath === '/auth/refresh' && ctx.method === 'POST') {
       return true;
     }
-    if (ctx.pathname === '/auth/logout' && ctx.method === 'POST') {
+    if (cleanPath === '/auth/logout' && ctx.method === 'POST') {
       return isMockToken || true;
     }
-    if (ctx.pathname === '/admin/dashboard' && ctx.method === 'GET') {
+    if (cleanPath === '/admin/dashboard' && ctx.method === 'GET') {
       return true;
     }
 
     return false;
   },
   handler: async (req: SandboxRequest, ctx) => {
+    const cleanPath = ctx.pathname.replace(/^\/(api\/v1|api|v1)/, '');
     let body: Record<string, any> = {};
     try {
       body = typeof req.data === 'string' ? JSON.parse(req.data) : (req.data || {});
@@ -60,8 +62,8 @@ export const authSandboxHandler: SandboxRouteHandler = {
     }
 
     // 1. Mock Login (/auth/token)
-    if (ctx.pathname === '/auth/token' && ctx.method === 'POST') {
-      const username = body.username;
+    if (cleanPath === '/auth/token' && ctx.method === 'POST') {
+      const username = body.username || body.userName;
       const password = body.password;
 
       if (username in SANDBOX_AUTH_USERS && password === 'bypass') {
@@ -91,7 +93,7 @@ export const authSandboxHandler: SandboxRouteHandler = {
     }
 
     // 2. Mock Refresh (/auth/refresh)
-    if (ctx.pathname === '/auth/refresh' && ctx.method === 'POST') {
+    if (cleanPath === '/auth/refresh' && ctx.method === 'POST') {
       const refreshToken = body.refreshToken;
       if (refreshToken && refreshToken in SANDBOX_REFRESH_TOKENS) {
         const roles = SANDBOX_REFRESH_TOKENS[refreshToken];
@@ -120,7 +122,7 @@ export const authSandboxHandler: SandboxRouteHandler = {
     }
 
     // 3. Mock Logout (/auth/logout)
-    if (ctx.pathname === '/auth/logout' && ctx.method === 'POST') {
+    if (cleanPath === '/auth/logout' && ctx.method === 'POST') {
       return {
         status: 200,
         statusText: 'OK',
@@ -129,7 +131,7 @@ export const authSandboxHandler: SandboxRouteHandler = {
     }
 
     // 4. Mock Protected Endpoint (/admin/dashboard)
-    if (ctx.pathname === '/admin/dashboard' && ctx.method === 'GET') {
+    if (cleanPath === '/admin/dashboard' && ctx.method === 'GET') {
       const authHeader = ctx.headers['authorization'];
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return {

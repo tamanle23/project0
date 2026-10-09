@@ -7,6 +7,7 @@ import {
 } from '../index';
 import { mockMetadataStore } from '@/features/metadata/data/mock-metadata';
 import { useSpringAuthStore } from '@/features/spring-auth/store';
+import { springApiClient } from '@/features/spring-auth/api-client';
 
 describe('Unified Sandbox Full Platform Integration (Phases 2-4)', () => {
   beforeEach(() => {
@@ -17,7 +18,33 @@ describe('Unified Sandbox Full Platform Integration (Phases 2-4)', () => {
     tasksSandboxRepo.reset();
   });
 
-  describe('Persona Synchronization with Auth Store', () => {
+  describe('Sandbox Bypass & SpringApiClient Integration', () => {
+    it('should authenticate admin_bypass via springApiClient.post("/auth/token") with 200 OK', async () => {
+      const res = await springApiClient.post('/auth/token', {
+        username: 'admin_bypass',
+        password: 'bypass',
+      }, {
+        headers: { 'X-Sandbox-Mock': 'true' },
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.data.accessToken).toContain('bW9ja19zaWduYXR1cmU');
+      expect(res.data.refreshToken).toBe('mock_refresh_token_admin');
+    });
+
+    it('should authenticate creator_bypass via springApiClient.post("/auth/token") with 200 OK', async () => {
+      const res = await springApiClient.post('/auth/token', {
+        username: 'creator_bypass',
+        password: 'bypass',
+      }, {
+        headers: { 'X-Sandbox-Mock': 'true' },
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.data.accessToken).toBeDefined();
+      expect(res.data.refreshToken).toBe('mock_refresh_token_creator');
+    });
+
     it('should update spring auth tokens when persona is switched', () => {
       sandboxManager.switchPersona('creator');
       const authState = useSpringAuthStore.getState();
@@ -30,10 +57,10 @@ describe('Unified Sandbox Full Platform Integration (Phases 2-4)', () => {
     });
   });
 
-  describe('Auth Sandbox Handler', () => {
+  describe('Auth Sandbox Handler Direct Dispatch', () => {
     it('should authenticate admin_bypass and return signed JWT with roles', async () => {
       const res = await sandboxManager.handleRequest({
-        url: '/auth/token',
+        url: '/api/auth/token',
         method: 'POST',
         data: { username: 'admin_bypass', password: 'bypass' },
       });
@@ -46,7 +73,7 @@ describe('Unified Sandbox Full Platform Integration (Phases 2-4)', () => {
 
     it('should reject invalid credentials with 401', async () => {
       const res = await sandboxManager.handleRequest({
-        url: '/auth/token',
+        url: '/api/auth/token',
         method: 'POST',
         data: { username: 'admin_bypass', password: 'wrong_password' },
       });
@@ -55,9 +82,9 @@ describe('Unified Sandbox Full Platform Integration (Phases 2-4)', () => {
       expect(res?.data.message).toBe('Bad credentials');
     });
 
-    it('should refresh tokens via /auth/refresh', async () => {
+    it('should refresh tokens via /api/auth/refresh', async () => {
       const res = await sandboxManager.handleRequest({
-        url: '/auth/refresh',
+        url: '/api/auth/refresh',
         method: 'POST',
         data: { refreshToken: 'mock_refresh_token_admin' },
       });
@@ -66,17 +93,17 @@ describe('Unified Sandbox Full Platform Integration (Phases 2-4)', () => {
       expect(res?.data.accessToken).toBeDefined();
     });
 
-    it('should authorize admin to /admin/dashboard and block unprivileged requests', async () => {
+    it('should authorize admin to /api/admin/dashboard and block unprivileged requests', async () => {
       // 1. Login as admin
       const loginRes = await sandboxManager.handleRequest({
-        url: '/auth/token',
+        url: '/api/auth/token',
         method: 'POST',
         data: { username: 'admin_bypass', password: 'bypass' },
       });
       const adminToken = loginRes?.data.accessToken;
 
       const dashRes = await sandboxManager.handleRequest({
-        url: '/admin/dashboard',
+        url: '/api/admin/dashboard',
         method: 'GET',
         headers: { authorization: `Bearer ${adminToken}` },
       });
@@ -86,7 +113,7 @@ describe('Unified Sandbox Full Platform Integration (Phases 2-4)', () => {
 
       // 2. Unauthenticated request
       const unauthRes = await sandboxManager.handleRequest({
-        url: '/admin/dashboard',
+        url: '/api/admin/dashboard',
         method: 'GET',
       });
       expect(unauthRes?.status).toBe(401);
