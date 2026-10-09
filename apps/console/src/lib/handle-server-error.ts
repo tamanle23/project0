@@ -17,7 +17,15 @@ export function handleServerError(error: unknown) {
   }
 
   if (error instanceof AxiosError) {
-    errMsg = error.response?.data.title
+    if (error.response?.status === 429) {
+      const retryAfter = error.response.headers['retry-after'] || error.response.headers['Retry-After']
+      errMsg = retryAfter 
+        ? `Rate limit exceeded. Please wait ${retryAfter} seconds before retrying.`
+        : 'Rate limit exceeded. Please wait a moment before trying again.'
+      toast.error(errMsg, { duration: 5000 })
+      return
+    }
+    errMsg = error.response?.data?.message || error.response?.data?.title || error.message || errMsg
   }
 
   toast.error(errMsg)

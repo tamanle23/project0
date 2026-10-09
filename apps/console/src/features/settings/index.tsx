@@ -1,5 +1,5 @@
 import { Outlet } from '@tanstack/react-router'
-import { Bell, Palette, UserCog } from 'lucide-react'
+import { Bell, Palette, UserCog, ShieldAlert } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
@@ -25,6 +25,11 @@ const sidebarNavItems = [
     title: 'Notifications',
     href: '/settings/notifications',
     icon: <Bell size={18} />,
+  },
+  {
+    title: 'Data & Privacy',
+    href: '/settings/data-privacy',
+    icon: <ShieldAlert size={18} />,
   },
 ]
 

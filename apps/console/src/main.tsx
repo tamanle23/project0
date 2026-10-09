@@ -75,6 +75,13 @@ const queryClient = new QueryClient({
             router.navigate({ to: '/500' })
           }
         }
+        if (error.response?.status === 429) {
+          const retryAfter = error.response.headers['retry-after'] || error.response.headers['Retry-After']
+          const msg = retryAfter
+            ? `Rate limit exceeded. Please wait ${retryAfter} seconds before retrying.`
+            : 'Rate limit exceeded. Please wait a moment before trying again.'
+          toast.error(msg, { duration: 5000 })
+        }
         if (error.response?.status === 403) {
           // router.navigate("/forbidden", { replace: true });
         }

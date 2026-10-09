@@ -59,6 +59,7 @@ src/routes/
 | `/settings` | `_authenticated/settings/index.tsx` | Yes | Settings Layout | Manage account name, email, avatar, bio |
 | `/settings/appearance` | `_authenticated/settings/appearance.tsx`| Yes | Settings Layout | Switch theme (light/dark/system), adjust glass intensity |
 | `/settings/notifications`| `_authenticated/settings/notifications.tsx`| Yes | Settings Layout | Configure email, push, and webhook alerts |
+| `/settings/data-privacy` | `_authenticated/settings/data-privacy.tsx` | Yes | Settings Layout | GDPR Art. 20 streaming export & Art. 17 hard-purge |
 | `/help-center` | `_authenticated/help-center/index.tsx` | Yes | Authenticated Shell | Browse docs, search FAQs, submit support tickets |
 | `/sign-in` | `(auth)/sign-in.tsx` | No | Fullscreen Canvas | Authenticate with credentials or OAuth |
 | `/sign-in-2` | `(auth)/sign-in-2.tsx` | No | Split Screen Canvas | Two-column branded sign-in |

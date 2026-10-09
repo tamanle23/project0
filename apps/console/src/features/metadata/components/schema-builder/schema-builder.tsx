@@ -55,8 +55,12 @@ export const SchemaBuilder: React.FC<Props> = ({ entityTypeId }) => {
             <h3 className="text-xl font-bold tracking-tight text-foreground">
               {entityType ? entityType.name : 'Entity'} Schema
             </h3>
-            <Badge variant="secondary" className="px-2 py-0.5 text-xs font-semibold">
-              {attributes.length} {attributes.length === 1 ? 'Field' : 'Fields'}
+            <Badge 
+              variant={attributes.length >= 100 ? "destructive" : "secondary"} 
+              className="px-2 py-0.5 text-xs font-semibold"
+              title={attributes.length >= 100 ? "Maximum limit of 100 attributes reached" : `${attributes.length} of 100 attributes used`}
+            >
+              {attributes.length}/100 Fields
             </Badge>
           </div>
           <p className="text-xs text-muted-foreground">
@@ -88,7 +92,9 @@ export const SchemaBuilder: React.FC<Props> = ({ entityTypeId }) => {
           <Button
             size="sm"
             onClick={openCreateAttributeDialog}
-            className="h-9 gap-1.5 text-xs shadow-md shadow-primary/20"
+            disabled={attributes.length >= 100}
+            className="h-9 gap-1.5 text-xs shadow-md shadow-primary/20 disabled:opacity-50"
+            title={attributes.length >= 100 ? "Maximum limit of 100 attributes reached for this model" : "Add Field"}
           >
             <Plus className="h-4 w-4" />
             <span>Add Field</span>

@@ -88,8 +88,12 @@ export const EntityTypeSidebar: React.FC = () => {
         <div className="flex items-center gap-2 min-w-0">
           <Database className="h-5 w-5 text-primary shrink-0" />
           <h3 className="font-bold text-foreground text-sm tracking-tight truncate">Entity Models</h3>
-          <Badge variant="secondary" className="text-[10px] h-5 px-1.5 font-mono shrink-0">
-            {totalElements}
+          <Badge 
+            variant={totalElements >= 50 ? "destructive" : "secondary"} 
+            className="text-[10px] h-5 px-1.5 font-mono shrink-0"
+            title={totalElements >= 50 ? "Maximum limit of 50 models reached" : `${totalElements} of 50 models used`}
+          >
+            {totalElements}/50
           </Badge>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
@@ -107,8 +111,9 @@ export const EntityTypeSidebar: React.FC = () => {
               size="sm"
               variant="outline"
               onClick={openCreateEntityTypeDialog}
-              className="h-8 px-2 gap-1 text-xs bg-white/40 dark:bg-white/5 border-white/20 shrink-0"
-              title="Create New Entity Model"
+              disabled={totalElements >= 50}
+              className="h-8 px-2 gap-1 text-xs bg-white/40 dark:bg-white/5 border-white/20 shrink-0 disabled:opacity-50"
+              title={totalElements >= 50 ? "Workspace model quota reached (max 50 models)" : "Create New Entity Model"}
             >
               <Plus className="h-3.5 w-3.5" />
               <span>New</span>

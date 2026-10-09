@@ -33,7 +33,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, ShieldAlert } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface Props {
   entityTypeId: string | number;
@@ -191,9 +192,20 @@ export const AttributeDialog: React.FC<Props> = ({ entityTypeId }) => {
     }
   };
 
+  const isDangerousRegex = (reg: string) => {
+    if (!reg) return false;
+    return /(\(.*[+*]\)[+*]|\([a-zA-Z0-9_[\]|-]+[+*]\)[+*])/.test(reg);
+  };
+
+  const hasDangerousPattern = isDangerousRegex(pattern);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !systemName.trim()) return;
+    if (hasDangerousPattern) {
+      alert('Regular expression pattern rejected: Catastrophic nested quantifier detected (potential ReDoS vulnerability).');
+      return;
+    }
 
     const options: Record<string, unknown> = {};
     if (choices.length > 0) options.choices = choices;
@@ -498,14 +510,33 @@ export const AttributeDialog: React.FC<Props> = ({ entityTypeId }) => {
 
               {currentMeta.hasPattern && (
                 <div className="space-y-2">
-                  <Label htmlFor="attr-pattern">Regex Validation Pattern</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="attr-pattern">Regex Validation Pattern</Label>
+                    {hasDangerousPattern && (
+                      <span className="flex items-center gap-1 text-[11px] font-semibold text-destructive">
+                        <ShieldAlert className="h-3.5 w-3.5" /> ReDoS nested quantifier detected!
+                      </span>
+                    )}
+                  </div>
                   <Input
                     id="attr-pattern"
                     value={pattern}
                     onChange={(e) => setPattern(e.target.value)}
                     placeholder="e.g. ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                    className="font-mono text-xs"
+                    className={cn(
+                      "font-mono text-xs",
+                      hasDangerousPattern && "border-destructive focus-visible:ring-destructive"
+                    )}
                   />
+                  {hasDangerousPattern ? (
+                    <p className="text-[11px] text-destructive leading-tight">
+                      Catastrophic nested quantifiers like <code>(a+)+</code> or <code>([a-z]+)*</code> are prohibited to prevent Regular Expression Denial of Service.
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground">
+                      Client and server validate this regex with a strict 50ms timeout budget.
+                    </p>
+                  )}
                 </div>
               )}
             </TabsContent>
