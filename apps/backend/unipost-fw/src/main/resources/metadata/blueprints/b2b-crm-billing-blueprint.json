@@ -1,0 +1,108 @@
+{
+  "id": "bp_crm_billing_v1",
+  "name": "B2B CRM & Invoicing",
+  "category": "COMMERCE",
+  "description": "Customer accounts, sales contacts, commercial invoices, and payment tracking.",
+  "icon": "Briefcase",
+  "entityTypes": [
+    {
+      "systemName": "ent_customer_acc",
+      "name": "Customer Account",
+      "description": "Corporate business client and billing profile",
+      "attributes": [
+        {
+          "systemName": "company_name",
+          "name": "Company Name",
+          "dataType": "STRING",
+          "uiComponent": "text",
+          "isRequired": true,
+          "displayOrder": 1
+        },
+        {
+          "systemName": "tax_id",
+          "name": "VAT / Tax Identifier",
+          "dataType": "STRING",
+          "uiComponent": "text",
+          "isRequired": false,
+          "displayOrder": 2
+        },
+        {
+          "systemName": "tier",
+          "name": "Customer Tier",
+          "dataType": "STRING",
+          "uiComponent": "select",
+          "isRequired": true,
+          "displayOrder": 3,
+          "options": {
+            "choices": ["STANDARD", "PREMIUM", "ENTERPRISE"]
+          }
+        },
+        {
+          "systemName": "billing_email",
+          "name": "Billing Email",
+          "dataType": "STRING",
+          "uiComponent": "text",
+          "isRequired": true,
+          "displayOrder": 4
+        }
+      ]
+    },
+    {
+      "systemName": "ent_invoice",
+      "name": "Commercial Invoice",
+      "description": "Accounts receivable invoice and financial settlement",
+      "attributes": [
+        {
+          "systemName": "invoice_number",
+          "name": "Invoice Number",
+          "dataType": "STRING",
+          "uiComponent": "text",
+          "isRequired": true,
+          "displayOrder": 1
+        },
+        {
+          "systemName": "total_amount",
+          "name": "Total Amount",
+          "dataType": "DECIMAL",
+          "uiComponent": "number",
+          "isRequired": true,
+          "displayOrder": 2
+        },
+        {
+          "systemName": "currency",
+          "name": "Currency Code",
+          "dataType": "STRING",
+          "uiComponent": "select",
+          "isRequired": true,
+          "displayOrder": 3,
+          "options": {
+            "choices": ["VND", "USD", "EUR", "SGD"]
+          },
+          "defaultValue": "VND"
+        },
+        {
+          "systemName": "status",
+          "name": "Invoice Status",
+          "dataType": "STRING",
+          "uiComponent": "select",
+          "isRequired": true,
+          "displayOrder": 4,
+          "options": {
+            "choices": ["DRAFT", "ISSUED", "PAID", "VOID"]
+          },
+          "defaultValue": "DRAFT"
+        }
+      ]
+    }
+  ],
+  "relationshipTypes": [
+    {
+      "systemName": "rel_customer_invoices",
+      "name": "Customer Invoices",
+      "description": "Connects an issued commercial invoice to the responsible client account",
+      "sourceEntityType": "ent_invoice",
+      "targetEntityType": "ent_customer_acc",
+      "cardinality": "MANY_TO_ONE"
+    }
+  ]
+}

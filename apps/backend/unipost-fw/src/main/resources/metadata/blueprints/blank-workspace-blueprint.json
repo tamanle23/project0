@@ -1,0 +1,9 @@
+{
+  "id": "bp_blank_v1",
+  "name": "Blank Workspace",
+  "category": "GENERAL",
+  "description": "Clean slate workspace for building completely custom entity schemas from scratch.",
+  "icon": "Layers",
+  "entityTypes": [],
+  "relationshipTypes": []
+}

@@ -1,0 +1,96 @@
+{
+  "id": "bp_logistics_v1",
+  "name": "Logistics & Fleet Management",
+  "category": "SUPPLY_CHAIN",
+  "description": "Commercial vehicle tracking, dispatch orders, and vehicle assignments.",
+  "icon": "Truck",
+  "entityTypes": [
+    {
+      "systemName": "ent_vehicle",
+      "name": "Fleet Vehicle",
+      "description": "Commercial transportation vehicles",
+      "attributes": [
+        {
+          "systemName": "license_plate",
+          "name": "License Plate",
+          "dataType": "STRING",
+          "uiComponent": "text",
+          "isRequired": true,
+          "displayOrder": 1
+        },
+        {
+          "systemName": "vehicle_type",
+          "name": "Vehicle Type",
+          "dataType": "STRING",
+          "uiComponent": "select",
+          "isRequired": true,
+          "displayOrder": 2,
+          "options": {
+            "choices": ["VAN", "BOX_TRUCK", "SEMI_TRAILER", "ELECTRIC_CARGO"]
+          }
+        },
+        {
+          "systemName": "max_payload_kg",
+          "name": "Max Payload (kg)",
+          "dataType": "INTEGER",
+          "uiComponent": "number",
+          "isRequired": false,
+          "displayOrder": 3
+        },
+        {
+          "systemName": "is_active",
+          "name": "Operational Status",
+          "dataType": "BOOLEAN",
+          "uiComponent": "switch",
+          "isRequired": true,
+          "displayOrder": 4,
+          "defaultValue": "true"
+        }
+      ]
+    },
+    {
+      "systemName": "ent_dispatch_order",
+      "name": "Dispatch Order",
+      "description": "Logistics delivery ticket and shipment status",
+      "attributes": [
+        {
+          "systemName": "tracking_number",
+          "name": "Tracking Number",
+          "dataType": "STRING",
+          "uiComponent": "text",
+          "isRequired": true,
+          "displayOrder": 1
+        },
+        {
+          "systemName": "delivery_status",
+          "name": "Delivery Status",
+          "dataType": "STRING",
+          "uiComponent": "select",
+          "isRequired": true,
+          "displayOrder": 2,
+          "options": {
+            "choices": ["SCHEDULED", "IN_TRANSIT", "DELIVERED", "FAILED"]
+          }
+        },
+        {
+          "systemName": "destination_address",
+          "name": "Destination Address",
+          "dataType": "STRING",
+          "uiComponent": "textarea",
+          "isRequired": true,
+          "displayOrder": 3
+        }
+      ]
+    }
+  ],
+  "relationshipTypes": [
+    {
+      "systemName": "rel_vehicle_assigned_order",
+      "name": "Assigned Vehicle",
+      "description": "Associates a delivery dispatch order to an assigned fleet vehicle",
+      "sourceEntityType": "ent_dispatch_order",
+      "targetEntityType": "ent_vehicle",
+      "cardinality": "MANY_TO_ONE"
+    }
+  ]
+}
