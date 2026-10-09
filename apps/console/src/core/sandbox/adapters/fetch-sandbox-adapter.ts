@@ -9,7 +9,7 @@ let originalFetch: typeof window.fetch | null = null;
  * the real network.
  */
 export function attachSandboxFetchInterceptor(): void {
-  if (typeof window === 'undefined' || !import.meta.env.DEV) {
+  if (typeof window === 'undefined' || import.meta.env.MODE === 'production') {
     return;
   }
 
@@ -40,6 +40,18 @@ export function attachSandboxFetchInterceptor(): void {
       input.headers.forEach((v, k) => {
         headers[k.toLowerCase()] = v;
       });
+      try {
+        const text = await input.clone().text();
+        if (text) {
+          try {
+            bodyData = JSON.parse(text);
+          } catch {
+            bodyData = text;
+          }
+        }
+      } catch {
+        /* ignore */
+      }
     }
 
     if (init) {
