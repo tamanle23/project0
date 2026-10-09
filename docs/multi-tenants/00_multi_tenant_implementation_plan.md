@@ -16,24 +16,24 @@ In accordance with user directives, the implementation plan prioritizes the **Pu
 │                        IMPLEMENTATION PHASING (FRONT-DOOR FIRST)                       │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │ PHASE 1 [FRONT DOOR]: Unipost Landing Page, Plans & payOS VietQR Onboarding (Part 10)  │
-│ ↳ Hero showcase, Basic/Pro/Pro Max pricing cards, Sign-in/Sign-up modal, payOS QR modal│
+│ ↳ [MOVED TO BACKLOG] Documented in `docs/multi-tenants/domain_blueprints_fullstack_guide.md`│
 ├────────────────────────────────────────────────────────────────────────────────────────┤
-│ PHASE 2 [CRITICAL CORE]: Database Isolation, System vs. Tenant Schemas & RLS (Pts 2, 7)│
+│ PHASE 2 [CRITICAL CORE - COMPLETED]: Database Isolation & RLS (Parts 2, 7)             │
 │ ↳ Tenant + SYSTEM RLS read-inheritance, scoped unique indexes, FORCE RLS, session hook │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
-│ PHASE 3 [SECURITY LIFECYCLE]: Cryptographic JWT Claims & TenantContext Pipeline(Part 4)│
+│ PHASE 3 [SECURITY LIFECYCLE - COMPLETED]: JWT Claims & TenantContext Pipeline (Part 4) │
 │ ↳ Zero client trust, JWT `tid`, TenantContextHolder, Async TaskDecorator               │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
-│ PHASE 4 [INTEGRITY & CACHE]: Composite Cache Fabric & Dual-Layer Versioning (Pts 1, 7) │
+│ PHASE 4 [INTEGRITY & CACHE - COMPLETED]: Composite Cache Fabric & Dual-Layer (Parts 1,7│
 │ ↳ Effective Schema composition, composite keys `schema:{tid}:{type}:v{tVer}_s{sVer}`   │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
-│ PHASE 5 [USER EXPERIENCE]: Console Dual-Mode Context Switching (Parts 3 & 7)           │
+│ PHASE 5 [USER EXPERIENCE - COMPLETED]: Console Dual-Mode Context Switching (Parts 3, 7)│
 │ ↳ Architect Mode vs. Operator Mode, System-Locked (🔒) vs Custom (✏️) UI badges        │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
-│ PHASE 6 [OPERATIONAL SCALE]: Tenant Onboarding & Blueprint Catalog Seeding (Part 5)    │
+│ PHASE 6 [OPERATIONAL SCALE - COMPLETED]: Tenant Onboarding & Blueprint Catalog (Part 5)│
 │ ↳ System blueprint manifests, deep-clone provisioning, decoupled schema evolution      │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
-│ PHASE 7 [RELIABILITY & STABILITY]: Noisy Neighbor Defense & Resource Quotas (Part 6)   │
+│ PHASE 7 [RELIABILITY & STABILITY - CURRENT]: Noisy Neighbor Defense & Quotas (Part 6)  │
 │ ↳ Redis Token Bucket rate limiting, JSON Schema ReDoS timeouts, storage quotas         │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │ PHASE 8 [DATA COMPLIANCE]: Streaming Export & GDPR Hard-Purge Pipeline (Part 8)        │
@@ -46,32 +46,13 @@ In accordance with user directives, the implementation plan prioritizes the **Pu
 
 ---
 
-## 2. Phase 1: Unipost Landing Page, Subscriptions & payOS Onboarding Funnel
-> **Priority:** 🚀 P0 (Immediate Front-Door Focus)  
-> **Reference Document:** [`docs/multi-tenants/10_landing_page_and_onboarding_funnel.md`](file:///c:/Users/Admin/workspace/git/unipost/docs/multi-tenants/10_landing_page_and_onboarding_funnel.md) & [`docs/multi-tenants/09_tenant_billing_payos_and_feature_entitlements.md`](file:///c:/Users/Admin/workspace/git/unipost/docs/multi-tenants/09_tenant_billing_payos_and_feature_entitlements.md)  
-> **Goal:** Build the public marketing landing page (`/`), showcase the 3 subscription tiers, provide seamless login/signup modals, and integrate instant payOS VietQR checkout.
+## 2. Phase 1: Unipost Landing Page, Subscriptions & payOS Onboarding Funnel (MOVED TO BACKLOG)
+> **Status:** ⏳ **BACKLOG (To be implemented later)**  
+> **Transferred Location:** Fully documented in [`docs/multi-tenants/domain_blueprints_fullstack_guide.md`](file:///c:/Users/Admin/workspace/git/unipost/docs/multi-tenants/domain_blueprints_fullstack_guide.md#6-part-5-public-landing-page-subscriptions--payos-onboarding-funnel-backlog)  
+> **Reference Documents:** [`docs/multi-tenants/10_landing_page_and_onboarding_funnel.md`](file:///c:/Users/Admin/workspace/git/unipost/docs/multi-tenants/10_landing_page_and_onboarding_funnel.md) & [`docs/multi-tenants/09_tenant_billing_payos_and_feature_entitlements.md`](file:///c:/Users/Admin/workspace/git/unipost/docs/multi-tenants/09_tenant_billing_payos_and_feature_entitlements.md)  
+> **Goal:** Build the public marketing landing page (`/`), showcase the 3 subscription tiers, integrate the Blueprint Template Carousel into the registration flow, and provide instant payOS VietQR checkout.
 
-### Tasks & Deliverables:
-- [ ] **Task 1.1: Public Landing Route Setup (`apps/console/src/routes/index.tsx`)**:
-  - Implement public index route (`/`) using TanStack Router with auth guard redirection (authenticated users auto-redirected to `/_authenticated`).
-- [ ] **Task 1.2: Liquid Glass Hero & Interactive Showcase (`@unipost/console`)**:
-  - Build `HeroSection` with dynamic animated value propositions ("Nền tảng Quản trị Dữ liệu Động & Metadata Đa Khách Hàng").
-  - Create interactive preview mockup showcasing dynamic form generation and graph edge connections.
-- [ ] **Task 1.3: Subscription & Pricing Section**:
-  - Build `PricingSection` with Monthly / Yearly billing toggle (with 2 months free badge on annual).
-  - Implement 3 transparent plan cards:
-    - **🆓 Basic (Cơ bản)**: Miễn phí (Free) | 1 User duy nhất | Unlimited Records.
-    - **⚡ Pro (Pro)**: 199,000 VND / tháng | Lên đến 5 Users | Unlimited Records.
-    - **👑 Pro Max (Pro Max)**: 499,000 VND / tháng | Không giới hạn Users | Unlimited Records.
-- [ ] **Task 1.4: Integrated Register / Login Modal Flow**:
-  - Implement modal allowing direct user and workspace registration from plan CTA buttons.
-  - Basic tier redirects directly into the workspace upon registration.
-- [ ] **Task 1.5: payOS VietQR Checkout Modal**:
-  - When clicking upgrade to Pro or Pro Max, open `PayOsQrModal` rendering a dynamic VietQR code for 1-click mobile banking transfer.
-  - Setup frontend status polling / SSE confirmation to immediately redirect upon payment receipt.
-
-### Verification Gate:
-- Load `http://localhost:5173/` in an incognito window: verify the landing page renders smoothly with Liquid Glass aesthetic. Toggle Monthly/Yearly prices. Click "Nâng cấp Pro" and verify the payOS VietQR modal generates properly.
+*See [`docs/multi-tenants/domain_blueprints_fullstack_guide.md`](file:///c:/Users/Admin/workspace/git/unipost/docs/multi-tenants/domain_blueprints_fullstack_guide.md) for full task specifications, mockups, and verification criteria.*
 
 ---
 
