@@ -76,7 +76,7 @@ class SchemaValidationServiceTest {
 
         String cachedSchema = "{\"$schema\": \"http://json-schema.org/draft-07/schema#\", \"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}";
 
-        when(schemaMap.get("schema:1:v1")).thenReturn(cachedSchema);
+        when(schemaMap.get("schema:default-tenant:1:v1_s1")).thenReturn(cachedSchema);
 
         assertDoesNotThrow(() -> schemaValidationService.validatePayload(entityTypeId, payload));
     }
@@ -92,12 +92,12 @@ class SchemaValidationServiceTest {
         attr.setDataType("integer");
         attr.setIsRequired(false);
 
-        when(schemaMap.get("schema:1:v1")).thenReturn(null);
-        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId)).thenReturn(Collections.singletonList(attr));
+        when(schemaMap.get("schema:default-tenant:1:v1_s1")).thenReturn(null);
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNullOrderByDisplayOrderAsc(entityTypeId)).thenReturn(Collections.singletonList(attr));
 
         assertDoesNotThrow(() -> schemaValidationService.validatePayload(entityTypeId, payload));
 
-        verify(schemaMap).putIfAbsent(eq("schema:1:v1"), anyString(), eq(1L), eq(TimeUnit.HOURS));
+        verify(schemaMap).putIfAbsent(eq("schema:default-tenant:1:v1_s1"), anyString(), eq(1L), eq(TimeUnit.HOURS));
     }
 
     @Test
@@ -106,7 +106,7 @@ class SchemaValidationServiceTest {
         Map<String, Object> payload = new HashMap<>();
 
         String cachedSchema = "{\"$schema\": \"http://json-schema.org/draft-07/schema#\", \"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}";
-        when(schemaMap.get("schema:1:v1")).thenReturn(cachedSchema);
+        when(schemaMap.get("schema:default-tenant:1:v1_s1")).thenReturn(cachedSchema);
 
         SchemaValidationException ex = assertThrows(SchemaValidationException.class,
                 () -> schemaValidationService.validatePayload(entityTypeId, payload));
@@ -123,8 +123,8 @@ class SchemaValidationServiceTest {
         attr.setUiComponent("switch");
         attr.setIsRequired(true);
 
-        when(schemaMap.get("schema:1:v1")).thenReturn(null);
-        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId)).thenReturn(Collections.singletonList(attr));
+        when(schemaMap.get("schema:default-tenant:1:v1_s1")).thenReturn(null);
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNullOrderByDisplayOrderAsc(entityTypeId)).thenReturn(Collections.singletonList(attr));
 
         Map<String, Object> payload = Map.of("isActive", true);
         assertDoesNotThrow(() -> schemaValidationService.validatePayload(entityTypeId, payload));
@@ -139,8 +139,8 @@ class SchemaValidationServiceTest {
         attr.setDataType("string");
         attr.setIsRequired(false);
 
-        when(schemaMap.get("schema:1:v1")).thenReturn(null);
-        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId)).thenReturn(Collections.singletonList(attr));
+        when(schemaMap.get("schema:default-tenant:1:v1_s1")).thenReturn(null);
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNullOrderByDisplayOrderAsc(entityTypeId)).thenReturn(Collections.singletonList(attr));
 
         Map<String, Object> payload = Map.of("name", "Valid", "unknownField", "Should Fail");
         assertThrows(SchemaValidationException.class, () -> schemaValidationService.validatePayload(entityTypeId, payload));
@@ -154,7 +154,7 @@ class SchemaValidationServiceTest {
         attr.setUiComponent("text");
         attr.setDataType("string");
 
-        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId)).thenReturn(List.of(attr));
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNullOrderByDisplayOrderAsc(entityTypeId)).thenReturn(List.of(attr));
 
         JsonNode schemaNode = schemaValidationService.compileSchemaNode(entityTypeId);
         assertNotNull(schemaNode);
@@ -170,8 +170,8 @@ class SchemaValidationServiceTest {
         attr.setUiComponent("text");
         attr.setDataType("string");
 
-        when(schemaMap.get("schema:1:v1")).thenReturn(null);
-        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId))
+        when(schemaMap.get("schema:default-tenant:1:v1_s1")).thenReturn(null);
+        when(attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNullOrderByDisplayOrderAsc(entityTypeId))
                 .thenReturn(List.of(attr));
 
         int threadCount = 20;
@@ -207,8 +207,8 @@ class SchemaValidationServiceTest {
         }
 
         // DB attribute repository findByEntityTypeId must only be invoked exactly ONCE
-        verify(attributeDefinitionRepository, times(1)).findByEntityTypeIdAndDeletedDateIsNull(entityTypeId);
-        verify(schemaMap, times(1)).putIfAbsent(eq("schema:1:v1"), anyString(), eq(1L), eq(TimeUnit.HOURS));
+        verify(attributeDefinitionRepository, times(1)).findByEntityTypeIdAndDeletedDateIsNullOrderByDisplayOrderAsc(entityTypeId);
+        verify(schemaMap, times(1)).putIfAbsent(eq("schema:default-tenant:1:v1_s1"), anyString(), eq(1L), eq(TimeUnit.HOURS));
     }
 }
 

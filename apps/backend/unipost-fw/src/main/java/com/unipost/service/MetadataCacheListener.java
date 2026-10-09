@@ -25,26 +25,26 @@ public class MetadataCacheListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleAttributeDefinitionUpdate(AttributeDefinitionUpdatedEvent event) {
         Long entityTypeId = event.getEntityTypeId();
-        log.info("Invalidating schema cache for entity type: {}", entityTypeId);
+        String tenantId = event.getTenantId();
+        log.info("Invalidating composite schema cache for entity type: {} (tenant: {})", entityTypeId, tenantId);
 
         // 1. Evict in-memory L1 cache
-        schemaValidationService.invalidateL1Cache(entityTypeId);
+        schemaValidationService.invalidateL1Cache(entityTypeId, tenantId);
 
         // 2. Evict distributed L2 Hazelcast cache keys
         try {
             if (hazelcastInstance != null) {
                 IMap<String, String> map = hazelcastInstance.getMap(HazelcastConfiguration.METADATA_SCHEMAS_MAP);
                 if (map != null) {
-                    // Delete base key if present
-                    map.remove("schema:" + entityTypeId);
-
-                    // Evict versioned keys schema:{id}:*
-                    String prefix = "schema:" + entityTypeId + ":";
+                    // Evict versioned keys matching tenant or entityTypeId
+                    String targetPart = ":" + entityTypeId + ":";
                     Set<String> keys = map.keySet();
                     if (keys != null) {
                         for (String key : keys) {
-                            if (key != null && key.startsWith(prefix)) {
-                                map.remove(key);
+                            if (key != null && key.contains(targetPart)) {
+                                if (tenantId == null || tenantId.isBlank() || key.startsWith("schema:" + tenantId + ":")) {
+                                    map.remove(key);
+                                }
                             }
                         }
                     }
@@ -55,4 +55,3 @@ public class MetadataCacheListener {
         }
     }
 }
-

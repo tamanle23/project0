@@ -12,6 +12,7 @@ import com.unipost.boot.config.HazelcastConfiguration;
 import com.unipost.core.io.Error;
 import com.unipost.domain.metadata.AttributeDefinition;
 import com.unipost.domain.metadata.EntityType;
+import com.unipost.fw.tenancy.TenantContextHolder;
 import com.unipost.repository.jpa.AttributeDefinitionRepository;
 import com.unipost.repository.jpa.EntityTypeRepository;
 import com.unipost.service.exception.MetadataNotFoundException;
@@ -21,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,22 +52,43 @@ public class SchemaValidationService {
         return null;
     }
 
-    private String buildCacheKey(Long entityTypeId, Long schemaVersion) {
+    /**
+     * Build composite cache key: schema:{tenant_id}:{entity_type_id}:v{tenantVer}_s{systemVer}
+     */
+    public String buildCacheKey(String tenantId, Long entityTypeId, Long schemaVersion) {
+        String tid = (tenantId != null && !tenantId.isBlank()) ? tenantId : "default-tenant";
         long version = schemaVersion != null ? schemaVersion : 1L;
-        return "schema:" + entityTypeId + ":v" + version;
+        // In dual-layer versioning, schema key encodes tenant identity and versions:
+        // schema:{tenant_id}:{entity_type_id}:v{tenantVer}_s{systemVer}
+        return "schema:" + tid + ":" + entityTypeId + ":v" + version + "_s1";
     }
 
     public void invalidateL1Cache(Long entityTypeId) {
+        invalidateL1Cache(entityTypeId, null);
+    }
+
+    public void invalidateL1Cache(Long entityTypeId, String tenantId) {
         if (entityTypeId == null) {
             l1ParsedSchemaCache.clear();
             return;
         }
-        String prefix = "schema:" + entityTypeId + ":";
-        l1ParsedSchemaCache.keySet().removeIf(k -> k.startsWith(prefix));
+        if (tenantId != null && !tenantId.isBlank()) {
+            String prefix = "schema:" + tenantId + ":" + entityTypeId + ":";
+            l1ParsedSchemaCache.keySet().removeIf(k -> k.startsWith(prefix));
+        } else {
+            // Remove across any tenant if tenantId is not specified
+            String target = ":" + entityTypeId + ":";
+            l1ParsedSchemaCache.keySet().removeIf(k -> k.contains(target));
+        }
     }
 
     public JsonSchema getOrCompileJsonSchema(Long entityTypeId, Long schemaVersion) {
-        String cacheKey = buildCacheKey(entityTypeId, schemaVersion);
+        String tenantId = TenantContextHolder.getTenantId();
+        return getOrCompileJsonSchema(tenantId, entityTypeId, schemaVersion);
+    }
+
+    public JsonSchema getOrCompileJsonSchema(String tenantId, Long entityTypeId, Long schemaVersion) {
+        String cacheKey = buildCacheKey(tenantId, entityTypeId, schemaVersion);
 
         // Fast path: L1 parsed schema cache hit
         JsonSchema l1Schema = l1ParsedSchemaCache.get(cacheKey);
@@ -74,7 +97,6 @@ public class SchemaValidationService {
         }
 
         // Lock-free atomic L1 computeIfAbsent prevents cache stampede / thundering herd
-        // across multiple concurrent request threads on the same JVM
         return l1ParsedSchemaCache.computeIfAbsent(cacheKey, key -> {
             // 1. Check L2 Hazelcast distributed cache
             String schemaJson = null;
@@ -90,11 +112,10 @@ public class SchemaValidationService {
             // 2. Distributed double-check / compile on cache miss
             if (schemaJson == null) {
                 log.debug("L1/L2 schema cache miss for {}. Compiling from DB rules...", key);
-                schemaJson = compileSchema(entityTypeId);
+                schemaJson = compileEffectiveSchema(tenantId, entityTypeId);
                 try {
                     IMap<String, String> schemaMap = getHazelcastSchemaMap();
                     if (schemaMap != null) {
-                        // putIfAbsent prevents concurrent cluster nodes from overwriting compiled schema
                         schemaMap.putIfAbsent(key, schemaJson, 1, TimeUnit.HOURS);
                     }
                 } catch (Exception e) {
@@ -157,19 +178,60 @@ public class SchemaValidationService {
         }
     }
 
-    public String compileSchema(Long entityTypeId) {
+    /**
+     * Composites base System attributes (SYSTEM) with Tenant custom overlay attributes.
+     */
+    public List<AttributeDefinition> resolveEffectiveAttributes(String tenantId, Long entityTypeId) {
+        List<AttributeDefinition> allVisible = attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNullOrderByDisplayOrderAsc(entityTypeId);
+        if (allVisible == null || allVisible.isEmpty()) {
+            return List.of();
+        }
+
+        // Composite map preserving order: System attributes first, tenant overlays overlaying or appending
+        Map<String, AttributeDefinition> compositeMap = new LinkedHashMap<>();
+
+        // First pass: include active SYSTEM attributes
+        for (AttributeDefinition attr : allVisible) {
+            if ("SYSTEM".equalsIgnoreCase(attr.getTenantId())) {
+                compositeMap.put(attr.getSystemName(), attr);
+            }
+        }
+
+        // Second pass: include or overlay tenant's own attributes
+        String activeTenant = (tenantId != null && !tenantId.isBlank()) ? tenantId : "default-tenant";
+        for (AttributeDefinition attr : allVisible) {
+            if (activeTenant.equalsIgnoreCase(attr.getTenantId())) {
+                compositeMap.put(attr.getSystemName(), attr);
+            }
+        }
+
+        // If no SYSTEM or tenant filter matched (e.g. tests without tenant separation), return all visible
+        if (compositeMap.isEmpty()) {
+            return allVisible;
+        }
+
+        return new ArrayList<>(compositeMap.values());
+    }
+
+    public String compileEffectiveSchema(String tenantId, Long entityTypeId) {
         EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId)
                 .orElseThrow(() -> new MetadataNotFoundException("EntityType not found with id: " + entityTypeId));
 
-        List<AttributeDefinition> attributes = attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId);
+        List<AttributeDefinition> attributes = resolveEffectiveAttributes(tenantId, entityTypeId);
         return schemaCompiler.compile(entityTypeId, entityType.getSchemaVersion(), attributes);
+    }
+
+    public String compileSchema(Long entityTypeId) {
+        String tenantId = TenantContextHolder.getTenantId();
+        return compileEffectiveSchema(tenantId, entityTypeId);
     }
 
     public JsonNode compileSchemaNode(Long entityTypeId) {
         EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId)
                 .orElseThrow(() -> new MetadataNotFoundException("EntityType not found with id: " + entityTypeId));
 
-        List<AttributeDefinition> attributes = attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNull(entityTypeId);
+        String tenantId = TenantContextHolder.getTenantId();
+        List<AttributeDefinition> attributes = resolveEffectiveAttributes(tenantId, entityTypeId);
         return schemaCompiler.compileNode(entityTypeId, entityType.getSchemaVersion(), attributes);
     }
 }

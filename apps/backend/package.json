@@ -11,6 +11,6 @@
     "lint": "node mvnw.cjs test-compile -DskipTests",
     "check-types": "node mvnw.cjs test-compile -DskipTests",
     "clean": "node mvnw.cjs clean",
-    "db-migrate-local": "node mvnw.cjs -pl unipost-db spring-boot:run -Dspring-boot.run.profiles=local"
+    "db-migrate-local": "node mvnw.cjs -pl unipost-db spring-boot:run -Dspring-boot.run.arguments=\"--spring.profiles.active=local,--LIQUIBASE_CONTEXTS=dev,--schema=identity\""
   }
 }

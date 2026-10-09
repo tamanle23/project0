@@ -170,12 +170,22 @@ public class MetadataService {
         EntityType entityType = entityTypeRepository.findByIdAndDeletedDateIsNull(entityTypeId)
                 .orElseThrow(() -> new MetadataNotFoundException("EntityType not found with id: " + entityTypeId));
 
-        if (attributeDefinitionRepository.existsByEntityTypeIdAndSystemNameAndDeletedDateIsNull(entityTypeId, request.systemName().trim())) {
-            throw new MetadataConflictException("Attribute with systemName '" + request.systemName() + "' already exists for EntityType " + entityTypeId);
+        String reqSysName = request.systemName().trim();
+        List<AttributeDefinition> existingAttrs = attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNullOrderByDisplayOrderAsc(entityTypeId);
+        
+        // Check collision against any active attribute (including SYSTEM base attributes)
+        boolean nameExists = existingAttrs.stream()
+                .anyMatch(a -> a.getSystemName() != null && a.getSystemName().equalsIgnoreCase(reqSysName));
+        if (nameExists) {
+            throw new MetadataConflictException("Attribute with systemName '" + reqSysName + "' already exists for EntityType " + entityTypeId);
         }
 
         AttributeDefinition attributeDefinition = MetadataDtoMapper.toEntity(request, entityType);
-        List<AttributeDefinition> existingAttrs = attributeDefinitionRepository.findByEntityTypeIdAndDeletedDateIsNullOrderByDisplayOrderAsc(entityTypeId);
+        String activeTenantId = com.unipost.fw.tenancy.TenantContextHolder.getTenantId();
+        if (activeTenantId != null && !activeTenantId.isBlank()) {
+            attributeDefinition.setTenantId(activeTenantId);
+        }
+
         int nextOrder = existingAttrs.stream()
                 .mapToInt(a -> a.getDisplayOrder() != null ? a.getDisplayOrder() : 0)
                 .max()
@@ -185,7 +195,7 @@ public class MetadataService {
         AttributeDefinition saved = attributeDefinitionRepository.save(attributeDefinition);
 
         incrementSchemaVersion(entityType);
-        eventPublisher.publishEvent(new AttributeDefinitionUpdatedEvent(this, entityTypeId));
+        eventPublisher.publishEvent(new AttributeDefinitionUpdatedEvent(this, entityTypeId, activeTenantId));
         return MetadataDtoMapper.toResponse(saved);
     }
 
@@ -196,6 +206,11 @@ public class MetadataService {
 
         AttributeDefinition attr = attributeDefinitionRepository.findByEntityTypeIdAndIdAndDeletedDateIsNull(entityTypeId, attributeId)
                 .orElseThrow(() -> new MetadataNotFoundException("AttributeDefinition not found with id: " + attributeId + " for entityTypeId: " + entityTypeId));
+
+        // System Field Immutability Guard: Tenants cannot mutate system attributes
+        if ("SYSTEM".equalsIgnoreCase(attr.getTenantId())) {
+            throw new MetadataConflictException("System attributes (tenant_id = 'SYSTEM') are immutable and cannot be modified by tenant admins");
+        }
 
         // Optimistic locking check
         if (request.version() != null && !request.version().equals(attr.getVersion())) {
@@ -219,7 +234,8 @@ public class MetadataService {
         AttributeDefinition saved = attributeDefinitionRepository.save(attr);
 
         incrementSchemaVersion(entityType);
-        eventPublisher.publishEvent(new AttributeDefinitionUpdatedEvent(this, entityTypeId));
+        String activeTenantId = com.unipost.fw.tenancy.TenantContextHolder.getTenantId();
+        eventPublisher.publishEvent(new AttributeDefinitionUpdatedEvent(this, entityTypeId, activeTenantId));
         return MetadataDtoMapper.toResponse(saved);
     }
 
@@ -230,6 +246,11 @@ public class MetadataService {
 
         AttributeDefinition attr = attributeDefinitionRepository.findByEntityTypeIdAndIdAndDeletedDateIsNull(entityTypeId, attributeId)
                 .orElseThrow(() -> new MetadataNotFoundException("AttributeDefinition not found with id: " + attributeId + " for entityTypeId: " + entityTypeId));
+
+        // System Field Immutability Guard: Tenants cannot delete system attributes
+        if ("SYSTEM".equalsIgnoreCase(attr.getTenantId())) {
+            throw new MetadataConflictException("System attributes (tenant_id = 'SYSTEM') are immutable and cannot be deleted by tenant admins");
+        }
 
         // Delete guard: check if any record contains this attribute key
         if (!force) {
@@ -245,7 +266,8 @@ public class MetadataService {
         attributeDefinitionRepository.save(attr);
 
         incrementSchemaVersion(entityType);
-        eventPublisher.publishEvent(new AttributeDefinitionUpdatedEvent(this, entityTypeId));
+        String activeTenantId = com.unipost.fw.tenancy.TenantContextHolder.getTenantId();
+        eventPublisher.publishEvent(new AttributeDefinitionUpdatedEvent(this, entityTypeId, activeTenantId));
     }
 
     @Transactional
@@ -256,11 +278,16 @@ public class MetadataService {
         AttributeDefinition attr = attributeDefinitionRepository.findByEntityTypeIdAndIdAndDeletedDateIsNull(entityTypeId, attributeId)
                 .orElseThrow(() -> new MetadataNotFoundException("AttributeDefinition not found with id: " + attributeId + " for entityTypeId: " + entityTypeId));
 
+        if ("SYSTEM".equalsIgnoreCase(attr.getTenantId())) {
+            throw new MetadataConflictException("System attributes (tenant_id = 'SYSTEM') are immutable and cannot be archived by tenant admins");
+        }
+
         attr.setIsArchived(true);
         AttributeDefinition saved = attributeDefinitionRepository.save(attr);
 
         incrementSchemaVersion(entityType);
-        eventPublisher.publishEvent(new AttributeDefinitionUpdatedEvent(this, entityTypeId));
+        String activeTenantId = com.unipost.fw.tenancy.TenantContextHolder.getTenantId();
+        eventPublisher.publishEvent(new AttributeDefinitionUpdatedEvent(this, entityTypeId, activeTenantId));
         return MetadataDtoMapper.toResponse(saved);
     }
 
@@ -276,7 +303,8 @@ public class MetadataService {
         AttributeDefinition saved = attributeDefinitionRepository.save(attr);
 
         incrementSchemaVersion(entityType);
-        eventPublisher.publishEvent(new AttributeDefinitionUpdatedEvent(this, entityTypeId));
+        String activeTenantId = com.unipost.fw.tenancy.TenantContextHolder.getTenantId();
+        eventPublisher.publishEvent(new AttributeDefinitionUpdatedEvent(this, entityTypeId, activeTenantId));
         return MetadataDtoMapper.toResponse(saved);
     }
 
@@ -301,7 +329,8 @@ public class MetadataService {
         }
 
         incrementSchemaVersion(entityType);
-        eventPublisher.publishEvent(new AttributeDefinitionUpdatedEvent(this, entityTypeId));
+        String activeTenantId = com.unipost.fw.tenancy.TenantContextHolder.getTenantId();
+        eventPublisher.publishEvent(new AttributeDefinitionUpdatedEvent(this, entityTypeId, activeTenantId));
         return result;
     }
 

@@ -8,7 +8,8 @@ public class MetadataConflictException extends BusinessException {
     private static final long serialVersionUID = 1L;
 
     public MetadataConflictException(String message) {
-        super(Error.builder().code("METADATA_CONFLICT").message(message).build());
+        super(message);
+        getErrors().add(Error.builder().code("METADATA_CONFLICT").message(message).build());
         setHttpCode(409);
         setServerSide(false);
     }

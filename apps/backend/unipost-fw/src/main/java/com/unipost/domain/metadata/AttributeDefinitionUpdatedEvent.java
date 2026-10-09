@@ -7,9 +7,15 @@ import org.springframework.context.ApplicationEvent;
 public class AttributeDefinitionUpdatedEvent extends ApplicationEvent {
 
     private final Long entityTypeId;
+    private final String tenantId;
 
     public AttributeDefinitionUpdatedEvent(Object source, Long entityTypeId) {
+        this(source, entityTypeId, null);
+    }
+
+    public AttributeDefinitionUpdatedEvent(Object source, Long entityTypeId, String tenantId) {
         super(source);
         this.entityTypeId = entityTypeId;
+        this.tenantId = tenantId;
     }
 }
