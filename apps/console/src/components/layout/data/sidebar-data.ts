@@ -22,6 +22,7 @@ import {
   GalleryVerticalEnd,
   Database,
   Building2,
+  CreditCard,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 import { useTranslation } from 'react-i18next'
@@ -190,6 +191,16 @@ export const useSidebarData = (): SidebarData => {
                 title: t('sidebar.items.profile', 'Profile'),
                 url: '/settings',
                 icon: UserCog,
+              },
+              {
+                title: t('sidebar.items.workspaces', 'Workspaces'),
+                url: '/settings/workspaces',
+                icon: Building2,
+              },
+              {
+                title: t('sidebar.items.billing', 'Billing & Subscriptions'),
+                url: '/settings/billing',
+                icon: CreditCard,
               },
               {
                 title: t('sidebar.items.appearance', 'Appearance'),

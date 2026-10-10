@@ -18,8 +18,8 @@ export const LandingPage: React.FC = () => {
   const [selectedPlan, setSelectedPlan] = useState<'BASIC' | 'PRO' | 'PRO_MAX'>('BASIC');
   const [selectedBlueprintId, setSelectedBlueprintId] = useState<string>('bp_cms_publishing_v1');
 
-  const handleOpenSignUp = (plan: 'BASIC' | 'PRO' | 'PRO_MAX' = 'BASIC', blueprintId?: string) => {
-    setSelectedPlan(plan);
+  const handleOpenSignUp = (plan: 'BASIC' | 'PRO' | 'PRO_MAX' | 'ENTERPRISE' = 'BASIC', blueprintId?: string) => {
+    setSelectedPlan(plan === 'ENTERPRISE' ? 'PRO_MAX' : plan);
     if (blueprintId) setSelectedBlueprintId(blueprintId);
     setIsOnboardingOpen(true);
   };

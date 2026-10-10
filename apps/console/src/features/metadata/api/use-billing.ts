@@ -2,14 +2,47 @@ import axios from 'axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMetadataUiStore } from '../store/use-metadata-ui-store';
 
+export type SubscriptionTier = 'BASIC' | 'PRO' | 'PRO_MAX' | 'ENTERPRISE';
+
+export interface QuotaUsage {
+  workspacesUsed: number;
+  maxWorkspaces: number; // -1 for unlimited
+  schemasUsed: number;
+  maxSchemas: number; // -1 for unlimited
+  recordsUsed: number;
+  maxRecords: number; // -1 for unlimited
+}
+
+export interface VatInvoiceInfo {
+  companyName: string;
+  taxCode: string;
+  address: string;
+  email: string;
+  isAutoInvoice: boolean;
+}
+
+export interface BillingTransaction {
+  orderCode: number;
+  amount: number;
+  planTier: SubscriptionTier;
+  billingCadence: 'MONTHLY' | 'YEARLY';
+  status: string;
+  description: string;
+  createdAt: string;
+  paidAt?: string | null;
+}
+
 export interface TenantBillingSummary {
   tenantId: string;
-  planTier: 'BASIC' | 'PRO' | 'PRO_MAX';
+  planTier: SubscriptionTier;
   billingCadence: 'MONTHLY' | 'YEARLY';
   status: 'ACTIVE' | 'EXPIRED' | 'PENDING';
   amountPaid: number;
   expiresAt: string | null;
   entitledFeatures: string[];
+  quotas?: QuotaUsage;
+  vatInvoice?: VatInvoiceInfo;
+  history?: BillingTransaction[];
 }
 
 export interface CreatePaymentLinkPayload {
@@ -26,6 +59,15 @@ export interface CheckoutResponse {
   checkoutUrl: string;
   qrCode: string;
   status: string;
+}
+
+export interface ContactSalesPayload {
+  companyName: string;
+  contactName: string;
+  email: string;
+  phone?: string;
+  seatCount?: number;
+  requirements?: string;
 }
 
 /**
@@ -58,6 +100,36 @@ export function useCreatePaymentLink() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['billing-summary', activeTenantId] });
+    },
+  });
+}
+
+/**
+ * Update VAT E-Invoice information
+ */
+export function useUpdateVatInvoice() {
+  const queryClient = useQueryClient();
+  const activeTenantId = useMetadataUiStore((s) => s.activeTenantId);
+
+  return useMutation<VatInvoiceInfo, Error, VatInvoiceInfo>({
+    mutationFn: async (payload) => {
+      const res = await axios.put('/api/v1/billing/vat-invoice', payload);
+      return res.data?.data || res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['billing-summary', activeTenantId] });
+    },
+  });
+}
+
+/**
+ * Submit Enterprise Contact Sales Inquiry
+ */
+export function useContactEnterpriseSales() {
+  return useMutation<string, Error, ContactSalesPayload>({
+    mutationFn: async (payload) => {
+      const res = await axios.post('/api/v1/billing/contact-sales', payload);
+      return res.data?.data || res.data;
     },
   });
 }

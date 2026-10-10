@@ -6,10 +6,7 @@ import com.unipost.core.io.ResponseWrapper;
 import com.unipost.fw.ResponseEntityBuilder;
 import com.unipost.fw.tenancy.TenantContextHolder;
 import com.unipost.tenant.billing.PayOsBillingService;
-import com.unipost.tenant.billing.dto.CheckoutResponseDto;
-import com.unipost.tenant.billing.dto.CreatePaymentLinkRequest;
-import com.unipost.tenant.billing.dto.PayOsWebhookPayload;
-import com.unipost.tenant.billing.dto.TenantBillingSummaryDto;
+import com.unipost.tenant.billing.dto.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,7 +54,7 @@ class TenantBillingControllerTest {
     }
 
     @Test
-    void testGetBillingSummary_ReturnsActiveTenantEntitlements() {
+    void testGetBillingSummary_ReturnsActiveTenantEntitlementsAndQuotas() {
         TenantBillingSummaryDto mockSummary = TenantBillingSummaryDto.builder()
                 .tenantId(TENANT_ID)
                 .planTier("PRO")
@@ -65,6 +63,9 @@ class TenantBillingControllerTest {
                 .amountPaid(199000L)
                 .expiresAt(LocalDateTime.now().plusDays(30))
                 .entitledFeatures(Set.of("FEATURE_SCHEMA_STUDIO", "FEATURE_PATTERN_C_GRAPH"))
+                .quotas(QuotaUsageDto.builder().workspacesUsed(1).maxWorkspaces(5).schemasUsed(4).maxSchemas(-1).recordsUsed(1200L).maxRecords(-1).build())
+                .vatInvoice(VatInvoiceDto.builder().companyName("Corp JSC").taxCode("010101").build())
+                .history(List.of(BillingTransactionDto.builder().orderCode(12345L).amount(199000L).build()))
                 .build();
 
         when(billingService.getTenantBillingSummary(TENANT_ID)).thenReturn(mockSummary);
@@ -76,6 +77,8 @@ class TenantBillingControllerTest {
         assertNotNull(response.getBody());
         assertEquals("PRO", response.getBody().getBody().getPlanTier());
         assertTrue(response.getBody().getBody().getEntitledFeatures().contains("FEATURE_PATTERN_C_GRAPH"));
+        assertNotNull(response.getBody().getBody().getQuotas());
+        assertEquals(5, response.getBody().getBody().getQuotas().getMaxWorkspaces());
         verify(billingService).getTenantBillingSummary(TENANT_ID);
     }
 
@@ -104,6 +107,47 @@ class TenantBillingControllerTest {
         assertEquals(4990000L, response.getBody().getBody().getAmount());
         assertEquals(1728567890000L, response.getBody().getBody().getOrderCode());
         verify(billingService).createPaymentLink(request);
+    }
+
+    @Test
+    void testUpdateVatInvoice_Success() {
+        VatInvoiceDto vatDto = VatInvoiceDto.builder()
+                .companyName("Công ty TNHH Giải pháp Phần mềm")
+                .taxCode("0102030405")
+                .address("Hà Nội")
+                .email("accounting@soft.vn")
+                .isAutoInvoice(true)
+                .build();
+
+        when(billingService.updateVatInvoice(TENANT_ID, vatDto)).thenReturn(vatDto);
+
+        ResponseEntity<ResponseWrapper<ContextHeader, VatInvoiceDto>> response = controller.updateVatInvoice(vatDto);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("0102030405", response.getBody().getBody().getTaxCode());
+        verify(billingService).updateVatInvoice(TENANT_ID, vatDto);
+    }
+
+    @Test
+    void testContactSales_Success() {
+        ContactSalesRequest req = ContactSalesRequest.builder()
+                .companyName("Enterprise VN")
+                .contactName("Nguyen Van A")
+                .email("a@enterprise.vn")
+                .phone("0909123456")
+                .seatCount(50)
+                .requirements("Private deployment")
+                .build();
+
+        doNothing().when(billingService).recordContactSales(TENANT_ID, req);
+
+        ResponseEntity<ResponseWrapper<ContextHeader, String>> response = controller.contactSales(req);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(billingService).recordContactSales(TENANT_ID, req);
     }
 
     @Test

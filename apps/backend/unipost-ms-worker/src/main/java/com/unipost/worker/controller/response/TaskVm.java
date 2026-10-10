@@ -6,9 +6,6 @@ import com.unipost.worker.model.enums.TaskType;
 import com.unipost.worker.model.enums.TriggerType;
 import lombok.Getter;
 import lombok.Setter;
-
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import java.time.LocalDateTime;
 
 @Getter

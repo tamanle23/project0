@@ -5,10 +5,7 @@ import com.unipost.core.io.ResponseWrapper;
 import com.unipost.fw.ResponseEntityBuilder;
 import com.unipost.fw.tenancy.TenantContextHolder;
 import com.unipost.tenant.billing.PayOsBillingService;
-import com.unipost.tenant.billing.dto.CheckoutResponseDto;
-import com.unipost.tenant.billing.dto.CreatePaymentLinkRequest;
-import com.unipost.tenant.billing.dto.PayOsWebhookPayload;
-import com.unipost.tenant.billing.dto.TenantBillingSummaryDto;
+import com.unipost.tenant.billing.dto.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +23,7 @@ public class TenantBillingController {
     private final ResponseEntityBuilder responseBuilder;
 
     /**
-     * Get active tenant's current plan, subscription status, and entitled feature tokens.
+     * Get active tenant's current plan, subscription status, quota usage, VAT invoice, and transaction history.
      */
     @GetMapping("/summary")
     @PreAuthorize("hasAuthority('METADATA_SCHEMA_READ') or hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
@@ -45,6 +42,30 @@ public class TenantBillingController {
             @Valid @RequestBody CreatePaymentLinkRequest request) {
         CheckoutResponseDto checkout = billingService.createPaymentLink(request);
         return responseBuilder.success(checkout);
+    }
+
+    /**
+     * Update corporate VAT E-Invoice information for active tenant.
+     */
+    @PutMapping("/vat-invoice")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, VatInvoiceDto>> updateVatInvoice(
+            @Valid @RequestBody VatInvoiceDto vatDto) {
+        String tenantId = TenantContextHolder.getRequiredTenantId();
+        VatInvoiceDto updated = billingService.updateVatInvoice(tenantId, vatDto);
+        return responseBuilder.success(updated);
+    }
+
+    /**
+     * Submit an Enterprise contact request for custom pricing and dedicated infrastructure.
+     */
+    @PostMapping("/contact-sales")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_READ') or hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, String>> contactSales(
+            @Valid @RequestBody ContactSalesRequest request) {
+        String tenantId = TenantContextHolder.getRequiredTenantId();
+        billingService.recordContactSales(tenantId, request);
+        return responseBuilder.success("Inquiry submitted successfully");
     }
 
     /**

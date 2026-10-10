@@ -62,6 +62,7 @@ src/routes/
 | `/settings/appearance` | `_authenticated/settings/appearance.tsx`| Yes | Settings Layout | Switch theme (light/dark/system), adjust glass intensity |
 | `/settings/data-privacy` | `_authenticated/settings/data-privacy.tsx` | Yes | Settings Layout | GDPR Art. 20 streaming export & Art. 17 hard-purge |
 | `/settings/workspaces`   | `_authenticated/settings/workspaces.tsx`   | Yes | Settings Layout | Manage multi-workspace environments & create new workspace with blueprint seeding |
+| `/settings/billing`      | `_authenticated/settings/billing.tsx`      | Yes | Settings Layout | Manage tenant subscription tiers, VietQR payments, VAT invoice, and quota telemetry |
 | `/help-center` | `_authenticated/help-center/index.tsx` | Yes | Authenticated Shell | Browse docs, search FAQs, submit support tickets |
 
 | `/sign-in` | `(auth)/sign-in.tsx` | No | Fullscreen Canvas | Authenticate with credentials or OAuth |
@@ -112,8 +113,11 @@ src/routes/
 - **Route:** `src/routes/_authenticated/settings/route.tsx`
 - **Sub-routes:**
   - `/settings`: Profile details, bio, avatar upload.
+  - `/settings/workspaces`: Multi-workspace environment manager & blueprint provisioning modal.
+  - `/settings/billing`: Tenant subscription tiers (`Basic (individual)`, `Pro (individual)`, `Pro Max (individual)`, `Enterprise (organization)`), real-time quota telemetry meters, payOS VietQR transaction history, Vietnamese VAT e-invoice preferences, and dev sandbox simulation dock.
   - `/settings/appearance`: Theme switcher (Light, Dark, System) and **Liquid Glass Intensity Slider** (`0.0` - `1.0`).
   - `/settings/notifications`: Toggle switches for email digests, incident webhooks, real-time sounds.
+  - `/settings/data-privacy`: GDPR Art. 20 streaming export & Art. 17 hard-purge.
 
 ### 3.8 Metadata Management (`/metadata`)
 - **Route:** `src/routes/_authenticated/metadata/index.tsx`

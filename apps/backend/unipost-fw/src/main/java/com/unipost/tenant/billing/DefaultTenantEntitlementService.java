@@ -48,6 +48,20 @@ public class DefaultTenantEntitlementService implements TenantEntitlementService
             "FEATURE_STREAMING_EXPORT"
     );
 
+    public static final Set<String> ENTERPRISE_FEATURES = Set.of(
+            "FEATURE_METADATA_READ",
+            "FEATURE_RECORDS_CRUD",
+            "FEATURE_SCHEMA_STUDIO",
+            "FEATURE_PATTERN_C_GRAPH",
+            "FEATURE_DATA_EXPORT",
+            "FEATURE_AI_AGENT_MCP",
+            "FEATURE_STATE_MACHINE",
+            "FEATURE_STREAMING_EXPORT",
+            "FEATURE_DEDICATED_REPLICA",
+            "FEATURE_ENTERPRISE_SLA",
+            "FEATURE_SSO_SAML"
+    );
+
     @Override
     public boolean isFeatureEntitled(String tenantId, String featureKey) {
         if (tenantId == null || "SYSTEM".equalsIgnoreCase(tenantId)) {
@@ -84,7 +98,9 @@ public class DefaultTenantEntitlementService implements TenantEntitlementService
             if (granted.isEmpty()) {
                 Optional<TenantBilling> billingOpt = billingRepository.findByTenantId(tid);
                 String plan = billingOpt.map(TenantBilling::getPlanTier).orElse("BASIC");
-                if ("PRO_MAX".equalsIgnoreCase(plan)) {
+                if ("ENTERPRISE".equalsIgnoreCase(plan)) {
+                    granted.addAll(ENTERPRISE_FEATURES);
+                } else if ("PRO_MAX".equalsIgnoreCase(plan)) {
                     granted.addAll(PRO_MAX_FEATURES);
                 } else if ("PRO".equalsIgnoreCase(plan)) {
                     granted.addAll(PRO_FEATURES);
@@ -121,9 +137,16 @@ public class DefaultTenantEntitlementService implements TenantEntitlementService
         billingRepository.save(billing);
 
         // Populate / update feature tokens in UNIPOST_TENANT_FEATURES
-        Set<String> targetFeatures = "PRO_MAX".equalsIgnoreCase(billing.getPlanTier())
-                ? PRO_MAX_FEATURES
-                : PRO_FEATURES;
+        Set<String> targetFeatures;
+        if ("ENTERPRISE".equalsIgnoreCase(billing.getPlanTier())) {
+            targetFeatures = ENTERPRISE_FEATURES;
+        } else if ("PRO_MAX".equalsIgnoreCase(billing.getPlanTier())) {
+            targetFeatures = PRO_MAX_FEATURES;
+        } else if ("PRO".equalsIgnoreCase(billing.getPlanTier())) {
+            targetFeatures = PRO_FEATURES;
+        } else {
+            targetFeatures = BASIC_FEATURES;
+        }
 
         grantFeatures(billing.getTenantId(), targetFeatures);
         invalidateCache(billing.getTenantId());

@@ -2,8 +2,6 @@ package com.unipost.tenant.billing.dto;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,19 +11,16 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TenantBillingSummaryDto implements Serializable {
+public class BillingTransactionDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String tenantId;
+    private Long orderCode;
+    private Long amount;
     private String planTier;
     private String billingCadence;
     private String status;
-    private Long amountPaid;
-    private LocalDateTime expiresAt;
-    private Set<String> entitledFeatures;
-
-    private QuotaUsageDto quotas;
-    private VatInvoiceDto vatInvoice;
-    private List<BillingTransactionDto> history;
+    private String description;
+    private LocalDateTime createdAt;
+    private LocalDateTime paidAt;
 }

@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Sparkles, ArrowRight, Zap, Crown } from 'lucide-react';
+import { Check, Sparkles, ArrowRight, Zap, Crown, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+export type PlanTierType = 'BASIC' | 'PRO' | 'PRO_MAX' | 'ENTERPRISE';
+
 interface Props {
-  onSelectPlan: (tier: 'BASIC' | 'PRO' | 'PRO_MAX', cadence: 'monthly' | 'yearly') => void;
+  onSelectPlan: (tier: PlanTierType, cadence: 'monthly' | 'yearly') => void;
+  onContactSales?: () => void;
 }
 
-export const LandingPricing: React.FC<Props> = ({ onSelectPlan }) => {
+export const LandingPricing: React.FC<Props> = ({ onSelectPlan, onContactSales }) => {
   const [cadence, setCadence] = useState<'monthly' | 'yearly'>('monthly');
 
   return (
@@ -18,7 +21,7 @@ export const LandingPricing: React.FC<Props> = ({ onSelectPlan }) => {
           Bảng giá Minh bạch & Dự đoán được
         </h2>
         <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto">
-          Không tính phí theo số lượng bản ghi hay lượt truy vấn. Khai phóng toàn bộ tiềm năng doanh nghiệp của bạn với quyền lợi tính năng động.
+          Linh hoạt theo quy mô cá nhân và tổ chức. Khai phóng toàn bộ tiềm năng doanh nghiệp của bạn với quyền lợi tính năng động.
         </p>
 
         {/* Cadence Toggle */}
@@ -55,39 +58,39 @@ export const LandingPricing: React.FC<Props> = ({ onSelectPlan }) => {
         </div>
       </div>
 
-      {/* Pricing Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-        {/* Tier 1: Basic */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-2xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 flex flex-col justify-between">
+      {/* 4-Tier Pricing Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+        {/* Tier 1: Basic (individual) */}
+        <div className="p-6 rounded-3xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-2xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-bold text-foreground">🆓 Basic (Cơ bản)</span>
-              <Badge variant="secondary" className="text-[10px] font-mono">Dùng thử</Badge>
+              <span className="text-sm font-bold text-foreground">🆓 Basic (individual)</span>
+              <Badge variant="secondary" className="text-[10px] font-mono">Cá nhân</Badge>
             </div>
             <div className="mb-4">
-              <div className="text-3xl font-black text-foreground">Miễn phí</div>
-              <div className="text-xs text-muted-foreground mt-1">Không giới hạn thời gian trải nghiệm</div>
+              <div className="text-2xl sm:text-3xl font-black text-foreground">Miễn phí</div>
+              <div className="text-xs text-muted-foreground mt-1">Trải nghiệm cá nhân không giới hạn</div>
             </div>
             <p className="text-xs text-muted-foreground mb-6">
-              Hoàn hảo cho lập trình viên cá nhân, freelancer hoặc tổ chức nhỏ bắt đầu mô hình hóa dữ liệu.
+              Hoàn hảo cho lập trình viên cá nhân, freelancer khám phá mô hình dữ liệu động.
             </p>
 
             <ul className="space-y-3 text-xs text-muted-foreground border-t border-white/20 pt-5">
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span className="text-foreground font-medium">1 User duy nhất</span>
+                <span className="text-foreground font-medium">1 Workspace cá nhân</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Không giới hạn bản ghi dữ liệu (Records)</span>
+                <span>5 Entity Schemas cơ bản</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Data Explorer & Biểu mẫu động</span>
+                <span>Data Records CRUD chuẩn</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Kho Domain Blueprints chuẩn hóa</span>
+                <span>Kho Domain Blueprints</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -106,8 +109,8 @@ export const LandingPricing: React.FC<Props> = ({ onSelectPlan }) => {
           </Button>
         </div>
 
-        {/* Tier 2: Pro (Featured) */}
-        <div className="relative p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-blue-500/10 via-white/70 to-white/50 dark:from-blue-900/20 dark:via-slate-900/80 dark:to-slate-900/60 backdrop-blur-2xl border-2 border-blue-500/50 shadow-2xl shadow-blue-500/10 flex flex-col justify-between">
+        {/* Tier 2: Pro (individual) - Featured */}
+        <div className="relative p-6 rounded-3xl bg-gradient-to-b from-blue-500/10 via-white/70 to-white/50 dark:from-blue-900/20 dark:via-slate-900/80 dark:to-slate-900/60 backdrop-blur-2xl border-2 border-blue-500/50 shadow-2xl shadow-blue-500/10 flex flex-col justify-between">
           <div className="absolute -top-3 left-1/2 -translate-x-1/2">
             <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm flex items-center gap-1">
               <Sparkles className="w-3 h-3" />
@@ -117,46 +120,42 @@ export const LandingPricing: React.FC<Props> = ({ onSelectPlan }) => {
 
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-bold text-blue-600 dark:text-blue-400">⚡ Pro (Chuyên nghiệp)</span>
+              <span className="text-sm font-bold text-blue-600 dark:text-blue-400">⚡ Pro (individual)</span>
               <Badge className="text-[10px] font-mono bg-blue-500/10 text-blue-600 border border-blue-500/20">
                 payOS VietQR
               </Badge>
             </div>
             <div className="mb-4">
-              <div className="text-3xl font-black text-foreground">
+              <div className="text-2xl sm:text-3xl font-black text-foreground">
                 {cadence === 'monthly' ? '199,000 VND' : '1,990,000 VND'}
                 <span className="text-xs font-normal text-muted-foreground ms-1">
                   / {cadence === 'monthly' ? 'tháng' : 'năm'}
                 </span>
               </div>
               <div className="text-xs text-muted-foreground mt-1">
-                {cadence === 'yearly' ? 'Tiết kiệm 398,000 VND mỗi năm' : 'Thanh toán linh hoạt theo tháng'}
+                {cadence === 'yearly' ? 'Tiết kiệm 398,000 VND' : 'Thanh toán linh hoạt'}
               </div>
             </div>
             <p className="text-xs text-muted-foreground mb-6">
-              Dành cho đội ngũ chuyên gia, doanh nghiệp SMEs cần mở rộng cộng tác và quản lý quan hệ thực thể phức tạp.
+              Dành cho chuyên gia cá nhân cần Schema Studio và biểu đồ quan hệ thực thể Pattern C.
             </p>
 
             <ul className="space-y-3 text-xs text-muted-foreground border-t border-white/20 pt-5">
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span className="text-foreground font-medium">Lên đến 5 Users thành viên</span>
+                <span className="text-foreground font-medium">5 Workspaces độc lập</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Không giới hạn bản ghi dữ liệu (Records)</span>
+                <span className="text-foreground font-semibold">Schema Architect Studio</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span className="text-foreground font-semibold">Schema Architect Studio nâng cao</span>
+                <span>Pattern C Entity Graph Edges</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Pattern C Multi-Dimensional Graph Edges</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Xuất dữ liệu streaming & sao lưu định kỳ</span>
+                <span>Xuất dữ liệu JSON / CSV</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -175,52 +174,48 @@ export const LandingPricing: React.FC<Props> = ({ onSelectPlan }) => {
           </Button>
         </div>
 
-        {/* Tier 3: Pro Max */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-2xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 flex flex-col justify-between">
+        {/* Tier 3: Pro Max (individual) */}
+        <div className="p-6 rounded-3xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-2xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-bold text-purple-600 dark:text-purple-400">👑 Pro Max (Doanh nghiệp)</span>
-              <Badge variant="secondary" className="text-[10px] font-mono">Toàn quyền</Badge>
+              <span className="text-sm font-bold text-purple-600 dark:text-purple-400">👑 Pro Max (individual)</span>
+              <Badge variant="secondary" className="text-[10px] font-mono">Nâng cao</Badge>
             </div>
             <div className="mb-4">
-              <div className="text-3xl font-black text-foreground">
+              <div className="text-2xl sm:text-3xl font-black text-foreground">
                 {cadence === 'monthly' ? '499,000 VND' : '4,990,000 VND'}
                 <span className="text-xs font-normal text-muted-foreground ms-1">
                   / {cadence === 'monthly' ? 'tháng' : 'năm'}
                 </span>
               </div>
               <div className="text-xs text-muted-foreground mt-1">
-                {cadence === 'yearly' ? 'Tiết kiệm 998,000 VND mỗi năm' : 'Toàn bộ tính năng cao cấp nhất'}
+                {cadence === 'yearly' ? 'Tiết kiệm 998,000 VND' : 'Toàn quyền cá nhân cao cấp'}
               </div>
             </div>
             <p className="text-xs text-muted-foreground mb-6">
-              Dành cho doanh nghiệp quy mô lớn yêu cầu không giới hạn người dùng, tích hợp AI Agent và bảo mật chuyên sâu.
+              Dành cho power users cá nhân yêu cầu tích hợp AI Agent MCP Server và streaming data pipeline.
             </p>
 
             <ul className="space-y-3 text-xs text-muted-foreground border-t border-white/20 pt-5">
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span className="text-foreground font-medium">Không giới hạn Users thành viên</span>
+                <span className="text-foreground font-medium">15 Workspaces môi trường</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Không giới hạn bản ghi dữ liệu (Records)</span>
+                <span className="text-foreground font-semibold">AI Agent MCP Protocol Server</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span className="text-foreground font-semibold">Tích hợp AI Agent MCP Server</span>
+                <span>State Machine Engine</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>State Machine & Vòng đời thực thể</span>
+                <span>GDPR Streaming Export</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Quản lý nhiều Workspace (Multi-Tenant Hub)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Kỹ sư hỗ trợ giải pháp 1-1 chuyên trách</span>
+                <span>Hỗ trợ 1-1 chuyên sâu</span>
               </li>
             </ul>
           </div>
@@ -231,7 +226,63 @@ export const LandingPricing: React.FC<Props> = ({ onSelectPlan }) => {
             onClick={() => onSelectPlan('PRO_MAX', cadence)}
             className="w-full mt-8 text-xs font-bold bg-white/60 dark:bg-white/5 border-white/20 hover:bg-white/80"
           >
-            Trải nghiệm Pro Max
+            Nâng cấp Pro Max
+          </Button>
+        </div>
+
+        {/* Tier 4: Enterprise (organization, contact for pricing) */}
+        <div className="p-6 rounded-3xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-2xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-bold text-amber-600 dark:text-amber-400">🏢 Enterprise (organization)</span>
+              <Badge variant="outline" className="text-[10px] font-mono border-amber-500/40 text-amber-600">Tổ chức</Badge>
+            </div>
+            <div className="mb-4">
+              <div className="text-2xl sm:text-3xl font-black text-foreground">Liên hệ báo giá</div>
+              <div className="text-xs text-muted-foreground mt-1">Tùy biến theo nhu cầu quy mô lớn</div>
+            </div>
+            <p className="text-xs text-muted-foreground mb-6">
+              Giải pháp toàn diện cho tổ chức và doanh nghiệp yêu cầu hạ tầng chuyên dụng, SLA 99.99% và bảo mật cấp cao.
+            </p>
+
+            <ul className="space-y-3 text-xs text-muted-foreground border-t border-white/20 pt-5">
+              <li className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span className="text-foreground font-medium">Không giới hạn Workspaces</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span className="text-foreground font-semibold">Dedicated Database Replica</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>Enterprise SLA 99.99%</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>SSO / SAML & On-premise VPC</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>Hóa đơn GTGT (VAT E-Invoice)</span>
+              </li>
+            </ul>
+          </div>
+
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={() => {
+              if (onContactSales) {
+                onContactSales();
+              } else {
+                onSelectPlan('ENTERPRISE', cadence);
+              }
+            }}
+            className="w-full mt-8 text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/30"
+          >
+            <Building2 className="w-3.5 h-3.5 me-1.5" />
+            <span>Liên hệ Doanh nghiệp</span>
           </Button>
         </div>
       </div>
