@@ -29,19 +29,28 @@ import { useMemo } from 'react'
 
 export const sidebarTeams = [
   {
-    name: 'Unipost',
+    id: 'ws-main',
+    name: 'Unipost Main',
     logo: Command,
-    plan: 'Vite + ShadcnUI',
+    plan: 'Production Workspace',
+    tenantId: 'default-tenant',
+    tenantName: 'Default Organization',
   },
   {
-    name: 'Acme Inc',
+    id: 'ws-acme-prod',
+    name: 'Acme Prod',
     logo: GalleryVerticalEnd,
-    plan: 'Enterprise',
+    plan: 'Production Workspace',
+    tenantId: 'tenant-acme',
+    tenantName: 'Acme International Corp',
   },
   {
-    name: 'Acme Corp.',
+    id: 'ws-acme-staging',
+    name: 'Acme Staging',
     logo: AudioWaveform,
-    plan: 'Startup',
+    plan: 'Staging Environment',
+    tenantId: 'tenant-acme',
+    tenantName: 'Acme International Corp',
   },
 ];
 

@@ -18,7 +18,7 @@ import { useMetadataUiStore } from '../../metadata/store/use-metadata-ui-store';
 import { BlueprintCard } from '../../metadata/components/blueprint-gallery/blueprint-card';
 import { TemplatePreviewModal } from '../../metadata/components/blueprint-gallery/template-preview-modal';
 import { useNavigate } from '@tanstack/react-router';
-import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, User, Building, Mail, Key } from 'lucide-react';
+import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, User, Building, Mail, Key, Layers } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Props {
@@ -40,16 +40,17 @@ export const OnboardingFunnelModal: React.FC<Props> = ({
   const { data: blueprints = [] } = useBlueprintCatalog();
   const provisionMutation = useProvisionTenantBlueprint();
   const { setTokens } = useSpringAuthStore();
-  const { setActiveTenant } = useMetadataUiStore();
+  const { setActiveTenant, setActiveWorkspace } = useMetadataUiStore();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [selectedPlan, setSelectedPlan] = useState<'BASIC' | 'PRO' | 'PRO_MAX'>(defaultPlan);
   const [selectedBlueprintId, setSelectedBlueprintId] = useState<string>(defaultBlueprintId);
   const [previewId, setPreviewId] = useState<string | null>(null);
 
-  // Form Fields
+  // Form Fields: Tenant (Organization) & Initial Workspace
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [organizationName, setOrganizationName] = useState('');
   const [workspaceName, setWorkspaceName] = useState('');
   const [isInitializing, setIsInitializing] = useState(false);
 
@@ -57,7 +58,7 @@ export const OnboardingFunnelModal: React.FC<Props> = ({
 
   const handleNextStep = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName.trim() || !email.trim() || !workspaceName.trim()) {
+    if (!fullName.trim() || !email.trim() || !organizationName.trim()) {
       toast.error('Vui lòng điền đầy đủ các thông tin bắt buộc');
       return;
     }
@@ -74,22 +75,30 @@ export const OnboardingFunnelModal: React.FC<Props> = ({
     }
 
     setIsInitializing(true);
-    const tenantSlug = workspaceName
+    const tenantSlug = organizationName
       .toLowerCase()
       .trim()
       .replace(/[^a-z0-9]/g, '-')
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '') || `org-${Date.now()}`;
 
+    const effectiveWorkspaceName = workspaceName.trim() || 'Không gian Chính (Default)';
+    const workspaceSlug = effectiveWorkspaceName
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '') || 'ws-main';
+
     try {
-      // 1. Provision chosen blueprint
+      // 1. Provision chosen blueprint for this tenant
       await provisionMutation.mutateAsync({
         tenantId: tenantSlug,
-        tenantName: workspaceName,
+        tenantName: organizationName,
         blueprintId: selectedBlueprintId,
       });
 
-      // 2. Hydrate demo authenticated session for the newly created tenant
+      // 2. Hydrate demo authenticated session for the newly created tenant & user
       const demoToken = `mock_token_${tenantSlug}.${btoa(
         JSON.stringify({
           sub: email,
@@ -102,9 +111,10 @@ export const OnboardingFunnelModal: React.FC<Props> = ({
       )}.mock_signature`;
 
       setTokens(demoToken, `mock_refresh_${Date.now()}`);
-      setActiveTenant(tenantSlug, workspaceName);
+      setActiveTenant(tenantSlug, organizationName);
+      setActiveWorkspace(workspaceSlug, effectiveWorkspaceName);
 
-      toast.success(`Chào mừng ${fullName}! Workspace đã sẵn sàng.`);
+      toast.success(`Chào mừng ${fullName}! Tổ chức & Workspace đã sẵn sàng.`);
       onClose();
 
       // 3. Smooth transition redirect into metadata studio
@@ -178,17 +188,33 @@ export const OnboardingFunnelModal: React.FC<Props> = ({
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
                   <Building className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span>Tên Tổ chức / Workspace *</span>
+                  <span>Tên Tổ chức / Doanh nghiệp (Tenant) *</span>
                 </label>
                 <Input
                   required
-                  placeholder="Acme Global Logistics"
+                  placeholder="Acme Global Logistics Corp"
+                  value={organizationName}
+                  onChange={(e) => setOrganizationName(e.target.value)}
+                  className="h-9 text-xs bg-white/50 dark:bg-white/5 border-white/20"
+                />
+                <span className="text-[10px] text-muted-foreground font-mono">
+                  Tenant ID: {organizationName ? organizationName.toLowerCase().replace(/[^a-z0-9]/g, '-') : 'org-slug'}
+                </span>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                  <Layers className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>Tên Không gian làm việc khởi tạo (Workspace)</span>
+                </label>
+                <Input
+                  placeholder="Không gian Chính (Default: Production)"
                   value={workspaceName}
                   onChange={(e) => setWorkspaceName(e.target.value)}
                   className="h-9 text-xs bg-white/50 dark:bg-white/5 border-white/20"
                 />
-                <span className="text-[10px] text-muted-foreground font-mono">
-                  Slug: {workspaceName ? workspaceName.toLowerCase().replace(/[^a-z0-9]/g, '-') : 'org-slug'}
+                <span className="text-[10px] text-muted-foreground">
+                  Một tổ chức có thể tạo nhiều workspace sau này (Development, Staging, Kho bãi...).
                 </span>
               </div>
 

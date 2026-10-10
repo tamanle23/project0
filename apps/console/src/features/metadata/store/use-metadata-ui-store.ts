@@ -29,6 +29,8 @@ interface MetadataUiState {
   // Multi-Tenancy Context & RBAC
   activeTenantId: string;
   activeTenantName: string;
+  activeWorkspaceId: string;
+  activeWorkspaceName: string;
   currentUserRole: TenantRole;
   workspaceMode: WorkspaceMode;
 
@@ -37,6 +39,7 @@ interface MetadataUiState {
   toggleWorkspaceMode: () => void;
   setCurrentUserRole: (role: TenantRole) => void;
   setActiveTenant: (tenantId: string, tenantName?: string) => void;
+  setActiveWorkspace: (workspaceId: string, workspaceName?: string) => void;
   canManageSchema: () => boolean;
   canMutateRecords: () => boolean;
 
@@ -122,6 +125,8 @@ export const useMetadataUiStore = create<MetadataUiState>((set, get) => ({
   // Multi-Tenancy & Workspace Mode
   activeTenantId: 'default-tenant',
   activeTenantName: 'Default Organization',
+  activeWorkspaceId: 'ws-main',
+  activeWorkspaceName: 'Production Workspace',
   currentUserRole: 'TENANT_ADMIN',
   workspaceMode: 'architect',
 
@@ -153,6 +158,13 @@ export const useMetadataUiStore = create<MetadataUiState>((set, get) => ({
     set({
       activeTenantId: tenantId,
       activeTenantName: tenantName || tenantId,
+    });
+  },
+
+  setActiveWorkspace: (workspaceId: string, workspaceName?: string) => {
+    set({
+      activeWorkspaceId: workspaceId,
+      activeWorkspaceName: workspaceName || workspaceId,
     });
   },
 

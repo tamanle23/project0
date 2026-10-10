@@ -7,6 +7,8 @@ export type Profile = {
   name: string
   logo?: React.ElementType
   plan?: string
+  tenantId?: string
+  tenantName?: string
   [key: string]: unknown
 }
 

@@ -18,7 +18,7 @@ describe('WorkspacesPanel Component', () => {
 
     expect(screen.getByText('Workspaces & Organizations')).toBeDefined();
     expect(screen.getByText('Tạo Workspace Mới')).toBeDefined();
-    expect(screen.getByText('Unipost')).toBeDefined();
+    expect(screen.getByText('Unipost Main')).toBeDefined();
     expect(screen.getByText('Đang chọn')).toBeDefined();
   });
 

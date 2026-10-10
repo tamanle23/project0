@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ContentSection } from '../components/content-section';
-import { useProfileStore } from '@/stores/profile-store';
+import { useProfileStore, type Profile } from '@/stores/profile-store';
 import { useMetadataUiStore } from '@/features/metadata/store/use-metadata-ui-store';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,35 +9,63 @@ import {
   Building2,
   Plus,
   CheckCircle2,
-  ExternalLink,
   ShieldCheck,
-  Layers,
+  LayoutGrid,
   Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const WorkspacesPanel: React.FC = () => {
   const { profiles, currentProfile, setCurrentProfile } = useProfileStore();
-  const { setActiveTenant } = useMetadataUiStore();
+  const { activeTenantId, activeTenantName, setActiveTenant, setActiveWorkspace } = useMetadataUiStore();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const handleSwitchWorkspace = (p: (typeof profiles)[0]) => {
+  const handleSwitchWorkspace = (p: Profile) => {
     setCurrentProfile(p);
-    const tenantId = (p.id as string) || p.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-    setActiveTenant(tenantId, p.name);
-    toast.success(`Đã chuyển sang workspace "${p.name}"`);
+    const tenantId = (p.tenantId as string) || 'default-tenant';
+    const tenantName = (p.tenantName as string) || p.name;
+    const workspaceId = (p.id as string) || p.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+
+    setActiveTenant(tenantId, tenantName);
+    setActiveWorkspace(workspaceId, p.name);
+    toast.success(`Đã chuyển sang workspace "${p.name}" (${tenantName})`);
   };
 
   return (
     <ContentSection
       title="Workspaces & Organizations"
-      desc="Quản lý danh sách các workspace tổ chức độc lập. Mỗi workspace sở hữu lược đồ và dữ liệu phân lập hoàn toàn qua PostgreSQL Row-Level Security."
+      desc="Quản lý danh sách các không gian làm việc (Workspaces) trực thuộc Tổ chức (Tenant). Một tổ chức có thể sở hữu nhiều workspace phân lập."
     >
       <div className="space-y-6">
+        {/* Active Tenant Context Card */}
+        <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0">
+              <Building2 className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Tổ chức Hiện tại (Tenant)
+                </span>
+                <Badge variant="outline" className="text-[10px] font-mono border-primary/30 text-primary">
+                  ID: {activeTenantId}
+                </Badge>
+              </div>
+              <h3 className="text-base font-bold text-foreground">
+                {activeTenantName || 'Default Organization'}
+              </h3>
+            </div>
+          </div>
+          <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-xs">
+            Multi-Tenant RLS Active
+          </Badge>
+        </div>
+
         {/* Top Action Bar */}
         <div className="flex items-center justify-between">
           <div className="text-xs text-muted-foreground">
-            Đang quản trị <span className="font-bold text-foreground">{profiles.length}</span> workspaces
+            Đang quản trị <span className="font-bold text-foreground">{profiles.length}</span> workspaces trên toàn hệ thống
           </div>
           <Button
             size="sm"
@@ -54,7 +82,8 @@ export const WorkspacesPanel: React.FC = () => {
           {profiles.map((p) => {
             const isCurrent =
               (p.id && p.id === currentProfile?.id) || p.name === currentProfile?.name;
-            const Logo = p.logo || Building2;
+            const Logo = p.logo || LayoutGrid;
+            const belongsToActiveTenant = (p.tenantId || 'default-tenant') === activeTenantId;
 
             return (
               <div
@@ -72,9 +101,16 @@ export const WorkspacesPanel: React.FC = () => {
                         <Logo className="h-5 w-5" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-sm text-foreground">{p.name}</h4>
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="font-bold text-sm text-foreground">{p.name}</h4>
+                          {belongsToActiveTenant && (
+                            <span className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">
+                              (Cùng tổ chức)
+                            </span>
+                          )}
+                        </div>
                         <span className="text-[11px] font-mono text-muted-foreground">
-                          ID: {(p.id as string) ?? p.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}
+                          Tenant: {(p.tenantName as string) || (p.tenantId as string) || 'Organization'}
                         </span>
                       </div>
                     </div>
@@ -84,13 +120,13 @@ export const WorkspacesPanel: React.FC = () => {
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="text-[10px] font-mono">
-                        {p.plan || 'Standard'}
+                        {p.plan || 'Workspace'}
                       </Badge>
                     )}
                   </div>
 
                   <p className="text-xs text-muted-foreground line-clamp-2">
-                    Môi trường dữ liệu Multi-Tenant độc lập được bảo vệ bởi PostgreSQL Row-Level Security.
+                    Không gian phân vùng dữ liệu thuộc tổ chức {(p.tenantName as string) || 'chính'}, áp dụng bảo mật RLS và cấu trúc Blueprint riêng biệt.
                   </p>
                 </div>
 

@@ -32,7 +32,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
 }) => {
   const { data: blueprints = [], isLoading: isCatalogLoading } = useBlueprintCatalog();
   const provisionMutation = useProvisionTenantBlueprint();
-  const { setActiveTenant } = useMetadataUiStore();
+  const { activeTenantId, activeTenantName, setActiveTenant, setActiveWorkspace } = useMetadataUiStore();
   const { profiles, setProfiles, setCurrentProfile } = useProfileStore();
 
   const [workspaceName, setWorkspaceName] = useState('');
@@ -49,36 +49,42 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
       return;
     }
 
-    const tenantSlug = workspaceName
+    const workspaceSlug = workspaceName
       .toLowerCase()
       .trim()
       .replace(/[^a-z0-9]/g, '-')
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '') || `ws-${Date.now()}`;
 
+    const effectiveTenantId = activeTenantId || 'default-tenant';
+    const effectiveTenantName = activeTenantName || 'Default Organization';
+
     setIsProvisioning(true);
     try {
-      // 1. Provision target blueprint for this workspace
+      // 1. Provision target blueprint for this workspace under active tenant
       await provisionMutation.mutateAsync({
-        tenantId: tenantSlug,
-        tenantName: workspaceName,
+        tenantId: effectiveTenantId,
+        tenantName: effectiveTenantName,
         blueprintId: selectedBlueprintId,
       });
 
-      // 2. Register into profile/workspace store
+      // 2. Register into profile/workspace store with explicit tenant-workspace relationship
       const newProfile = {
-        id: tenantSlug,
+        id: workspaceSlug,
         name: workspaceName,
-        logo: Building2,
-        plan: 'Standard Workspace',
+        logo: LayoutGrid,
+        plan: 'Custom Space',
+        tenantId: effectiveTenantId,
+        tenantName: effectiveTenantName,
       };
       setProfiles([...profiles, newProfile]);
       setCurrentProfile(newProfile);
-      setActiveTenant(tenantSlug, workspaceName);
+      setActiveTenant(effectiveTenantId, effectiveTenantName);
+      setActiveWorkspace(workspaceSlug, workspaceName);
 
-      toast.success(`Workspace "${workspaceName}" đã được tạo thành công!`);
+      toast.success(`Workspace "${workspaceName}" thuộc tổ chức "${effectiveTenantName}" đã được tạo thành công!`);
       if (onWorkspaceCreated) {
-        onWorkspaceCreated(tenantSlug, workspaceName);
+        onWorkspaceCreated(workspaceSlug, workspaceName);
       }
       onClose();
     } catch (err: any) {
@@ -99,29 +105,40 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
               </div>
               <div>
                 <DialogTitle className="text-xl font-bold tracking-tight text-foreground">
-                  Tạo Workspace / Tổ chức Mới
+                  Tạo Workspace Mới
                 </DialogTitle>
                 <DialogDescription className="text-xs text-muted-foreground">
-                  Khởi tạo một không gian quản trị dữ liệu độc lập với PostgreSQL Row-Level Security riêng biệt.
+                  Khởi tạo một không gian làm việc mới trực thuộc tổ chức <span className="font-semibold text-foreground">{activeTenantName || 'Default Organization'}</span>.
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
 
           <form onSubmit={handleCreate} className="space-y-4 py-3">
+            {/* Active Parent Tenant Indicator */}
+            <div className="p-3 rounded-xl bg-muted/40 border border-border/60 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Tổ chức sở hữu (Tenant):</span>
+                <span className="font-bold text-foreground">{activeTenantName || 'Default Organization'}</span>
+              </div>
+              <Badge variant="outline" className="font-mono text-[10px]">
+                {activeTenantId}
+              </Badge>
+            </div>
+
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground">
-                Tên Workspace / Tổ chức *
+                Tên Workspace Mới *
               </label>
               <Input
                 required
-                placeholder="Ví dụ: North Branch Logistics Hub"
+                placeholder="Ví dụ: Warehouse Hub North hoặc Marketing Lab"
                 value={workspaceName}
                 onChange={(e) => setWorkspaceName(e.target.value)}
                 className="h-9 text-xs bg-white/50 dark:bg-white/5 border-white/20"
               />
               <span className="text-[10px] text-muted-foreground font-mono">
-                Tenant Slug: {workspaceName ? workspaceName.toLowerCase().replace(/[^a-z0-9]/g, '-') : 'workspace-slug'}
+                Workspace Slug: {workspaceName ? workspaceName.toLowerCase().replace(/[^a-z0-9]/g, '-') : 'workspace-slug'}
               </span>
             </div>
 
