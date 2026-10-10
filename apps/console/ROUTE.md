@@ -49,7 +49,9 @@ src/routes/
 
 | Route Path | File Location | Auth Required | Layout Shell | Primary User Action / Feature |
 | :--- | :--- | :--- | :--- | :--- |
-| `/` | `_authenticated/index.tsx` | Yes | Authenticated Shell | System health telemetry, quick stats, operational overview |
+| `/` | `src/routes/index.tsx` | No (Public) | Standalone Glass | Commercial Landing Page, Value Showcase, Bento Grid, Pricing Tiers & Onboarding Funnel (Authenticated users auto-redirect to `/metadata`) |
+| `/dashboard` | `_authenticated/index.tsx` | Yes | Authenticated Shell | System health telemetry, quick stats, operational overview |
+
 | `/tasks` | `_authenticated/tasks/index.tsx` | Yes | Authenticated Shell | Manage backlog tasks, filter priority, update status |
 | `/apps` | `_authenticated/apps/index.tsx` | Yes | Authenticated Shell | Browse connected services, toggle integrations |
 | `/chats` | `_authenticated/chats/index.tsx` | Yes | Authenticated Shell | Direct and channel messaging with team members |
