@@ -1,5 +1,5 @@
 import { Outlet } from '@tanstack/react-router'
-import { Bell, Palette, UserCog, ShieldAlert } from 'lucide-react'
+import { Bell, Palette, UserCog, ShieldAlert, Building2 } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
@@ -17,6 +17,11 @@ const sidebarNavItems = [
     icon: <UserCog size={18} />,
   },
   {
+    title: 'Workspaces',
+    href: '/settings/workspaces',
+    icon: <Building2 size={18} />,
+  },
+  {
     title: 'Appearance',
     href: '/settings/appearance',
     icon: <Palette size={18} />,
@@ -32,6 +37,7 @@ const sidebarNavItems = [
     icon: <ShieldAlert size={18} />,
   },
 ]
+
 
 export function Settings() {
   return (

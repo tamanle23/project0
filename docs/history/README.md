@@ -16,4 +16,6 @@
 | [012](012_wcag_2_2_compliance_milestone_2.md) | 2026-10-09 | WCAG 2.2 AA Compliance - Milestone 2 | Wired SkipToMain bypass block, standardized explicit role="banner" and descriptive ARIA landmark labels, and normalized h1->h2->h3 heading hierarchy. |
 | [013](013_blueprint_gallery_and_template_preview_ui.md) | 2026-10-10 | Domain Blueprints Full-Stack Phase 1: In-App Gallery, SVG Graph & Template Preview | Implemented GET /blueprints/{id} detail endpoint, permitAlls catalog access, sandbox simulation, useBlueprint hooks, zero-dependency SVG DAG canvas, TemplatePreviewModal, and BlueprintGalleryDialog. |
 | [014](014_public_landing_page_and_onboarding_funnel.md) | 2026-10-10 | Domain Blueprints Full-Stack Phase 2: Public Landing Page & Onboarding Funnel | Implemented public root / route with auth bypass, Liquid Glass Hero & Bento Grid, interactive 3-column studio preview, 3 subscription pricing tiers, and 2-step onboarding funnel modal. |
+| [015](015_multi_workspace_switcher_and_organization_provisioning.md) | 2026-10-10 | Domain Blueprints Full-Stack Phase 3: Multi-Workspace Switcher & Organization Provisioning | Implemented /settings/workspaces management panel, CreateWorkspaceModal with blueprint seeding, and sidebar ProfileSwitcher tenant context synchronization. |
+
 

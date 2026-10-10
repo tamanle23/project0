@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import {
   DropdownMenu,
@@ -15,7 +16,10 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 import { useProfile, type Profile } from '@/context/profile-provider'
+import { useMetadataUiStore } from '@/features/metadata/store/use-metadata-ui-store'
+import { CreateWorkspaceModal } from '@/features/settings/workspaces/create-workspace-modal'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 type ProfileSwitcherProps = {
   profiles?: Profile[]
@@ -24,8 +28,19 @@ type ProfileSwitcherProps = {
 export function ProfileSwitcher({ profiles: propProfiles }: ProfileSwitcherProps) {
   const { isMobile } = useSidebar()
   const { currentProfile, setCurrentProfile, profiles: contextProfiles } = useProfile()
+  const { setActiveTenant } = useMetadataUiStore()
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+
   const availableProfiles = propProfiles ?? contextProfiles
   const activeProfile = currentProfile ?? availableProfiles[0]
+
+  const handleSelectProfile = (profile: Profile) => {
+    setCurrentProfile(profile)
+    const tenantId = (profile.id as string) || profile.name.toLowerCase().replace(/[^a-z0-9]/g, '-')
+    setActiveTenant(tenantId, profile.name)
+    toast.success(`Đã chuyển sang workspace "${profile.name}"`)
+  }
+
 
   return (
     <SidebarMenu>
@@ -68,7 +83,7 @@ export function ProfileSwitcher({ profiles: propProfiles }: ProfileSwitcherProps
               return (
                 <DropdownMenuItem
                   key={profile.id ?? profile.name}
-                  onClick={() => setCurrentProfile(profile)}
+                  onClick={() => handleSelectProfile(profile)}
                   className={cn(
                     'gap-2 p-2 rounded-lg cursor-pointer transition-colors',
                     isSelected && 'bg-accent/60 font-medium'
@@ -96,7 +111,10 @@ export function ProfileSwitcher({ profiles: propProfiles }: ProfileSwitcherProps
               )
             })}
             <DropdownMenuSeparator className='bg-border/60' />
-            <DropdownMenuItem className='gap-2 p-2 rounded-lg cursor-pointer text-muted-foreground hover:text-foreground'>
+            <DropdownMenuItem
+              onClick={() => setIsCreateOpen(true)}
+              className='gap-2 p-2 rounded-lg cursor-pointer text-muted-foreground hover:text-foreground'
+            >
               <div className='flex size-6 items-center justify-center rounded-md border border-dashed border-border bg-background/50'>
                 <Plus className='size-3.5' />
               </div>
@@ -105,6 +123,12 @@ export function ProfileSwitcher({ profiles: propProfiles }: ProfileSwitcherProps
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
+
+      <CreateWorkspaceModal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+      />
     </SidebarMenu>
   )
 }
+
