@@ -32,6 +32,7 @@ import {
   ChevronsRight,
   ChevronDown,
   ChevronUp,
+  Sparkles,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -48,7 +49,9 @@ export const EntityTypeSidebar: React.FC = () => {
     openCreateEntityTypeDialog,
     openEditEntityTypeDialog,
     openDeleteEntityTypeDialog,
+    openBlueprintGallery,
   } = useMetadataUiStore();
+
 
   const [isMobileExpanded, setIsMobileExpanded] = useState(!selectedEntityTypeId);
 
@@ -107,20 +110,34 @@ export const EntityTypeSidebar: React.FC = () => {
             {isMobileExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
           {canManageSchema() && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={openCreateEntityTypeDialog}
-              disabled={totalElements >= 50}
-              className="h-8 px-2 gap-1 text-xs bg-white/40 dark:bg-white/5 border-white/20 shrink-0 disabled:opacity-50"
-              title={totalElements >= 50 ? "Workspace model quota reached (max 50 models)" : "Create New Entity Model"}
-            >
-              <Plus className="h-3.5 w-3.5" />
-              <span>New</span>
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={openBlueprintGallery}
+                disabled={totalElements >= 50}
+                className="h-8 px-2 gap-1 text-xs bg-white/40 dark:bg-white/5 border-white/20 shrink-0 text-blue-600 dark:text-blue-400 hover:text-blue-700"
+                title="Browse Domain Blueprint Catalog"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Templates</span>
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={openCreateEntityTypeDialog}
+                disabled={totalElements >= 50}
+                className="h-8 px-2 gap-1 text-xs bg-white/40 dark:bg-white/5 border-white/20 shrink-0 disabled:opacity-50"
+                title={totalElements >= 50 ? "Workspace model quota reached (max 50 models)" : "Create New Entity Model"}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>New</span>
+              </Button>
+            </div>
           )}
         </div>
       </div>
+
 
       <div className={cn('flex flex-col gap-3 flex-1 min-h-0', !isMobileExpanded && 'max-lg:hidden')}>
         {/* Search Filter */}

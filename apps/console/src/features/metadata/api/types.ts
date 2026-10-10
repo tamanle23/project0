@@ -202,3 +202,73 @@ export interface EntityFacetsResponse {
   totalRecords: number;
   facets: FacetGroupDto[];
 }
+
+// ==========================================
+// 8. Domain Blueprint Types
+// ==========================================
+
+export interface BlueprintSummaryDto {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  icon: string;
+  entityTypesCount: number;
+  relationshipTypesCount: number;
+}
+
+export interface BlueprintAttribute {
+  systemName: string;
+  name: string;
+  dataType: string;
+  uiComponent: string;
+  isRequired?: boolean;
+  displayOrder?: number;
+  defaultValue?: string;
+  options?: Record<string, unknown>;
+}
+
+export interface BlueprintEntityType {
+  systemName: string;
+  name: string;
+  description?: string;
+  attributes: BlueprintAttribute[];
+}
+
+export interface BlueprintRelationship {
+  systemName: string;
+  name: string;
+  description?: string;
+  sourceEntityType: string;
+  targetEntityType: string;
+  cardinality: string;
+}
+
+export interface BlueprintManifest {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  icon: string;
+  entityTypes: BlueprintEntityType[];
+  relationshipTypes: BlueprintRelationship[];
+}
+
+export interface TenantProvisioningRequest {
+  tenantId: string;
+  tenantName: string;
+  blueprintId: string;
+}
+
+export interface TenantProvisioningResult {
+  tenantId: string;
+  tenantName: string;
+  blueprintId: string;
+  blueprintName: string;
+  createdEntityTypesCount: number;
+  createdAttributesCount: number;
+  createdRelationshipsCount: number;
+  createdEntityTypeNames: string[];
+  durationMs: number;
+}
+

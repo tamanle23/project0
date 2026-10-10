@@ -110,7 +110,13 @@ interface MetadataUiState {
   isJsonSchemaPreviewOpen: boolean;
   openJsonSchemaPreview: () => void;
   closeJsonSchemaPreview: () => void;
+
+  // Blueprint Gallery Dialog
+  isBlueprintGalleryOpen: boolean;
+  openBlueprintGallery: () => void;
+  closeBlueprintGallery: () => void;
 }
+
 
 export const useMetadataUiStore = create<MetadataUiState>((set, get) => ({
   // Multi-Tenancy & Workspace Mode
@@ -280,4 +286,10 @@ export const useMetadataUiStore = create<MetadataUiState>((set, get) => ({
   isJsonSchemaPreviewOpen: false,
   openJsonSchemaPreview: () => set({ isJsonSchemaPreviewOpen: true }),
   closeJsonSchemaPreview: () => set({ isJsonSchemaPreviewOpen: false }),
+
+  // Blueprint Gallery Dialog
+  isBlueprintGalleryOpen: false,
+  openBlueprintGallery: () => set({ isBlueprintGalleryOpen: true }),
+  closeBlueprintGallery: () => set({ isBlueprintGalleryOpen: false }),
 }));
+

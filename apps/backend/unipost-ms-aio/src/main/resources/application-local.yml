@@ -25,6 +25,8 @@ application:
       - /graphql
       - /graphiql
       - /graphiql/**
+      - /api/v1/metadata/blueprints
+      - /api/v1/metadata/blueprints/**
     jwtCookieName: X-AUTH-TOKEN
     jwtCookieDomain:
     jwtCookiePath: /
