@@ -35,6 +35,19 @@ public class TenantProvisioningController {
     }
 
     /**
+     * Retrieves the complete manifest details of a specific blueprint template.
+     */
+    @GetMapping("/blueprints/{blueprintId}")
+    @PreAuthorize("hasAuthority('METADATA_SCHEMA_READ') or hasAuthority('METADATA_SCHEMA_WRITE') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseWrapper<ContextHeader, com.unipost.tenant.blueprint.BlueprintManifest>> getBlueprintDetails(
+            @PathVariable String blueprintId) {
+        com.unipost.tenant.blueprint.BlueprintManifest manifest = blueprintCatalogService.getBlueprint(blueprintId)
+                .orElseThrow(() -> new com.unipost.service.exception.MetadataNotFoundException(
+                        "Blueprint template not found with id: " + blueprintId));
+        return responseBuilder.success(manifest);
+    }
+
+    /**
      * Provisions a new or existing tenant with a selected blueprint model catalog.
      * Deep-clones EntityTypes, Attributes, Relationships, and pre-warms compiled JSON Schemas into cache fabric.
      */
@@ -46,3 +59,4 @@ public class TenantProvisioningController {
         return responseBuilder.success(result);
     }
 }
+

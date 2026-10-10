@@ -1,6 +1,7 @@
 import type { SandboxRouteHandler, SandboxRequest } from '../types';
 import { mockMetadataStore } from '../../../features/metadata/data/mock-metadata';
 import { useSandboxStore } from '../store/sandbox-store';
+import { mockBlueprintManifests, mockBlueprintSummaries } from '../../../features/metadata/data/mock-blueprints';
 
 /**
  * MetadataSandboxAdapter: Bridges incoming metadata API requests (/api/metadata/*, /v1/metadata/*, /api/v1/metadata/*)
@@ -22,7 +23,78 @@ export const metadataSandboxAdapter: SandboxRouteHandler = {
     // Standardize sub-path by stripping API base prefix
     const subPath = pathname.replace(/^\/(api\/v1\/metadata|v1\/metadata|api\/metadata)/, '');
 
+    // 0. Blueprints Catalog & Details
+    if (subPath === '/blueprints' || subPath === '/blueprints/') {
+      if (req.method === 'GET') {
+        return { status: 200, data: mockBlueprintSummaries };
+      }
+    }
+
+    const blueprintDetailMatch = subPath.match(/^\/blueprints\/([^/]+)$/);
+    if (blueprintDetailMatch) {
+      const bpId = blueprintDetailMatch[1];
+      if (req.method === 'GET') {
+        const found = mockBlueprintManifests.find((b) => b.id === bpId);
+        if (!found) {
+          return { status: 404, data: { message: `Blueprint not found with id: ${bpId}` } };
+        }
+        return { status: 200, data: found };
+      }
+    }
+
+    // 0.1 Tenant Provisioning with Blueprint
+    if (subPath === '/tenants/provision' && req.method === 'POST') {
+      const { tenantId, tenantName, blueprintId } = req.data || {};
+      const manifest = mockBlueprintManifests.find((b) => b.id === blueprintId);
+      if (!manifest) {
+        return { status: 404, data: { message: `Blueprint template not found with id: ${blueprintId}` } };
+      }
+
+      const createdNames: string[] = [];
+      let totalAttributes = 0;
+
+      // Seed models into mockMetadataStore
+      for (const bType of manifest.entityTypes) {
+        const createdEt = await mockMetadataStore.createEntityType({
+          name: bType.name,
+          systemName: bType.systemName,
+          description: bType.description,
+        });
+        createdNames.push(createdEt.name);
+
+        for (const bAttr of bType.attributes) {
+          await mockMetadataStore.createAttributeDefinition(createdEt.id, {
+            name: bAttr.name,
+            systemName: bAttr.systemName,
+            dataType: bAttr.dataType as any,
+            uiComponent: bAttr.uiComponent as any,
+            isRequired: Boolean(bAttr.isRequired),
+            displayOrder: bAttr.displayOrder,
+            defaultValue: bAttr.defaultValue,
+            options: bAttr.options,
+          });
+          totalAttributes++;
+        }
+      }
+
+      return {
+        status: 200,
+        data: {
+          tenantId: tenantId || activeTenantId,
+          tenantName: tenantName || 'Provisioned Workspace',
+          blueprintId: manifest.id,
+          blueprintName: manifest.name,
+          createdEntityTypesCount: manifest.entityTypes.length,
+          createdAttributesCount: totalAttributes,
+          createdRelationshipsCount: manifest.relationshipTypes.length,
+          createdEntityTypeNames: createdNames,
+          durationMs: 42,
+        },
+      };
+    }
+
     // 1. Entity Types List or Create
+
     if (subPath === '/entity-types' || subPath === '/entity-types/') {
       if (req.method === 'GET') {
         const page = parseInt(searchParams.get('number') || searchParams.get('page') || '0', 10);

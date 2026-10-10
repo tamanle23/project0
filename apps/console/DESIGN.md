@@ -121,6 +121,12 @@ Google Stitch ingests these design tokens as prompt-level constraints when rende
 - **Dynamic Field Inputs:** `bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-white/20 focus:border-primary` with WCAG AA compliant contrast.
 - **Data Table Canvas:** Translucent table container `backdrop-blur-xl bg-white/45 dark:bg-slate-900/45 border border-white/30 dark:border-white/10 rounded-2xl shadow-lg` with sticky header `bg-white/60 dark:bg-slate-800/60` and hover rows `hover:bg-white/40 dark:hover:bg-white/5`.
 
+### 3.6 Multi-Tenant Billing & FinOps Suite (`/settings/billing`)
+- **Subscription Overview Card:** `bg-white/50 dark:bg-slate-900/50 backdrop-blur-2xl border border-white/30 dark:border-white/10 shadow-xl shadow-black/5 rounded-3xl p-6` with active tier specular badges and live quota progress gauges.
+- **4-Tier Pricing Grid:** 4-column responsive grid (`grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4`) with popular highlight `ring-2 ring-blue-500/40 bg-blue-500/15` and annual discount pill `-20%`.
+- **VietQR Transaction Ledger:** Translucent table container `bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-2xl` with localized timestamps and Napas247 receipt download actions.
+- **Corporate E-Invoice Form:** Vietnamese VAT compliance panel with monospace tax code (MST) input and auto-invoice dispatch toggle.
+
 ---
 
 ## 4. Google Stitch Prompting Blueprint (Zoom-Out-Zoom-In)

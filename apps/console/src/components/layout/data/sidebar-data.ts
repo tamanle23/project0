@@ -22,6 +22,7 @@ import {
   GalleryVerticalEnd,
   Database,
   Building2,
+  CreditCard,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 import { useTranslation } from 'react-i18next'
@@ -29,19 +30,28 @@ import { useMemo } from 'react'
 
 export const sidebarTeams = [
   {
-    name: 'Unipost',
+    id: 'ws-main',
+    name: 'Unipost Main',
     logo: Command,
-    plan: 'Vite + ShadcnUI',
+    plan: 'Production Workspace',
+    tenantId: 'default-tenant',
+    tenantName: 'Default Organization',
   },
   {
-    name: 'Acme Inc',
+    id: 'ws-acme-prod',
+    name: 'Acme Prod',
     logo: GalleryVerticalEnd,
-    plan: 'Enterprise',
+    plan: 'Production Workspace',
+    tenantId: 'tenant-acme',
+    tenantName: 'Acme International Corp',
   },
   {
-    name: 'Acme Corp.',
+    id: 'ws-acme-staging',
+    name: 'Acme Staging',
     logo: AudioWaveform,
-    plan: 'Startup',
+    plan: 'Staging Environment',
+    tenantId: 'tenant-acme',
+    tenantName: 'Acme International Corp',
   },
 ];
 
@@ -181,6 +191,16 @@ export const useSidebarData = (): SidebarData => {
                 title: t('sidebar.items.profile', 'Profile'),
                 url: '/settings',
                 icon: UserCog,
+              },
+              {
+                title: t('sidebar.items.workspaces', 'Workspaces'),
+                url: '/settings/workspaces',
+                icon: Building2,
+              },
+              {
+                title: t('sidebar.items.billing', 'Billing & Subscriptions'),
+                url: '/settings/billing',
+                icon: CreditCard,
               },
               {
                 title: t('sidebar.items.appearance', 'Appearance'),
