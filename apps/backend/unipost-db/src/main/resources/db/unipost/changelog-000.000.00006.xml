@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="tenant-billing-payos-and-features-06" author="antigravity">
+        <comment>Create UNIPOST_TENANT_BILLING and UNIPOST_TENANT_FEATURES tables with RLS and partial indexes</comment>
+
+        <!-- 1. Tenant Billing Table -->
+        <createTable tableName="UNIPOST_TENANT_BILLING">
+            <column name="tenant_id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="payos_customer_id" type="VARCHAR(255)"/>
+            <column name="current_order_code" type="BIGINT"/>
+            <column name="plan_tier" type="VARCHAR(50)" defaultValue="BASIC">
+                <constraints nullable="false"/>
+            </column>
+            <column name="billing_cadence" type="VARCHAR(20)" defaultValue="MONTHLY">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount_paid" type="BIGINT" defaultValueNumeric="0"/>
+            <column name="expires_at" type="TIMESTAMP"/>
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="last_updated_date" type="TIMESTAMP"/>
+        </createTable>
+
+        <!-- 2. Tenant Dynamic Feature Entitlements Table -->
+        <createTable tableName="UNIPOST_TENANT_FEATURES">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tenant_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="feature_key" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMP"/>
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="last_updated_date" type="TIMESTAMP"/>
+        </createTable>
+
+        <!-- 3. Unique Index on Tenant + Feature Key -->
+        <sql dbms="postgresql">
+            CREATE UNIQUE INDEX IF NOT EXISTS uk_tenant_feature_active
+            ON UNIPOST_TENANT_FEATURES (tenant_id, feature_key);
+
+            CREATE INDEX IF NOT EXISTS idx_tenant_billing_status
+            ON UNIPOST_TENANT_BILLING (tenant_id, status);
+
+            -- 4. Enable Row-Level Security (RLS) on Billing & Features
+            ALTER TABLE UNIPOST_TENANT_BILLING ENABLE ROW LEVEL SECURITY;
+            ALTER TABLE UNIPOST_TENANT_FEATURES ENABLE ROW LEVEL SECURITY;
+
+            DROP POLICY IF EXISTS tenant_isolation_billing ON UNIPOST_TENANT_BILLING;
+            CREATE POLICY tenant_isolation_billing ON UNIPOST_TENANT_BILLING
+                FOR ALL
+                USING (
+                    tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')
+                    OR tenant_id = 'SYSTEM'
+                )
+                WITH CHECK (
+                    tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')
+                    AND tenant_id != 'SYSTEM'
+                );
+
+            DROP POLICY IF EXISTS tenant_isolation_features ON UNIPOST_TENANT_FEATURES;
+            CREATE POLICY tenant_isolation_features ON UNIPOST_TENANT_FEATURES
+                FOR ALL
+                USING (
+                    tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')
+                    OR tenant_id = 'SYSTEM'
+                )
+                WITH CHECK (
+                    tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')
+                    AND tenant_id != 'SYSTEM'
+                );
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

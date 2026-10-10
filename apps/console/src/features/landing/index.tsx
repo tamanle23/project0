@@ -7,11 +7,14 @@ import { LandingPricing } from './components/landing-pricing';
 import { LandingBlueprintsSection } from './components/landing-blueprints-section';
 import { LandingFooter } from './components/landing-footer';
 import { OnboardingFunnelModal } from './components/onboarding-funnel-modal';
+import { PayOsQrModal } from '../metadata/components/billing/payos-qr-modal';
 import { useNavigate } from '@tanstack/react-router';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [isPayOsModalOpen, setIsPayOsModalOpen] = useState(false);
+  const [payOsPlan, setPayOsPlan] = useState<'PRO' | 'PRO_MAX'>('PRO');
   const [selectedPlan, setSelectedPlan] = useState<'BASIC' | 'PRO' | 'PRO_MAX'>('BASIC');
   const [selectedBlueprintId, setSelectedBlueprintId] = useState<string>('bp_cms_publishing_v1');
 
@@ -61,6 +64,16 @@ export const LandingPage: React.FC = () => {
         onClose={() => setIsOnboardingOpen(false)}
         defaultPlan={selectedPlan}
         defaultBlueprintId={selectedBlueprintId}
+        onUpgradePrompt={(plan) => {
+          setPayOsPlan(plan);
+          setIsPayOsModalOpen(true);
+        }}
+      />
+
+      <PayOsQrModal
+        isOpen={isPayOsModalOpen}
+        onClose={() => setIsPayOsModalOpen(false)}
+        planTier={payOsPlan}
       />
     </div>
   );

@@ -12,6 +12,7 @@ import { SchemaBuilder } from './schema-builder';
 import { EntityDataGrid } from './data-explorer';
 import { RelationshipTypesManager } from './relationships';
 import { MetadataDialogs } from './metadata-dialogs';
+import { FeatureGate } from './billing/feature-gate';
 import { Header } from '@/components/layout/header';
 import { Main } from '@/components/layout/main';
 import { Search } from '@/components/search';
@@ -261,11 +262,25 @@ export const MetadataFeature: React.FC = () => {
 
                 {/* Tab Views */}
                 {activeTab === 'schema' ? (
-                  <SchemaBuilder entityTypeId={selectedEntityTypeId} />
+                  <FeatureGate
+                    featureKey="FEATURE_SCHEMA_STUDIO"
+                    featureTitle="Schema Architect Studio"
+                    requiredTier="PRO"
+                    description="Thiết kế và tùy biến các trường dữ liệu động (Attribute Definitions) cho mô hình thực thể. Nâng cấp Pro hoặc Pro Max để kích hoạt."
+                  >
+                    <SchemaBuilder entityTypeId={selectedEntityTypeId} />
+                  </FeatureGate>
                 ) : activeTab === 'data' ? (
                   <EntityDataGrid entityTypeId={selectedEntityTypeId} />
                 ) : (
-                  <RelationshipTypesManager entityTypeId={selectedEntityTypeId} />
+                  <FeatureGate
+                    featureKey="FEATURE_PATTERN_C_GRAPH"
+                    featureTitle="Pattern C Connected Graph Edges"
+                    requiredTier="PRO"
+                    description="Khởi tạo và cấu hình các mối quan hệ đồ thị đa chiều giữa các mô hình dữ liệu. Nâng cấp Pro hoặc Pro Max để kích hoạt."
+                  >
+                    <RelationshipTypesManager entityTypeId={selectedEntityTypeId} />
+                  </FeatureGate>
                 )}
               </div>
             ) : (
