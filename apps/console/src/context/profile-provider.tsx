@@ -18,8 +18,14 @@ type ProfileProviderProps = {
 }
 
 export function ProfileProvider({ children, defaultProfiles }: ProfileProviderProps) {
-  const store = useProfileStore()
-  const setProfiles = store.setProfiles
+  // Optimization: Use granular Zustand state selectors instead of full store subscription (`useProfileStore()`).
+  // Calling `useProfileStore()` without a selector causes the provider to re-subscribe to all state changes,
+  // triggering unnecessary re-renders when unrelated store properties update. Granular selectors preserve
+  // referential stability for actions and ensure re-renders only occur when selected state slice changes.
+  const currentProfile = useProfileStore((state) => state.currentProfile)
+  const profiles = useProfileStore((state) => state.profiles)
+  const setCurrentProfile = useProfileStore((state) => state.setCurrentProfile)
+  const setProfiles = useProfileStore((state) => state.setProfiles)
 
   React.useEffect(() => {
     if (defaultProfiles && defaultProfiles.length > 0) {
@@ -29,12 +35,12 @@ export function ProfileProvider({ children, defaultProfiles }: ProfileProviderPr
 
   const value = React.useMemo<ProfileContextType>(
     () => ({
-      currentProfile: store.currentProfile,
-      profiles: store.profiles,
-      setCurrentProfile: store.setCurrentProfile,
-      setProfiles: store.setProfiles,
+      currentProfile,
+      profiles,
+      setCurrentProfile,
+      setProfiles,
     }),
-    [store.currentProfile, store.profiles, store.setCurrentProfile, store.setProfiles]
+    [currentProfile, profiles, setCurrentProfile, setProfiles]
   )
 
   return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>
