@@ -1,5 +1,5 @@
 import { Outlet } from '@tanstack/react-router'
-import { Bell, Palette, UserCog, ShieldAlert } from 'lucide-react'
+import { Bell, Palette, UserCog, ShieldAlert, Building2, CreditCard } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
@@ -17,6 +17,16 @@ const sidebarNavItems = [
     icon: <UserCog size={18} />,
   },
   {
+    title: 'Workspaces',
+    href: '/settings/workspaces',
+    icon: <Building2 size={18} />,
+  },
+  {
+    title: 'Billing & Subscriptions',
+    href: '/settings/billing',
+    icon: <CreditCard size={18} />,
+  },
+  {
     title: 'Appearance',
     href: '/settings/appearance',
     icon: <Palette size={18} />,
@@ -32,6 +42,7 @@ const sidebarNavItems = [
     icon: <ShieldAlert size={18} />,
   },
 ]
+
 
 export function Settings() {
   return (
@@ -58,7 +69,7 @@ export function Settings() {
         </div>
         <Separator className='my-4 lg:my-6' />
         <div className='liquid-glass-card rounded-2xl p-4 sm:p-6 flex flex-1 flex-col space-y-4 max-lg:overflow-visible lg:overflow-hidden md:space-y-4 lg:flex-row lg:space-y-0 lg:space-x-10 shadow-lg'>
-          <aside className='top-0 lg:sticky lg:w-1/5'>
+          <aside aria-label="Settings Menu" className='top-0 lg:sticky lg:w-1/5'>
             <SidebarNav items={sidebarNavItems} />
           </aside>
           <div className='flex w-full max-lg:overflow-visible lg:overflow-y-hidden p-1'>

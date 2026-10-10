@@ -7,9 +7,12 @@ type User = {
 }
 
 type Team = {
+  id?: string
   name: string
   logo: React.ElementType
   plan: string
+  tenantId?: string
+  tenantName?: string
 }
 
 type BaseNavItem = {

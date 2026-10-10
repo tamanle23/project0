@@ -25,6 +25,10 @@ application:
       - /graphql
       - /graphiql
       - /graphiql/**
+      - /api/v1/metadata/blueprints
+      - /api/v1/metadata/blueprints/**
+      - /api/v1/billing/payos/webhook
+      - /api/v1/billing/payos/webhook/**
     jwtCookieName: X-AUTH-TOKEN
     jwtCookieDomain:
     jwtCookiePath: /

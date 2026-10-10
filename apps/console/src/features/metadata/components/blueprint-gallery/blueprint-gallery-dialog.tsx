@@ -1,0 +1,181 @@
+import React, { useMemo, useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  useBlueprintCatalog,
+  useProvisionTenantBlueprint,
+} from '../../api/use-blueprints';
+import { useMetadataUiStore } from '../../store/use-metadata-ui-store';
+import { BlueprintCard } from './blueprint-card';
+import { TemplatePreviewModal } from './template-preview-modal';
+import { Search, BookTemplate, Sparkles, Filter, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+export const BlueprintGalleryDialog: React.FC = () => {
+  const {
+    isBlueprintGalleryOpen,
+    closeBlueprintGallery,
+    activeTenantId,
+    activeTenantName,
+  } = useMetadataUiStore();
+
+  const { data: blueprints = [], isLoading } = useBlueprintCatalog();
+  const provisionMutation = useProvisionTenantBlueprint();
+
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [previewBlueprintId, setPreviewBlueprintId] = useState<string | null>(null);
+
+  // Extract unique categories
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    blueprints.forEach((b) => {
+      if (b.category) set.add(b.category);
+    });
+    return ['ALL', ...Array.from(set)];
+  }, [blueprints]);
+
+  const filteredBlueprints = useMemo(() => {
+    return blueprints.filter((b) => {
+      const matchesSearch =
+        !search.trim() ||
+        b.name.toLowerCase().includes(search.toLowerCase()) ||
+        b.description.toLowerCase().includes(search.toLowerCase());
+
+      const matchesCategory =
+        selectedCategory === 'ALL' || b.category === selectedCategory;
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [blueprints, search, selectedCategory]);
+
+  const handleSelectBlueprint = async (blueprintId: string) => {
+    await provisionMutation.mutateAsync({
+      tenantId: activeTenantId,
+      tenantName: activeTenantName,
+      blueprintId,
+    });
+    closeBlueprintGallery();
+  };
+
+  return (
+    <>
+      <Dialog
+        open={isBlueprintGalleryOpen}
+        onOpenChange={(open) => !open && closeBlueprintGallery()}
+      >
+        <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col p-6 rounded-3xl bg-white/85 dark:bg-slate-900/90 backdrop-blur-2xl border border-white/30 dark:border-white/10 shadow-2xl">
+          <DialogHeader className="space-y-1 shrink-0 pb-3 border-b border-border/40">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                <BookTemplate className="h-5 w-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                  <span>Domain Blueprint Catalog</span>
+                  <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                    Sub-250ms Seeding
+                  </span>
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground">
+                  Jump-start your workspace with production-ready schemas, attributes, and graph relationships.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          {/* Search & Category Filter Toolbar */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 shrink-0">
+            <div className="relative w-full sm:w-72">
+              <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search templates (e.g. CMS, Fleet, CRM)..."
+                className="pl-8 pr-7 h-8 text-xs bg-white/50 dark:bg-white/5 border-white/20"
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch('')}
+                  className="absolute right-2 top-2 p-0.5 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Category Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat)}
+                  className={cn(
+                    'px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 border',
+                    selectedCategory === cat
+                      ? 'bg-primary text-primary-foreground border-primary shadow-xs'
+                      : 'bg-white/40 dark:bg-white/5 border-white/20 text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {cat === 'ALL'
+                    ? 'All Blueprints'
+                    : cat === 'MEDIA_PUBLISHING'
+                    ? 'Publishing & Media'
+                    : cat === 'OPERATIONS'
+                    ? 'Logistics & Fleet'
+                    : cat === 'COMMERCE'
+                    ? 'Commerce & Billing'
+                    : cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Catalog Grid View */}
+          <div className="flex-1 min-h-0 overflow-y-auto mt-2 pr-1">
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center p-16 gap-3 text-muted-foreground">
+                <div className="h-7 w-7 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <span className="text-xs">Fetching domain blueprint templates...</span>
+              </div>
+            ) : filteredBlueprints.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-16 text-center text-muted-foreground">
+                <Sparkles className="h-8 w-8 mb-2 opacity-40" />
+                <h4 className="font-semibold text-sm text-foreground">No blueprints match your search</h4>
+                <p className="text-xs mt-1">Try clearing your search query or choosing another category.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
+                {filteredBlueprints.map((bp) => (
+                  <BlueprintCard
+                    key={bp.id}
+                    blueprint={bp}
+                    onPreview={(id) => setPreviewBlueprintId(id)}
+                    onSelect={handleSelectBlueprint}
+                    isImporting={provisionMutation.isPending}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Embedded Preview Modal */}
+      <TemplatePreviewModal
+        blueprintId={previewBlueprintId}
+        isOpen={Boolean(previewBlueprintId)}
+        onClose={() => setPreviewBlueprintId(null)}
+      />
+    </>
+  );
+};

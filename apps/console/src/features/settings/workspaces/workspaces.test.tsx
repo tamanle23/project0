@@ -1,0 +1,35 @@
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { WorkspacesPanel } from './workspaces-panel';
+import { useMetadataUiStore } from '@/features/metadata/store/use-metadata-ui-store';
+
+const renderWithQueryClient = (ui: React.ReactElement) => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
+};
+
+describe('WorkspacesPanel Component', () => {
+  it('renders list of available workspaces and current active indicator', () => {
+    renderWithQueryClient(<WorkspacesPanel />);
+
+    expect(screen.getByText('Workspaces & Organizations')).toBeDefined();
+    expect(screen.getByText('Tạo Workspace Mới')).toBeDefined();
+    expect(screen.getByText('Unipost Main')).toBeDefined();
+    expect(screen.getByText('Đang chọn')).toBeDefined();
+  });
+
+  it('switches active workspace when clicking Switch button', () => {
+    renderWithQueryClient(<WorkspacesPanel />);
+
+    const switchBtn = screen.getAllByText(/Chuyển sang workspace này/i)[0];
+    fireEvent.click(switchBtn);
+
+    const activeTenant = useMetadataUiStore.getState().activeTenantId;
+    expect(activeTenant).toBeDefined();
+  });
+});
+

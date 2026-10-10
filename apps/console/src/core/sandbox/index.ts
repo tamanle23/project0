@@ -9,6 +9,7 @@ export * from './handlers/auth-sandbox-handler';
 export * from './handlers/metadata-sandbox-adapter';
 export * from './handlers/users-sandbox-handler';
 export * from './handlers/tasks-sandbox-handler';
+export * from './handlers/billing-sandbox-handler';
 export * from './adapters/axios-sandbox-adapter';
 export * from './adapters/fetch-sandbox-adapter';
 
@@ -18,12 +19,14 @@ import { authSandboxHandler } from './handlers/auth-sandbox-handler';
 import { metadataSandboxAdapter } from './handlers/metadata-sandbox-adapter';
 import { usersSandboxHandler } from './handlers/users-sandbox-handler';
 import { tasksSandboxHandler } from './handlers/tasks-sandbox-handler';
+import { billingSandboxHandler } from './handlers/billing-sandbox-handler';
 import { attachSandboxFetchInterceptor } from './adapters/fetch-sandbox-adapter';
 
 sandboxRegistry.register(authSandboxHandler);
 sandboxRegistry.register(metadataSandboxAdapter);
 sandboxRegistry.register(usersSandboxHandler);
 sandboxRegistry.register(tasksSandboxHandler);
+sandboxRegistry.register(billingSandboxHandler);
 
 // Attach fetch interceptor in development
 attachSandboxFetchInterceptor();

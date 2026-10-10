@@ -34,6 +34,8 @@ import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDataPrivacyRouteImport } from './routes/_authenticated/settings/data-privacy'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
+import { Route as AuthenticatedSettingsWorkspacesRouteImport } from './routes/_authenticated/settings/workspaces'
+import { Route as AuthenticatedSettingsBillingRouteImport } from './routes/_authenticated/settings/billing'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -169,6 +171,18 @@ const AuthenticatedSettingsAppearanceRoute =
     path: '/appearance',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedSettingsWorkspacesRoute =
+  AuthenticatedSettingsWorkspacesRouteImport.update({
+    id: '/workspaces',
+    path: '/workspaces',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
+const AuthenticatedSettingsBillingRoute =
+  AuthenticatedSettingsBillingRouteImport.update({
+    id: '/billing',
+    path: '/billing',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
 const AuthenticatedErrorsErrorRoute =
   AuthenticatedErrorsErrorRouteImport.update({
     id: '/errors/$error',
@@ -191,6 +205,8 @@ export interface FileRoutesByFullPath {
   '/503': typeof errors503Route
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/settings/workspaces': typeof AuthenticatedSettingsWorkspacesRoute
+  '/settings/billing': typeof AuthenticatedSettingsBillingRoute
   '/settings/data-privacy': typeof AuthenticatedSettingsDataPrivacyRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/apps/': typeof AuthenticatedAppsIndexRoute
@@ -217,6 +233,8 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/settings/workspaces': typeof AuthenticatedSettingsWorkspacesRoute
+  '/settings/billing': typeof AuthenticatedSettingsBillingRoute
   '/settings/data-privacy': typeof AuthenticatedSettingsDataPrivacyRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
@@ -246,6 +264,8 @@ export interface FileRoutesById {
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/_authenticated/settings/workspaces': typeof AuthenticatedSettingsWorkspacesRoute
+  '/_authenticated/settings/billing': typeof AuthenticatedSettingsBillingRoute
   '/_authenticated/settings/data-privacy': typeof AuthenticatedSettingsDataPrivacyRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
@@ -275,6 +295,8 @@ export interface FileRouteTypes {
     | '/503'
     | '/errors/$error'
     | '/settings/appearance'
+    | '/settings/workspaces'
+    | '/settings/billing'
     | '/settings/data-privacy'
     | '/settings/notifications'
     | '/apps/'
@@ -301,6 +323,8 @@ export interface FileRouteTypes {
     | '/'
     | '/errors/$error'
     | '/settings/appearance'
+    | '/settings/workspaces'
+    | '/settings/billing'
     | '/settings/data-privacy'
     | '/settings/notifications'
     | '/apps'
@@ -329,6 +353,8 @@ export interface FileRouteTypes {
     | '/_authenticated/'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/appearance'
+    | '/_authenticated/settings/workspaces'
+    | '/_authenticated/settings/billing'
     | '/_authenticated/settings/data-privacy'
     | '/_authenticated/settings/notifications'
     | '/_authenticated/apps/'
@@ -533,6 +559,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsAppearanceRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/settings/workspaces': {
+      id: '/_authenticated/settings/workspaces'
+      path: '/workspaces'
+      fullPath: '/settings/workspaces'
+      preLoaderRoute: typeof AuthenticatedSettingsWorkspacesRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
+    '/_authenticated/settings/billing': {
+      id: '/_authenticated/settings/billing'
+      path: '/billing'
+      fullPath: '/settings/billing'
+      preLoaderRoute: typeof AuthenticatedSettingsBillingRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
     '/_authenticated/errors/$error': {
       id: '/_authenticated/errors/$error'
       path: '/errors/$error'
@@ -545,6 +585,8 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedSettingsRouteRouteChildren {
   AuthenticatedSettingsAppearanceRoute: typeof AuthenticatedSettingsAppearanceRoute
+  AuthenticatedSettingsWorkspacesRoute: typeof AuthenticatedSettingsWorkspacesRoute
+  AuthenticatedSettingsBillingRoute: typeof AuthenticatedSettingsBillingRoute
   AuthenticatedSettingsDataPrivacyRoute: typeof AuthenticatedSettingsDataPrivacyRoute
   AuthenticatedSettingsNotificationsRoute: typeof AuthenticatedSettingsNotificationsRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
@@ -553,6 +595,8 @@ interface AuthenticatedSettingsRouteRouteChildren {
 const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteChildren =
   {
     AuthenticatedSettingsAppearanceRoute: AuthenticatedSettingsAppearanceRoute,
+    AuthenticatedSettingsWorkspacesRoute: AuthenticatedSettingsWorkspacesRoute,
+    AuthenticatedSettingsBillingRoute: AuthenticatedSettingsBillingRoute,
     AuthenticatedSettingsDataPrivacyRoute:
       AuthenticatedSettingsDataPrivacyRoute,
     AuthenticatedSettingsNotificationsRoute:

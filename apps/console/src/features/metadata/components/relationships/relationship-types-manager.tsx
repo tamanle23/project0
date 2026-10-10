@@ -80,10 +80,10 @@ export const RelationshipTypesManager: React.FC<Props> = ({ entityTypeId }) => {
       {/* Top action bar */}
       <div className="flex items-center justify-between p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-sm">
         <div>
-          <h3 className="font-bold text-sm md:text-base text-foreground flex items-center gap-2">
+          <h2 className="font-bold text-sm md:text-base text-foreground flex items-center gap-2">
             <GitFork className="h-4 w-4 text-primary" />
             Model Graph Relationships
-          </h3>
+          </h2>
           <p className="text-xs text-muted-foreground">
             Define edge schema connections, cardinality rules, and referential constraints.
           </p>
@@ -109,9 +109,9 @@ export const RelationshipTypesManager: React.FC<Props> = ({ entityTypeId }) => {
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary mb-3">
             <GitFork className="h-6 w-6" />
           </div>
-          <h4 className="font-semibold text-foreground mb-1 text-sm md:text-base">
+          <h3 className="font-semibold text-foreground mb-1 text-sm md:text-base">
             No Relationship Types Configured
-          </h4>
+          </h3>
           <p className="text-xs max-w-sm mb-4">
             Connect this entity model to other entities (e.g. Orders, Profiles, Deployments) by defining relationship edge types.
           </p>

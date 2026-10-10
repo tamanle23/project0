@@ -17,7 +17,7 @@ export function AppSidebar() {
   const { collapsible, variant } = useLayout()
   const sidebarData = useSidebarData()
   return (
-    <Sidebar collapsible={collapsible} variant={variant}>
+    <Sidebar collapsible={collapsible} variant={variant} aria-label="Main Navigation">
       <SidebarHeader>
         {/* <TeamSwitcher teams={sidebarData.teams} /> */}
         <ProfileSwitcher profiles={sidebarData.teams} />

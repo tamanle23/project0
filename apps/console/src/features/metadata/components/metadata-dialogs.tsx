@@ -5,6 +5,7 @@ import {
   RelationshipTypeDeleteDialog,
   RecordRelationshipsInspector,
 } from './relationships';
+import { BlueprintGalleryDialog } from './blueprint-gallery';
 
 export const MetadataDialogs: React.FC = () => {
   return (
@@ -14,6 +15,8 @@ export const MetadataDialogs: React.FC = () => {
       <RelationshipTypeDialog />
       <RelationshipTypeDeleteDialog />
       <RecordRelationshipsInspector />
+      <BlueprintGalleryDialog />
     </>
   );
 };
+

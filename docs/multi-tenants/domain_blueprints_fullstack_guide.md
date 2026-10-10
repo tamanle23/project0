@@ -62,11 +62,16 @@ When a prospective customer signs up or creates their organization:
    - Seamlessly redirects the user into their fresh workspace at `/_authenticated/data`.
 
 ### Touchpoint B: Multi-Workspace / Organization Switcher
-In enterprise accounts, an organization admin may manage multiple workspaces (e.g., *Warehouse Hub North*, *Digital Marketing Branch*):
-1. Inside **Settings $\rightarrow$ Workspaces $\rightarrow$ "+ Create New Workspace"**:
-   - The admin selects a domain template to seed the sub-workspace.
-   - For example: provision a subsidiary as a **CMS Publishing Hub** while the parent organization remains a **B2B CRM & Billing** workspace.
-2. The UI calls the same provisioning API and creates an isolated tenant environment instantly.
+The system enforces a clean **Tenant $\rightarrow$ Workspace** hierarchy:
+- **Tenant (Organization or Individual representation):** Top-level billing account, PostgreSQL RLS tenant boundary (`tenant_id`), entity types owner, and subscription holder. One Tenant can have multiple Users.
+- **Workspaces (Environments / Spaces / Branches):** Sub-divisions belonging to a parent Tenant (e.g., *Production Workspace*, *Staging Environment*, *Warehouse Hub North*). 1 Workspace $\ne$ 1 Organization; Workspaces are children of a Tenant.
+
+Inside **Settings $\rightarrow$ Workspaces** & the Header **ProfileSwitcher**:
+1. Workspaces are clearly grouped under their parent **Organization (Tenant)**.
+2. In **"+ Tạo Workspace Mới"**:
+   - The admin creates a workspace scoped under the currently active Tenant (or an explicit parent organization).
+   - The admin selects a domain template to seed the initial schema models for that space.
+3. The UI synchronizes both `setActiveTenant(tenantId, tenantName)` and `setActiveWorkspace(workspaceId, workspaceName)` without clobbering organizational boundaries.
 
 ### Touchpoint C: Dynamic Navigation & UI Hydration
 Once a blueprint is provisioned, the frontend requires **zero manual configuration or hardcoding**:

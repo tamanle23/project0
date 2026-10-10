@@ -1,0 +1,168 @@
+import React, { useState } from 'react';
+import { ContentSection } from '../components/content-section';
+import { useProfileStore, type Profile } from '@/stores/profile-store';
+import { useMetadataUiStore } from '@/features/metadata/store/use-metadata-ui-store';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { CreateWorkspaceModal } from './create-workspace-modal';
+import {
+  Building2,
+  Plus,
+  CheckCircle2,
+  ShieldCheck,
+  LayoutGrid,
+  Sparkles,
+} from 'lucide-react';
+import { toast } from 'sonner';
+
+export const WorkspacesPanel: React.FC = () => {
+  const { profiles, currentProfile, setCurrentProfile } = useProfileStore();
+  const { activeTenantId, activeTenantName, setActiveTenant, setActiveWorkspace } = useMetadataUiStore();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+  const handleSwitchWorkspace = (p: Profile) => {
+    setCurrentProfile(p);
+    const tenantId = (p.tenantId as string) || 'default-tenant';
+    const tenantName = (p.tenantName as string) || p.name;
+    const workspaceId = (p.id as string) || p.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+
+    setActiveTenant(tenantId, tenantName);
+    setActiveWorkspace(workspaceId, p.name);
+    toast.success(`Đã chuyển sang workspace "${p.name}" (${tenantName})`);
+  };
+
+  return (
+    <ContentSection
+      title="Workspaces & Organizations"
+      desc="Quản lý danh sách các không gian làm việc (Workspaces) trực thuộc Tổ chức (Tenant). Một tổ chức có thể sở hữu nhiều workspace phân lập."
+    >
+      <div className="space-y-6">
+        {/* Active Tenant Context Card */}
+        <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0">
+              <Building2 className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Tổ chức Hiện tại (Tenant)
+                </span>
+                <Badge variant="outline" className="text-[10px] font-mono border-primary/30 text-primary">
+                  ID: {activeTenantId}
+                </Badge>
+              </div>
+              <h3 className="text-base font-bold text-foreground">
+                {activeTenantName || 'Default Organization'}
+              </h3>
+            </div>
+          </div>
+          <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-xs">
+            Multi-Tenant RLS Active
+          </Badge>
+        </div>
+
+        {/* Top Action Bar */}
+        <div className="flex items-center justify-between">
+          <div className="text-xs text-muted-foreground">
+            Đang quản trị <span className="font-bold text-foreground">{profiles.length}</span> workspaces trên toàn hệ thống
+          </div>
+          <Button
+            size="sm"
+            onClick={() => setIsCreateOpen(true)}
+            className="text-xs gap-1.5 font-semibold bg-primary text-primary-foreground shadow-sm"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>Tạo Workspace Mới</span>
+          </Button>
+        </div>
+
+        {/* Workspaces List */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {profiles.map((p) => {
+            const isCurrent =
+              (p.id && p.id === currentProfile?.id) || p.name === currentProfile?.name;
+            const Logo = p.logo || LayoutGrid;
+            const belongsToActiveTenant = (p.tenantId || 'default-tenant') === activeTenantId;
+
+            return (
+              <div
+                key={(p.id as string) ?? p.name}
+                className={`p-5 rounded-2xl border transition-all flex flex-col justify-between ${
+                  isCurrent
+                    ? 'bg-blue-500/10 border-blue-500/50 shadow-md ring-1 ring-blue-500/30'
+                    : 'bg-white/40 dark:bg-white/5 border-white/20 hover:border-white/40'
+                }`}
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
+                        <Logo className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="font-bold text-sm text-foreground">{p.name}</h4>
+                          {belongsToActiveTenant && (
+                            <span className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">
+                              (Cùng tổ chức)
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[11px] font-mono text-muted-foreground">
+                          Tenant: {(p.tenantName as string) || (p.tenantId as string) || 'Organization'}
+                        </span>
+                      </div>
+                    </div>
+                    {isCurrent ? (
+                      <Badge className="text-[10px] font-mono bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                        Đang chọn
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-[10px] font-mono">
+                        {p.plan || 'Workspace'}
+                      </Badge>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    Không gian phân vùng dữ liệu thuộc tổ chức {(p.tenantName as string) || 'chính'}, áp dụng bảo mật RLS và cấu trúc Blueprint riêng biệt.
+                  </p>
+                </div>
+
+                <div className="mt-5 pt-3 border-t border-white/10 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-mono">
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+                    <span>RLS Enforced</span>
+                  </div>
+
+                  {isCurrent ? (
+                    <span className="text-xs font-semibold text-primary flex items-center gap-1">
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span>Không gian hiện tại</span>
+                    </span>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleSwitchWorkspace(p)}
+                      className="h-8 text-xs font-semibold text-primary hover:bg-primary/10"
+                    >
+                      <span>Chuyển sang workspace này →</span>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Create Workspace Modal */}
+        <CreateWorkspaceModal
+          isOpen={isCreateOpen}
+          onClose={() => setIsCreateOpen(false)}
+        />
+      </div>
+    </ContentSection>
+  );
+};

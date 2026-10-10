@@ -49,7 +49,9 @@ src/routes/
 
 | Route Path | File Location | Auth Required | Layout Shell | Primary User Action / Feature |
 | :--- | :--- | :--- | :--- | :--- |
-| `/` | `_authenticated/index.tsx` | Yes | Authenticated Shell | System health telemetry, quick stats, operational overview |
+| `/` | `src/routes/index.tsx` | No (Public) | Standalone Glass | Commercial Landing Page, Value Showcase, Bento Grid, Pricing Tiers & Onboarding Funnel (Authenticated users auto-redirect to `/metadata`) |
+| `/dashboard` | `_authenticated/index.tsx` | Yes | Authenticated Shell | System health telemetry, quick stats, operational overview |
+
 | `/tasks` | `_authenticated/tasks/index.tsx` | Yes | Authenticated Shell | Manage backlog tasks, filter priority, update status |
 | `/apps` | `_authenticated/apps/index.tsx` | Yes | Authenticated Shell | Browse connected services, toggle integrations |
 | `/chats` | `_authenticated/chats/index.tsx` | Yes | Authenticated Shell | Direct and channel messaging with team members |
@@ -58,9 +60,11 @@ src/routes/
 | `/metadata` | `_authenticated/metadata/index.tsx` | Yes (Admin) | Authenticated Shell | Enterprise schema builder, dynamic attribute configurator, data records explorer |
 | `/settings` | `_authenticated/settings/index.tsx` | Yes | Settings Layout | Manage account name, email, avatar, bio |
 | `/settings/appearance` | `_authenticated/settings/appearance.tsx`| Yes | Settings Layout | Switch theme (light/dark/system), adjust glass intensity |
-| `/settings/notifications`| `_authenticated/settings/notifications.tsx`| Yes | Settings Layout | Configure email, push, and webhook alerts |
 | `/settings/data-privacy` | `_authenticated/settings/data-privacy.tsx` | Yes | Settings Layout | GDPR Art. 20 streaming export & Art. 17 hard-purge |
+| `/settings/workspaces`   | `_authenticated/settings/workspaces.tsx`   | Yes | Settings Layout | Manage multi-workspace environments & create new workspace with blueprint seeding |
+| `/settings/billing`      | `_authenticated/settings/billing.tsx`      | Yes | Settings Layout | Manage tenant subscription tiers, VietQR payments, VAT invoice, and quota telemetry |
 | `/help-center` | `_authenticated/help-center/index.tsx` | Yes | Authenticated Shell | Browse docs, search FAQs, submit support tickets |
+
 | `/sign-in` | `(auth)/sign-in.tsx` | No | Fullscreen Canvas | Authenticate with credentials or OAuth |
 | `/sign-in-2` | `(auth)/sign-in-2.tsx` | No | Split Screen Canvas | Two-column branded sign-in |
 | `/sign-up` | `(auth)/sign-up.tsx` | No | Fullscreen Canvas | Register new user account |
@@ -109,8 +113,11 @@ src/routes/
 - **Route:** `src/routes/_authenticated/settings/route.tsx`
 - **Sub-routes:**
   - `/settings`: Profile details, bio, avatar upload.
+  - `/settings/workspaces`: Multi-workspace environment manager & blueprint provisioning modal.
+  - `/settings/billing`: Tenant subscription tiers (`Basic (individual)`, `Pro (individual)`, `Pro Max (individual)`, `Enterprise (organization)`), real-time quota telemetry meters, payOS VietQR transaction history, Vietnamese VAT e-invoice preferences, and dev sandbox simulation dock.
   - `/settings/appearance`: Theme switcher (Light, Dark, System) and **Liquid Glass Intensity Slider** (`0.0` - `1.0`).
   - `/settings/notifications`: Toggle switches for email digests, incident webhooks, real-time sounds.
+  - `/settings/data-privacy`: GDPR Art. 20 streaming export & Art. 17 hard-purge.
 
 ### 3.8 Metadata Management (`/metadata`)
 - **Route:** `src/routes/_authenticated/metadata/index.tsx`
