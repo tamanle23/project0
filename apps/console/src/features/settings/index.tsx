@@ -58,7 +58,7 @@ export function Settings() {
         </div>
         <Separator className='my-4 lg:my-6' />
         <div className='liquid-glass-card rounded-2xl p-4 sm:p-6 flex flex-1 flex-col space-y-4 max-lg:overflow-visible lg:overflow-hidden md:space-y-4 lg:flex-row lg:space-y-0 lg:space-x-10 shadow-lg'>
-          <aside className='top-0 lg:sticky lg:w-1/5'>
+          <aside aria-label="Settings Menu" className='top-0 lg:sticky lg:w-1/5'>
             <SidebarNav items={sidebarNavItems} />
           </aside>
           <div className='flex w-full max-lg:overflow-visible lg:overflow-y-hidden p-1'>

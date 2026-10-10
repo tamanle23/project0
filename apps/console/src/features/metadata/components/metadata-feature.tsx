@@ -108,9 +108,9 @@ export const MetadataFeature: React.FC = () => {
         {/* Page Title & Intro + Dual-Mode Switcher */}
         <div className="flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">
+            <h1 className="text-2xl font-bold tracking-tight">
               {t('metadata.title', 'Metadata Management')}
-            </h2>
+            </h1>
             <p className="text-muted-foreground text-xs md:text-sm">
               {t(
                 'metadata.description',

@@ -52,9 +52,9 @@ export const SchemaBuilder: React.FC<Props> = ({ entityTypeId }) => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <h3 className="text-xl font-bold tracking-tight text-foreground">
+            <h2 className="text-xl font-bold tracking-tight text-foreground">
               {entityType ? entityType.name : 'Entity'} Schema
-            </h3>
+            </h2>
             <Badge 
               variant={attributes.length >= 100 ? "destructive" : "secondary"} 
               className="px-2 py-0.5 text-xs font-semibold"
@@ -109,7 +109,7 @@ export const SchemaBuilder: React.FC<Props> = ({ entityTypeId }) => {
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary mb-3">
               <Layers className="h-6 w-6" />
             </div>
-            <h4 className="font-semibold text-foreground mb-1">No Fields Defined</h4>
+            <h3 className="font-semibold text-foreground mb-1">No Fields Defined</h3>
             <p className="text-xs text-muted-foreground max-w-sm mb-4">
               This entity type currently has no schema properties. Add attributes to start capturing structured data.
             </p>

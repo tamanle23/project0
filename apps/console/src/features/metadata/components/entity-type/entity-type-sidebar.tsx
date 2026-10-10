@@ -85,12 +85,12 @@ export const EntityTypeSidebar: React.FC = () => {
   }, [selectedEntityTypeId, entityTypes, setSelectedEntityTypeId]);
 
   return (
-    <aside className="w-full lg:w-76 shrink-0 flex flex-col gap-3 p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 min-h-0 overflow-hidden">
+    <aside aria-label="Entity Models Rail" className="w-full lg:w-76 shrink-0 flex flex-col gap-3 p-4 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 min-h-0 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2 min-w-0">
           <Database className="h-5 w-5 text-primary shrink-0" />
-          <h3 className="font-bold text-foreground text-sm tracking-tight truncate">Entity Models</h3>
+          <h2 className="font-bold text-foreground text-sm tracking-tight truncate">Entity Models</h2>
           <Badge 
             variant={totalElements >= 50 ? "destructive" : "secondary"} 
             className="text-[10px] h-5 px-1.5 font-mono shrink-0"

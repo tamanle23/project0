@@ -32,6 +32,7 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
 
   return (
     <header
+      role="banner"
       className={cn(
         'z-50 h-16 transition-colors duration-200',
         fixed && 'header-fixed peer/header sticky top-0 w-[inherit]',
