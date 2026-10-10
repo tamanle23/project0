@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { springApiClient } from '@/features/spring-auth/api-client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMetadataUiStore } from '../store/use-metadata-ui-store';
 
@@ -79,7 +79,7 @@ export function useTenantBilling() {
   return useQuery<TenantBillingSummary>({
     queryKey: ['billing-summary', activeTenantId],
     queryFn: async () => {
-      const res = await axios.get('/api/v1/billing/summary');
+      const res = await springApiClient.get('/v1/billing/summary');
       return res.data?.data || res.data;
     },
     staleTime: 1000 * 60 * 5, // 5 mins
@@ -95,7 +95,7 @@ export function useCreatePaymentLink() {
 
   return useMutation<CheckoutResponse, Error, CreatePaymentLinkPayload>({
     mutationFn: async (payload) => {
-      const res = await axios.post('/api/v1/billing/checkout', payload);
+      const res = await springApiClient.post('/v1/billing/checkout', payload);
       return res.data?.data || res.data;
     },
     onSuccess: () => {
@@ -113,7 +113,7 @@ export function useUpdateVatInvoice() {
 
   return useMutation<VatInvoiceInfo, Error, VatInvoiceInfo>({
     mutationFn: async (payload) => {
-      const res = await axios.put('/api/v1/billing/vat-invoice', payload);
+      const res = await springApiClient.put('/v1/billing/vat-invoice', payload);
       return res.data?.data || res.data;
     },
     onSuccess: () => {
@@ -128,7 +128,7 @@ export function useUpdateVatInvoice() {
 export function useContactEnterpriseSales() {
   return useMutation<string, Error, ContactSalesPayload>({
     mutationFn: async (payload) => {
-      const res = await axios.post('/api/v1/billing/contact-sales', payload);
+      const res = await springApiClient.post('/v1/billing/contact-sales', payload);
       return res.data?.data || res.data;
     },
   });
@@ -143,7 +143,7 @@ export function useSimulatePaymentWebhook() {
 
   return useMutation<boolean, Error, { orderCode: number; amount: number; planTier: string }>({
     mutationFn: async ({ orderCode, amount, planTier }) => {
-      const res = await axios.post('/api/v1/billing/payos/webhook', {
+      const res = await springApiClient.post('/v1/billing/payos/webhook', {
         code: '00',
         desc: 'Success',
         signature: 'mock_signature_ok',
@@ -161,3 +161,4 @@ export function useSimulatePaymentWebhook() {
     },
   });
 }
+

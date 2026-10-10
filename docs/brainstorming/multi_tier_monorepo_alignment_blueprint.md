@@ -399,9 +399,9 @@ packages/
 
 ---
 
-## 10. Granular Deep-Dive Implementation Roadmap (14 Phases)
+## 10. Granular Deep-Dive Implementation Roadmap (15 Phases)
 
-To eliminate big-bang delivery risks, cognitive overload, and inter-team blocking, the architecture is partitioned into **14 discrete, testable, and incrementally shippable phases**:
+To eliminate big-bang delivery risks, cognitive overload, and inter-team blocking, the architecture is partitioned into **15 discrete, testable, and incrementally shippable phases**:
 
 ```mermaid
 graph TD
@@ -421,6 +421,7 @@ graph TD
     P11 --> P12["Phase 12: Declarative FSM State Machine & Action Bars"]
     P12 --> P13["Phase 13: Cross-Platform Liquid Glass Tokens (@unipost/tokens)"]
     P13 --> P14["Phase 14: End-to-End Observability & SRE Production Verification"]
+    P14 --> P15["Phase 15: Full-Spectrum Multi-Tier Testing Matrix & Automation Framework"]
 ```
 
 ---
@@ -653,6 +654,220 @@ graph TD
 - **Verification Gates:**
   - Single synthetic transaction traced end-to-end in OpenTelemetry Jaeger/Grafana.
   - Build, lint, and test pipelines pass with zero warnings across all monorepo targets.
+
+---
+
+### Phase 15: Full-Spectrum Multi-Tier Testing Matrix & Automation Framework
+- **Objective:** Establish an exhaustive, multi-tiered enterprise testing framework guaranteeing zero regressions, multi-tenant isolation, contract compatibility, and automated cross-client E2E verification across `@unipost/backend`, `@unipost/console`, `mobile-ui`, and `tekgo-ui`.
+- **Target Scope:** Monorepo-wide (`apps/*`, `packages/*`, and CI/CD pipelines).
+
+#### 1. Multi-Tier Testing Pyramid Architecture
+
+```mermaid
+flowchart TD
+    subgraph L5["L5: Non-Functional & SRE Chaos (5%)"]
+        SecurityFuzz["Multi-Tenant RLS Leak Fuzzing"]
+        Chaos["Toxiproxy Network / DB Partitions"]
+        Perf["k6 / Gatling Load & Stress Tests"]
+        A11y["@axe-core/playwright WCAG 2.2 AA"]
+    end
+
+    subgraph L4["L4: Cross-Tier End-to-End Automation (15%)"]
+        PlaywrightWeb["Playwright E2E: Console & Tekgo"]
+        MaestroNative["Maestro Native E2E: mobile-ui"]
+        GoldenFlows["Cross-Client Closed-Loop Workflows"]
+    end
+
+    subgraph L3["L3: Contract & Schema Drift Tests (15%)"]
+        Pact["Pact / OpenAPI Spec Compatibility"]
+        SchemaDrift["JSON Schema Draft-07 Drift Tests"]
+        TypeSync["tsc --noEmit Monorepo Integrity"]
+    end
+
+    subgraph L2["L2: Slicing & Boundary Integration (25%)"]
+        ModulithTest["Spring Modulith @ApplicationModuleTest"]
+        Testcontainers["Testcontainers PostgreSQL with RLS"]
+        SandboxFlows["@unipost/sandbox Full Flow Tests"]
+        OutboxSyncTest["Offline Outbox Reconnect Sync Tests"]
+    end
+
+    subgraph L1["L1: Fast Unit & Component Isolation (40%)"]
+        BackendUnit["JUnit 5 + Mockito + AssertJ"]
+        WebUnit["Vitest + React Testing Library"]
+        MobileUnit["Jest + React Native Testing Library"]
+        TokenMath["Liquid Glass Contrast & Blur Math Tests"]
+    end
+
+    L1 --> L2
+    L2 --> L3
+    L3 --> L4
+    L4 --> L5
+```
+
+---
+
+#### 2. Backend Testing Architecture (`@unipost/backend`)
+
+The Spring Modulith backend enforces four distinct testing slices:
+
+1. **Pure Unit Tests (JUnit 5 + Mockito + AssertJ)**:
+   - Target: `unipost-core`, `unipost-fw`.
+   - Execution Time: `< 20ms` per test, zero I/O, zero Spring Context.
+   - Test Cases:
+     - 3-Way Auto-Merge JSON algorithm: verifies non-overlapping field merge vs overlapping conflict detection.
+     - XFetch probabilistic early expiration math: verifies recalculation window across random seeds.
+     - Google CEL transition guard evaluator: asserts syntax validation, role checking, and rule evaluations.
+     - Token bucket rate limiter: asserts burst replenishment and token consumption math.
+2. **Spring Modulith Architectural & Scenario Tests (`@ApplicationModuleTest`)**:
+   - Target: `unipost-fw`, `unipost-ms-identity`, `unipost-ms-worker`.
+   - Verifies module encapsulation: fails compilation if internal packages of `unipost-ms-identity` are accessed directly by `unipost-fw` without public interfaces.
+   - Scenario Tests: `Scenario.create(...)` verifies asynchronous domain event emissions (`RecordStateChangedEvent`, `TenantProvisionedEvent`).
+3. **Database Integration & RLS Slicing (Testcontainers PostgreSQL 16)**:
+   - Target: `unipost-db`, `unipost-fw`.
+   - Runs against an ephemeral, real PostgreSQL container with Row-Level Security policies active.
+   - Test Cases:
+     - Multi-Tenant Isolation: Executes `SET LOCAL app.current_tenant_id = 'tenant_A'`. Asserts that `SELECT * FROM UNIPOST_ENTITY_RECORDS` returns **zero rows** belonging to `tenant_B`.
+     - Optimistic Concurrency Control (OCC): Launches 20 concurrent threads attempting to update the same record. Asserts that disjoint updates successfully auto-merge while conflicting updates throw `OptimisticLockingException` returning HTTP 409.
+     - Partial Unique Indexes: Asserts that duplicate system names are rejected when `deleted_date IS NULL`, but allowed when previously soft-deleted.
+4. **Cache Coherence & Distributed Mutex Tests**:
+   - Target: Hazelcast / Redis cluster slice.
+   - Cache Stampede Simulation: 50 concurrent virtual threads requesting an uncached entity schema simultaneously. Asserts Hazelcast `FencedLock` ensures exactly **1 database compilation query** occurs; all 49 other threads receive the warmed result from cache.
+
+---
+
+#### 3. Frontend Testing Architecture across Clients
+
+```
+apps/
+├── console/ (Web & Desktop)
+│   ├── Unit / Hook: Vitest + @testing-library/react (useTenantBilling, useBlueprints, etc.)
+│   ├── Component: Radix & Liquid Glass UI states, accessibility roles, aria landmarks
+│   ├── Integration: Unified Sandbox mock engine flow tests
+│   └── E2E: Playwright (Chromium, Firefox, WebKit, Electrobun Desktop)
+├── mobile-ui/ (Mobile Operator Companion)
+│   ├── Unit: Jest + @testing-library/react-native (useOutboxStore, DynamicFieldRenderer)
+│   ├── Integration: FetchSandboxAdapter simulation (offline outbox -> sync reconnect)
+│   └── Native E2E: Maestro UI automation (navigation, image picker, pull-to-refresh)
+└── tekgo-ui/ (Specialized Public Blog Website)
+    ├── Unit: Vitest (Next.js App Router helpers, metadata tags, reading time)
+    ├── Integration: Route Handler tests (/api/revalidate signature & replay window)
+    └── E2E: Playwright (SSR/ISR page rendering, SEO OpenGraph, newsletter modal)
+```
+
+1. **`@unipost/console` (React 19 / Vite 8)**:
+   - **Unit & Hook Tests**: Test custom hooks (`useTenantBilling`, `useBlueprints`) with mock query clients; verify RFC 6902 inverse patch calculations.
+   - **Sandbox Integration Tests**: Simulate full user journeys using `@unipost/sandbox`:
+     - *Blueprint Provisioning*: Select Headless CMS $\to$ preview DAG $\to$ click provision $\to$ assert query cache invalidated and sidebar models populated.
+     - *VietQR payOS Checkout*: Click Upgrade to Pro $\to$ modal displays QR $\to$ mock payOS webhook arrives $\to$ UI transitions to "Active Pro" immediately without page reload.
+     - *GDPR Hard-Purge*: Trigger 5-stage purge $\to$ progress bar increments $\to$ cryptographic Certificate of Erasure generated.
+   - **E2E Tests (Playwright)**: Test full responsive viewport scaling (Mobile, Tablet, Bento Grid Desktop) and screen reader landmarks (`role="banner"`, `role="main"`, SkipToMain).
+2. **`mobile-ui` (Expo React Native)**:
+   - **Unit & Store Tests**: Test `useOutboxStore` with mocked SQLCipher storage; verify that offline actions generate valid RFC 6902 patch deltas with unique idempotency keys.
+   - **Dynamic Form Renderer Tests**: Feed arbitrary `CompiledSchema` objects into `<DynamicFieldRenderer />`; assert correct native controls render (`TextInput`, `Switch`, `DatePicker`, `MediaPickerInput`).
+   - **Native E2E Automation (Maestro)**:
+     - Script: Launch app $\to$ switch workspace via bottom sheet $\to$ compose new article with photo $\to$ tap "Submit for Review" $\to$ assert record appears in operator timeline.
+     - Network Partition Script: Toggle network OFF $\to$ create draft $\to$ assert "Saved Offline" glass pill appears $\to$ toggle network ON $\to$ assert automatic background sync flushes without user intervention.
+3. **`tekgo-ui` (Next.js 15 App Router)**:
+   - **Route Handler Tests**:
+     - Deliver invalid HMAC signature $\to$ assert HTTP 401.
+     - Deliver timestamp older than 300s $\to$ assert HTTP 401 Replay Expired.
+     - Deliver valid webhook $\to$ assert Next.js `revalidatePath` and `revalidateTag` invoked.
+   - **E2E Reader Tests (Playwright)**:
+     - Assert static generation of `/blog`, `/blog/[slug]`, and `/tags/[tag]`.
+     - Validate SEO metadata, structured JSON-LD data, and OpenGraph images.
+     - Verify newsletter subscription submission via `/api/newsletter`.
+
+---
+
+#### 4. The 4 Golden Cross-Tier E2E Workflows
+
+To validate true enterprise platform cohesion, four end-to-end automated integration tests span the entire stack:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor E2E as Automated E2E Runner (Playwright + Maestro)
+    participant Console as @unipost/console
+    participant Mobile as mobile-ui
+    participant Backend as @unipost/backend
+    participant Outbox as UNIPOST_EVENT_OUTBOX
+    participant Worker as unipost-ms-worker
+    participant Tekgo as tekgo-ui (Blog)
+
+    Note over E2E, Tekgo: Golden Flow 1: Closed-Loop Publishing Pipeline
+    E2E->>Console: 1. Provision "Headless CMS" Blueprint
+    Console->>Backend: POST /v1/metadata/tenants/provision
+    Backend-->>Console: 200 OK (article schema created)
+    
+    E2E->>Mobile: 2. Create article "Enterprise Architecture" + attach photo
+    Mobile->>Backend: POST /v1/metadata/records (DRAFT)
+    E2E->>Mobile: 3. Tap "Publish Now" Action Button
+    Mobile->>Backend: POST /v1/metadata/records/{id}/transitions/PUBLISH
+    Backend->>Outbox: Commit state PUBLISHED + Outbox Event in 1 ACID Tx
+    Backend-->>Mobile: 200 OK
+    
+    Worker->>Outbox: Polls Outbox via SELECT ... FOR UPDATE SKIP LOCKED
+    Worker->>Tekgo: POST /api/revalidate (HMAC signature + slug)
+    Tekgo->>Tekgo: Next.js revalidates edge cache
+    
+    E2E->>Tekgo: 4. Navigate to /blog/enterprise-architecture
+    Tekgo-->>E2E: 200 OK (Article HTML renders with full Liquid Glass styling)
+```
+
+1. **Golden Flow 1: Closed-Loop Headless CMS Publishing Pipeline**:
+   - Console provisions blueprint $\to$ Mobile operator composes and publishes $\to$ Backend ACID transaction writes record and Transactional Outbox $\to$ Outbox worker delivers HMAC webhook $\to$ Tekgo edge invalidates $\to$ Playwright confirms reader sees live post within 1 second.
+2. **Golden Flow 2: Multi-Tenant Zero-Trust Penetration Fuzzing**:
+   - Automated security scanner iterates across all 40+ REST endpoints. Using a JWT signed for `tenant_alpha`, attempts to read, insert, update, or purge records belonging to `tenant_beta` (passing tampered headers, path parameters, and query parameters).
+   - Assertion: **100% of unauthorized attempts must be rejected with HTTP 403 or HTTP 404**; PostgreSQL RLS must record **0 tenant boundary leaks**.
+3. **Golden Flow 3: FinOps payOS VietQR Checkout & Dynamic Feature Gating**:
+   - Console clicks "Upgrade to Pro" $\to$ Backend generates payOS checkout link $\to$ Test runner injects payOS HMAC webhook callback $\to$ Backend updates `UNIPOST_TENANT_FEATURES` $\to$ Both Console and Mobile unlock `<FeatureGate feature="ANALYTICS_EXPORT" />` dynamically without session termination.
+4. **Golden Flow 4: High-Concurrency 3-Way Auto-Merge**:
+   - Concurrently launches 2 automated workers modifying the same record: Worker 1 (Web) updates `attributes.title`; Worker 2 (Mobile) updates `attributes.tags`.
+   - Both submit with `version: 1`.
+   - Backend detects disjoint changes, auto-merges into unified state, and commits `version: 2`. Both clients receive HTTP 200 with merged attributes and zero data loss.
+
+---
+
+#### 5. Non-Functional, Chaos & Accessibility Testing
+
+1. **Chaos Engineering & Resilience Tests (Toxiproxy)**:
+   - **PostgreSQL Latency Spike**: Inject 2000ms latency into the database proxy. Assert statement timeout (`3000ms`) and connection semaphores trigger clean HTTP 429/503 responses without thread pool exhaustion.
+   - **Network Partition during Outbox Dispatch**: Sever network connection between `unipost-ms-worker` and `tekgo-ui` during webhook delivery. Assert event remains in `UNIPOST_EVENT_OUTBOX`; when network heals, worker delivers with exponential backoff and zero event drops.
+2. **Pathological ReDoS Fuzzing**:
+   - Fuzz tester generates evil regular expressions (e.g. `(a+)+$`, `(a|aa)+$`) and submits them via `CreateAttributeDefinitionDto`.
+   - Assert server's `InterruptibleCharSequence` terminates evaluation at **50ms**, returning HTTP 422 with `ProblemDetail` indicating regex evaluation timeout.
+3. **Automated Accessibility & Contrast Auditing (WCAG 2.2 AA)**:
+   - Playwright test runs `@axe-core/playwright` across every route in `@unipost/console` and `tekgo-ui`.
+   - Assert:
+     - Zero contrast violations ($\ge 4.5:1$ for normal text, $\ge 3:1$ for large text).
+     - Strict heading hierarchy ($h1 \to h2 \to h3$).
+     - Minimum target touch size $\ge 24 \times 24\text{px}$ (WCAG SC 2.5.8).
+     - Screen reader landmarks (`role="banner"`, `role="main"`, SkipToMain bypass block).
+
+---
+
+#### 6. Continuous Integration (CI) Pipeline Architecture
+
+The monorepo uses Turborepo pipelines with aggressive caching and test sharding:
+
+```mermaid
+flowchart LR
+    Commit["git push / PR"] --> FastCheck["Tier 1: Pre-Commit & Fast Checks ( < 2m )<br/>• Linting & Biome/ESLint<br/>• TypeScript Typecheck (tsc -b)<br/>• Unit Tests (Vitest & JUnit 5)"]
+    
+    FastCheck --> SliceTest["Tier 2: Boundary & Integration ( < 5m )<br/>• Spring Modulith Tests<br/>• Testcontainers Postgres RLS<br/>• Unified Sandbox Mock Flows"]
+    
+    SliceTest --> E2ETest["Tier 3: Full E2E & Golden Flows ( < 10m )<br/>• Playwright Web & Tekgo E2E<br/>• Maestro Mobile E2E<br/>• 4 Golden Cross-Tier Workflows"]
+    
+    E2ETest --> SRETest["Tier 4: Nightly SRE & Chaos (Scheduled)<br/>• Toxiproxy Network Partitions<br/>• Multi-Tenant Penetration Fuzzing<br/>• k6 Distributed Load Test"]
+```
+
+- **Pre-requisites:** Phases 1 through 14 complete.
+- **Verification Gates:**
+  - `pnpm turbo run test` passes across all workspace packages with zero failures.
+  - `mvnw test -Dtest="*Test"` passes across all Spring backend modules.
+  - E2E Playwright test suite passes with 100% assertions green on Chromium, Firefox, and WebKit.
+  - Automated WCAG 2.2 AA audit passes with 0 violations.
+- **Rollback Strategy:** Isolated feature flags and semantic release branching.
 
 ---
 
