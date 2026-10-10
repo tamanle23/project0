@@ -6,12 +6,14 @@ type MainProps = React.HTMLAttributes<HTMLElement> & {
   ref?: React.Ref<HTMLElement>
 }
 
-export function Main({ fixed, className, fluid, ...props }: MainProps) {
+export function Main({ fixed, className, fluid, id = 'content', ...props }: MainProps) {
   return (
     <main
+      id={id}
+      tabIndex={-1}
       data-layout={fixed ? 'fixed' : 'auto'}
       className={cn(
-        'px-4 py-6',
+        'outline-none px-4 py-6',
 
         // If layout is fixed, make the main container flex and grow; pinned on desktop, scrollable on mobile
         fixed && 'flex grow flex-col max-lg:min-h-0 max-lg:overflow-y-auto lg:overflow-hidden',

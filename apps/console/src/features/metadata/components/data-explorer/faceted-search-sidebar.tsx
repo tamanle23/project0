@@ -383,6 +383,7 @@ export const FacetedSearchSidebar: React.FC<FacetedSearchSidebarProps> = ({
 
   return (
     <aside
+      aria-label="Faceted Search Filters"
       className={`w-full lg:w-64 xl:w-72 shrink-0 rounded-2xl bg-white/45 dark:bg-slate-900/45 backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/25 flex flex-col min-h-0 overflow-hidden transition-all ${className}`}
     >
       {/* Header */}
